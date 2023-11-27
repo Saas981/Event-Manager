@@ -68,3 +68,6 @@ This section has moved here: [https://facebook.github.io/create-react-app/docs/d
 ### `npm run build` fails to minify
 
 This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+
+### About Me
+Greetings, fellow Earthlings! 🚀 My name is Zara Stardust, and I'm on a cosmic journey through the realms of imagination and creativity. As an intergalactic explorer, I've touched down on this digital space to share my adventures and connect with like-minded beings.
