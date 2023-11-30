@@ -1,7 +1,7 @@
 // home.js
 
 import React, { useState } from 'react';
-import './Home.css'; // Import the CSS file for styling
+import '../Styles/Home.css'; // Import the CSS file for styling
 
 const Home = () => {
   const [schedule, setSchedule] = useState([]);
