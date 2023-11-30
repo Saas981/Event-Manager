@@ -26,7 +26,7 @@ function About({ title, description, author, date }) {
         </div>
       )}
       <p>
-        Go back to <Link to="/">Home</Link>.
+        Go back to <Link to="/home">Home</Link>.
       </p>
     </section>
   );
