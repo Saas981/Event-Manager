@@ -1,0 +1,24 @@
+/* Navbar.css */
+.navbar {
+    background-color: #6c63ff; /* Purple background color */
+    padding: 10px;
+  }
+  
+  .navbar ul {
+    list-style: none;
+    display: flex;
+    justify-content: space-around;
+  }
+  
+  .navbar a {
+    text-decoration: none;
+    color: #fff;
+    padding: 10px;
+    border-radius: 4px;
+    transition: background-color 0.3s;
+  }
+  
+  .navbar a:hover {
+    background-color: #564dff; /* Darker purple on hover */
+  }
+  

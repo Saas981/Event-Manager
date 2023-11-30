@@ -1,32 +1,19 @@
 // App.js
 import React from 'react';
-import { BrowserRouter as Router, Routes, Route, Link } from 'react-router-dom';
-
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import Navbar from './Components/Navbar';
 import Home from './Components/Home';
 import About from './Components/About';
 import Contact from './Components/Contact';
 import Login from './Components/Login';
+import SignUp from './Components/Signup';
+import './App.css';
+
 function App() {
   return (
     <Router>
       <div>
-        <nav>
-          <ul>
-            <li>
-              <Link to="/home">Home</Link>
-            </li>
-            <li>
-              <Link to="/about">About</Link>
-            </li>
-            <li>
-              <Link to="/contact">Contact</Link>
-            </li>
-            <li>
-            <Link to="/login">Login</Link>
-            </li>
-          </ul>
-        </nav>
-
+        <Navbar /> {/* Use the Navbar component here */}
         <hr />
 
         <Routes>
@@ -34,6 +21,7 @@ function App() {
           <Route path="/about" element={<About />} />
           <Route path="/contact" element={<Contact />} />
           <Route path="/login" element={<Login />} />
+          <Route path="/SignUp" element={<SignUp />} />
         </Routes>
       </div>
     </Router>
