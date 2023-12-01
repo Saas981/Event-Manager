@@ -10,6 +10,11 @@
       "StackName": "amplify-eventmanager-staging-172907",
       "StackId": "arn:aws:cloudformation:us-east-1:677957308068:stack/amplify-eventmanager-staging-172907/7861b670-8d4a-11ee-87ef-0aad9ebccbcd",
       "AmplifyAppId": "d3k7qca3rly2nj"
+    },
+    "categories": {
+      "auth": {
+        "EventManager": {}
+      }
     }
   }
 }

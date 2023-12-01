@@ -1,30 +1,59 @@
-/* Navbar.css */
 .navbar {
-  background-color: #6c63ff; /* Purple background color */
-  padding: 10px;
+  background: linear-gradient(45deg, #6c63ff, #8245ff);
+  padding: 15px;
   width: 100%;
-  position: fixed; /* Fixed position */
-  top: 0; /* Stick to the top of the screen */
+  position: fixed;
+  top: 0;
   left: 0;
-  z-index: 1000; /* Ensure it's above other elements */
+  z-index: 1000;
+  backdrop-filter: blur(8px);
 }
 
-.navbar ul {
-  list-style: none;
+.navbar-container {
   display: flex;
-  justify-content: space-around;
-  margin: 0; /* Remove default margin */
-  padding: 0; /* Remove default padding */
+  justify-content: space-between;
+  align-items: center;
 }
 
-.navbar a {
+.logo {
   text-decoration: none;
   color: #fff;
-  padding: 10px;
-  border-radius: 4px;
-  transition: background-color 0.3s;
+  font-size: 1.5rem;
+  font-weight: bold;
 }
 
-.navbar a:hover {
-  background-color: #564dff; /* Darker purple on hover */
+.nav-links {
+  display: flex;
+}
+
+.nav-links a {
+  text-decoration: none;
+  color: #fff;
+  padding: 12px 20px;
+  border-radius: 8px;
+  transition: background-color 0.3s, color 0.3s;
+  margin: 0 10px; /* Adjusted spacing */
+}
+
+.nav-links a:hover {
+  background-color: #5248ff;
+  color: #f0f0f0;
+}
+
+.auth-icons {
+  margin-right: 30px;
+  display: flex;
+  align-items: center;
+}
+
+.auth-icons a {
+  margin-left: 40px;
+  font-size: 18px;
+  color: #fff;
+  text-decoration: none;
+  transition: color 0.3s;
+}
+
+.auth-icons a:hover {
+  color: #f0f0f0;
 }
