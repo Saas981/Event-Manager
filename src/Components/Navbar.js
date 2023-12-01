@@ -1,30 +1,27 @@
-// Navbar.js
 import React from 'react';
 import { Link } from 'react-router-dom';
+import { User, LogIn, Plus, Info, UserPlus, } from 'react-feather'; // Import Feather icons
 import '../Styles/Navbar.css';
 
-function Navbar() {
+const Navbar = () => {
   return (
     <nav className="navbar">
-      <ul>
-        <li>
+      <div className="navbar-container">
+        <Link to="/" className="logo">YourLogo</Link>
+
+        <div className="nav-links">
           <Link to="/home">Home</Link>
-        </li>
-        <li>
           <Link to="/about">About</Link>
-        </li>
-        <li>
           <Link to="/contact">Contact</Link>
-        </li>
-        <li>
-          <Link to="/login">Login</Link>
-        </li>
-        <li>
-          <Link to="/SignUp">SignUp</Link>
-        </li>
-      </ul>
+        </div>
+
+        <div className="auth-icons">
+          <Link to="/login">    <User /></Link>
+          <Link to="/signup"><UserPlus /></Link>
+        </div>
+      </div>
     </nav>
   );
-}
+};
 
 export default Navbar;
