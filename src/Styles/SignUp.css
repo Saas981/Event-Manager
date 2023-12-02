@@ -5,12 +5,12 @@ body {
     display: flex;
     justify-content: center;
     align-items: center;
-    height: 100vh;
+    height: 140vh;
     background: linear-gradient(to bottom, #ff6e7f, #bfe9ff); /* Sunset gradient background */
   }
   
   .signup-container {
-    background-color: #fff;
+    background-color: #ffffff;
     padding: 40px;
     border-radius: 8px;
     box-shadow: 0 0 20px rgba(0, 0, 0, 0.2);
@@ -20,7 +20,7 @@ body {
   }
   
   .signup-form {
-    margin-bottom: 20px;
+    margin-bottom: 4px;
   }
   
   h2 {
