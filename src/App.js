@@ -8,8 +8,13 @@ import Contact from './Components/Contact';
 import Login from './Components/Login';
 import SignUp from './Components/Signup';
 import './App.css';
+import '@aws-amplify/ui-react/styles.css';
+import config from './aws-exports';
+import { Amplify } from 'aws-amplify';
+Amplify.configure(config);
 
-function App() {
+function App({ signOut, user }) {
+
   return (
     <Router>
       <div>
