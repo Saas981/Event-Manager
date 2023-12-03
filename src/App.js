@@ -7,27 +7,32 @@ import About from './Components/About';
 import Contact from './Components/Contact';
 import Login from './Components/Login';
 import SignUp from './Components/Signup';
-import './App.css';
-import '@aws-amplify/ui-react/styles.css';
-import config from './aws-exports';
-import { Amplify } from 'aws-amplify';
-Amplify.configure(config);
+import { Container, Grid } from '@mui/material';
+import './App.css'; // Import your global styles if any
 
 function App({ signOut, user }) {
-
   return (
-    <Router>
-      <div>
-        <Navbar /> {/* Use the Navbar component here */}
-        <hr />
-
-        <Routes>
-          <Route path="/home" element={<Home />} />
-          <Route path="/about" element={<About />} />
-          <Route path="/contact" element={<Contact />} />
-          <Route path="/login" element={<Login />} />
-          <Route path="/SignUp" element={<SignUp />} />
-        </Routes>
+    <Router >
+      <div >
+        <Navbar />
+        <br></br>
+          <Grid
+            container
+            direction="column"
+            justifyContent="center"
+            alignItems="center"
+            style={{ paddingTop: '20px' }}
+            
+          >
+            <Routes>
+              <Route path="/home" element={<Home />} />
+              <Route path="/about" element={<About />} />
+              <Route path="/contact" element={<Contact />} />
+              <Route path="/login" element={<Login />} />
+              <Route path="/signup" element={<SignUp />} />
+            </Routes>
+          </Grid>
+      
       </div>
     </Router>
   );
