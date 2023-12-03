@@ -1,4 +1,3 @@
-// App.js
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import Navbar from './Components/Navbar';
@@ -8,7 +7,15 @@ import Contact from './Components/Contact';
 import Login from './Components/Login';
 import SignUp from './Components/Signup';
 import { Container, Grid } from '@mui/material';
-import './App.css'; // Import your global styles if any
+import './App.css'; 
+
+
+import config from './aws-exports';
+import { Amplify } from 'aws-amplify';
+Amplify.configure(config);
+
+// App.js
+
 
 function App({ signOut, user }) {
   return (
