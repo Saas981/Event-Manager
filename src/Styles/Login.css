@@ -6,9 +6,18 @@ body {
  /* Login.css */
 .login-container {
   display: flex;
+  text-align: center;
+
   justify-content: center;
   align-items: center;
-  height: 100vh;
+  align-self: center;
+  height: 150%;
+  width: 70%;
+ 
+}
+.left-section-text{
+  color:#f8f8f8;
+
 }
 
 .login-card {
@@ -20,6 +29,8 @@ body {
 }
 
 .left-section {
+  padding: 150px 10px;
+
   flex: 2;
   background: linear-gradient(to right, #8e44ad, #3498db);
   color: #fff;
@@ -53,6 +64,8 @@ body {
 }
 
 form {
+  text-align: center;
+
   display: flex;
   flex-direction: column;
   gap: 20px;

@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { signUp, confirmSignUp } from 'aws-amplify/auth';
 import { TextField, Button, Alert } from '@mui/material';
 import '../Styles/SignUp.css';
-
+import PersonAddAltSharpIcon from '@mui/icons-material/PersonAddAltSharp';
 function SignUp() {
   const [formData, setFormData] = useState({
     email: '',
@@ -75,7 +75,9 @@ function SignUp() {
     <div className="signup-container">
       <div className="signup-card">
         <div className="left-section">
+
           <h1 className="left-section-text">Create an Account</h1>
+          
           <p className="left-section-text">Join our community! Sign up for exclusive access.</p>
         </div>
         <div className="right-section">
@@ -83,8 +85,9 @@ function SignUp() {
           
             {!signedUp ? (
               <>
-                <h2>Sign Up</h2>
+                <h2>Sign Up </h2>
                 <form onSubmit={handleSignUp} style={{ width: '300px' }}>
+                  
                   <TextField
                     type="email"
                     id="email"
@@ -115,6 +118,7 @@ function SignUp() {
               </>
             ) : (
               <>
+                <h2 className='send'>    <svg xmlns="http://www.w3.org/2000/svg" width="80" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" font-size="24"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg></h2>
                 <h2>Confirm Sign Up</h2>
                 <form onSubmit={handleConfirmSignUp}>
                 <TextField

@@ -9,6 +9,9 @@
   backdrop-filter: blur(2px);
 }
 
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap');
+
+
 .navbar-container {
   display: flex;
   justify-content: space-between;
@@ -56,4 +59,17 @@
 
 .auth-icons a:hover {
   color: #f0f0f0;
+}
+
+
+.nav-button:hover{
+    opacity: 1 !important;
+    background-color: rgba(238, 195, 255, 0.2) !important;
+
+}
+
+.nav-button{
+  border-radius: 14px !important;
+  font-family: 'Poppins, sans-serif' ;
+
 }

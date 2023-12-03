@@ -5,14 +5,17 @@
   display: flex;
   justify-content: center;
   align-items: center;
-  height: 100vh;
+  align-self: center;
+  height: 150%;
+  width: 100%;
   background-color: #f4f4f4; /* Change background color as desired */
 }
 
 .signup-card {
-  min-height: 60%;
+  min-height:60%;
   display: flex;
   width: 70%;
+  height: 100%;
   max-width: 1200px; /* Adjust max width as needed */
   border-radius: 8px;
   overflow: hidden;
@@ -21,7 +24,10 @@
 }
 
 .left-section {
+  padding: 150px 50px;
+
   width: 50%;
+  
   animation: fadeInLeft 1s ease; /* Add fade-in animation */
   background: linear-gradient(to bottom right, #5a3fc0, #4a90e2); /* Dynamic gradient */
   display: flex;
@@ -61,7 +67,7 @@ h1, h2, p {
 }
 
 /* Hide left section on mobile screens */
-@media (max-width: 768px) {
+@media (max-width: 1000px) {
   .left-section {
     display: none;
   }
@@ -71,6 +77,7 @@ h1, h2, p {
   height: 100%;
   /* Add your design or image styling here */
 }
+
 
 .right-section {
   width: 50%;
