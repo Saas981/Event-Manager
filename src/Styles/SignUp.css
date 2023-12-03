@@ -1,64 +1,173 @@
-/* SignUp.css */
-body {
-    font-family: 'Arial', sans-serif;
-    margin: 0;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    height: 140vh;
-    background: linear-gradient(to bottom, #ff6e7f, #bfe9ff); /* Sunset gradient background */
+/* Import Poppins font */
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap');
+
+.signup-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  background-color: #f4f4f4; /* Change background color as desired */
+}
+
+.signup-card {
+  min-height: 60%;
+  display: flex;
+  width: 70%;
+  max-width: 1200px; /* Adjust max width as needed */
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  background-color: #fff;
+}
+
+.left-section {
+  width: 50%;
+  animation: fadeInLeft 1s ease; /* Add fade-in animation */
+  background: linear-gradient(to bottom right, #5a3fc0, #4a90e2); /* Dynamic gradient */
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  overflow: hidden; /* Hide overflowing content */
+}
+
+.left-section-text{
+  color:#f8f8f8;
+
+}
+
+/* Animation for elements in the left section */
+@keyframes fadeInLeft {
+  from {
+    opacity: 0;
+    transform: translateX(-20px);
   }
-  
-  .signup-container {
-    background-color: #ffffff;
-    padding: 40px;
-    border-radius: 8px;
-    box-shadow: 0 0 20px rgba(0, 0, 0, 0.2);
-    max-width: 400px;
-    width: 100%;
-    text-align: center;
+  to {
+    opacity: 1;
+    transform: translateX(0);
   }
-  
-  .signup-form {
-    margin-bottom: 4px;
+}
+
+
+
+
+
+
+
+/* Style headings and paragraphs */
+h1, h2, p {
+  font-family: 'Poppins', sans-serif; /* Apply Poppins font */
+  color: #fff; /* Text color on the left section */
+}
+
+/* Hide left section on mobile screens */
+@media (max-width: 768px) {
+  .left-section {
+    display: none;
   }
-  
-  h2 {
-    color: #ff6e7f;
-    font-size: 2.5em;
-    letter-spacing: 4px;
-    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.design-section {
+  height: 100%;
+  /* Add your design or image styling here */
+}
+
+.right-section {
+  width: 50%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: 40px;
+  padding-left: 8%;
+  padding-right: 8%;
+  margin-left: 5%;
+  background-color: #f8f8f8; /* Lighter background color */
+  border-left: 1px solid #ddd; /* Add a subtle border for separation */
+  transition: transform 0.5s ease; /* Add transition property */
+  transform: translateX(0); /* Initial position */
+}
+
+.right-section.show {
+  transform: translateX(100%); /* Slide in position */
+}
+
+.signup-form {
+  text-align: center;
+  color: #fff; /* Set text color to white for better visibility */
+}
+
+/* Style headings and paragraphs */
+h1, h2, p {
+  font-family: 'Poppins', sans-serif; /* Apply Poppins font */
+  color: #333; /* Darker text color */
+}
+
+.alert{
+  font-family: 'Poppins', sans-serif; /* Apply Poppins font */
+
+}
+
+.alert {
+  background-color: #f8d7da;
+  color: #721c24;
+  border: 1px solid #f5c6cb;
+  padding: 0px;
+  border-radius: 4px;
+  margin-bottom: 15px;
+  font-size: 14px;
+
+}
+
+.success {
+  background-color: #ddf8d7;
+  color: #1c7229;
+  border: 1px solid #ddf8d7;
+  padding: 5px;
+  border-radius: 4px;
+  margin-bottom: 15px;
+  font-size: 14px;
+
+}
+
+.success strong {
+  font-weight: bold;
+}
+
+.alert strong {
+  font-weight: bold;
+}
+
+/* Add animation to the heading */
+h1 {
+  animation: bounce 1s infinite alternate; /* Bouncing animation */
+  font-size:40px !important;
+}
+
+h2{
+  font-size:30px !important;
+
+}
+
+/* Add animation to the icon */
+.icon {
+  font-size: 48px;
+  animation: rotate 2s linear infinite; /* Rotating animation */
+}
+
+@keyframes bounce {
+  from {
+    transform: translateY(0);
   }
-  
-  form {
-    display: flex;
-    flex-direction: column;
+  to {
+    transform: translateY(-10px);
   }
-  
-  label {
-    margin-bottom: 8px;
-    color: #ff6e7f;
+}
+
+@keyframes rotate {
+  from {
+    transform: rotate(0deg);
   }
-  
-  input {
-    padding: 12px;
-    margin-bottom: 20px;
-    border: 2px solid #ff6e7f;
-    border-radius: 6px;
-    outline: none;
+  to {
+    transform: rotate(360deg);
   }
-  
-  button {
-    background-color: #ff6e7f;
-    color: #fff;
-    padding: 12px;
-    border: none;
-    border-radius: 6px;
-    cursor: pointer;
-    transition: background-color 0.3s;
-  }
-  
-  button:hover {
-    background-color: #ff4f63; /* Darker pink on hover */
-  }
-  
+}
