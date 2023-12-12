@@ -1,14 +1,15 @@
 /* Import Poppins font */
 @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap');
 
+
 .signup-container {
   display: flex;
   justify-content: center;
   align-items: center;
   align-self: center;
   height: 150%;
+  
   width: 100%;
-  background-color: #f4f4f4; /* Change background color as desired */
 }
 
 .signup-card {
@@ -145,7 +146,7 @@ h1, h2, p {
 }
 
 /* Add animation to the heading */
-h1 {
+.authTitle {
   animation: bounce 1s infinite alternate; /* Bouncing animation */
   font-size:40px !important;
 }

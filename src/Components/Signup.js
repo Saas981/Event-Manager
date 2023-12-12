@@ -76,7 +76,7 @@ function SignUp() {
       <div className="signup-card">
         <div className="left-section">
 
-          <h1 className="left-section-text">Create an Account</h1>
+          <h1 className="left-section-text authTitle">Create an Account</h1>
           
           <p className="left-section-text">Join our community! Sign up for exclusive access.</p>
         </div>

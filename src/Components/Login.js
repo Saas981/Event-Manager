@@ -9,7 +9,7 @@ function Login() {
     <div className="login-container">
       <div className="login-card">
         <div className="left-section">
-          <h1 className='left-section-text'>Welcome Back!</h1>
+          <h1 className='left-section-text authTitle'>Welcome Back!</h1>
           <p className='left-section-text'>Enter your credentials to access your account.</p>
         </div>
         <div className="right-section">

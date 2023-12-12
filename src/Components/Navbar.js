@@ -34,7 +34,7 @@ const Navbar = ({ user, signOut }) => {
     <AppBar className="navbar" position="static" style={{ opacity:0.6,background: 'linear-gradient(to right, #503F9F, #FF51B5)', borderRadius: 0 }}>
       <Container >
         <Toolbar >
-          <IconButton  className="nav-button" edge="start" color="inherit" component={Link} to="/home">
+          <IconButton  className="nav-button" edge="start" color="inherit" component={Link} to="/">
             <Home />
           </IconButton>
           <Typography variant="h6" style={{ flexGrow: 1, marginLeft: '10px', fontFamily: 'Poppins, sans-serif' }}>
