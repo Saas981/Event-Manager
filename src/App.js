@@ -20,19 +20,20 @@ Amplify.configure(config);
 function App({ signOut, user }) {
   return (
     <Router >
-      <div >
-        <Navbar />
+           <Navbar style={{zIndex:100}}/>
+      <div style={{minHeight: '90vh',background: 'linear-gradient(to right, rgba(80, 63, 159,0.18), rgba(255, 81, 181,0.18))',}} >
+   
         <br></br>
           <Grid
             container
             direction="column"
             justifyContent="center"
             alignItems="center"
-            style={{ paddingTop: '20px' }}
+            style={{ paddingTop: '20px', }}
             
           >
             <Routes>
-              <Route path="/home" element={<Home />} />
+              <Route path="/" element={<Home />} />
               <Route path="/about" element={<About />} />
               <Route path="/contact" element={<Contact />} />
               <Route path="/login" element={<Login />} />
