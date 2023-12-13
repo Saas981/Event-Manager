@@ -41,7 +41,7 @@ const Navbar = ({ user, signOut }) => {
 
   return (
     <Slide appear={false} direction="down" in={!trigger}>
-      <AppBar className="navbar" position="fixed" style={{ opacity: 0.5, background: 'linear-gradient(to right, #ae9dfa, #f7abd7)', borderRadius: 0 }}>
+      <AppBar className="navbar" position="fixed" style={{ opacity: 0.6, background: 'linear-gradient(to right, #ae9dfa, #f7abd7)', borderRadius: 0 }}>
         <Container>
           <Toolbar >
             <IconButton className="nav-button" edge="start" color="inherit" component={Link} to="/">
