@@ -4,23 +4,21 @@
 
 .signup-container {
   display: flex;
+  text-align: center;
+  
   justify-content: center;
   align-items: center;
   align-self: center;
   height: 150%;
-  
-  width: 100%;
+  width: 70%;
 }
 
 .signup-card {
-  min-height:60%;
   display: flex;
-  width: 70%;
-  height: 100%;
-  max-width: 1200px; /* Adjust max width as needed */
-  border-radius: 8px;
+  width: 100%;
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+  border-radius: 20px;
   overflow: hidden;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
   background-color: #fff;
 }
 
@@ -30,7 +28,7 @@
   width: 50%;
   
   animation: fadeInLeft 1s ease; /* Add fade-in animation */
-  background: linear-gradient(to bottom right, #5a3fc0, #4a90e2); /* Dynamic gradient */
+  background: linear-gradient(to bottom right, rgba(74, 158, 226,0.6),rgba(90, 63, 192,0.6)); /* Dynamic gradient */
   display: flex;
   flex-direction: column;
   justify-content: center;
