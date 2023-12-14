@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
-import { signUp, confirmSignUp } from 'aws-amplify/auth';
-import { TextField, Button, Alert } from '@mui/material';
+import { signUp, confirmSignUp, signIn } from 'aws-amplify/auth';
+import { TextField, Button, Alert, CircularProgress } from '@mui/material';
 import '../Styles/SignUp.css';
 import PersonAddAltSharpIcon from '@mui/icons-material/PersonAddAltSharp';
 function SignUp() {
@@ -14,6 +14,19 @@ function SignUp() {
   const [error, setError] = useState(null);
   const [loading, setLoading] = useState(false);
 
+
+
+
+  async function handleAutoSignIn() {
+    try {
+      const { email, password } = formData;
+      const username = email;
+      await signIn({username, password});
+      console.log('Auto sign-in success');
+    } catch (error) {
+      console.log('Auto sign-in error:', error);
+    }
+  }
 
   const handleChange = (e) => {
     setFormData({
@@ -62,9 +75,13 @@ function SignUp() {
     try {
       await confirmSignUp({ username: email, confirmationCode: cleanedConfirmationCode });
       console.log('Confirmation success');
+      await handleAutoSignIn()
       setError(null)
-
-      window.location.href = '/home';
+      setLoading(true)
+      await new Promise(resolve => setTimeout(resolve, 1500));
+      setLoading(false)
+      window.location.href = '/';
+      
     } catch (error) {
       console.error('Error confirming sign up:', error);
       setError(error.message); // Set the error message in the state
@@ -134,9 +151,10 @@ function SignUp() {
                 pattern: '[0-9]*', // Only allow numeric characters
               }}
             />
-
+  
                   <Button variant="contained" type="submit">
-                    Confirm Sign Up
+                  {loading ? <CircularProgress size={24} color="inherit" /> :"Confirm Sign Up" }
+          
                   </Button>
                   {error ?  <div className="alert">
               <p>{error}</p>
