@@ -6,6 +6,7 @@ import useScrollTrigger from '@mui/material/useScrollTrigger';
 import { styled } from '@mui/material/styles';
 import { Link } from 'react-router-dom';
 import { signOut } from 'aws-amplify/auth';
+
 import '../Styles/Navbar.css';
 
 const StyledBadge = styled(Badge)(({ theme }) => ({
@@ -47,7 +48,7 @@ const Navbar = ({ user }) => {
   const [loading, setLoading] = useState(false); // Added loading state
 
 
-
+  console.log("CURRENT USER ",user)
   async function handleSignOut() {
     try {
       setLoading(true); // Set loading to true when starting sign-out
