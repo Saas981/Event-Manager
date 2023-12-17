@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { TextField, Button, Alert, CircularProgress } from '@mui/material';
 import '../Styles/Login.css';
-import {signIn } from 'aws-amplify/auth'; // Import Auth from aws-amplify
+import {signIn,signOut } from 'aws-amplify/auth'; // Import Auth from aws-amplify
 
 function Login() {
   const [loading, setLoading] = useState(false);
@@ -20,25 +20,52 @@ function Login() {
     });
   };
 
+  async function handleSignOut() {
+    try {
+      setLoading(true); // Set loading to true when starting sign-out
+      await signOut();
+      await new Promise(resolve => setTimeout(resolve, 1500));
+      window.location.reload(); // Reload the page after successful sign-out
+      window.location.href = '/login';
+
+    } catch (error) {
+      console.log('error signing out: ', error);
+    } finally {
+      setLoading(false); // Set loading to false whether sign-out succeeds or fails
+    }
+  }
+
+
   const handleLogin = async (e) => {
     e.preventDefault();
-
-    const { username, password } = formData; // Change email to username
-
+  
+    const { username, password } = formData;
+  
     try {
-      await signIn({username, password}); // Use Auth.signIn with username
-      setError(null); // Reset error state on successful login
-
-      // Redirect to the dashboard on successful login
-      setLoading(true)
+      await signIn({username, password});
+      setError(null);
+      setLoading(true);
       await new Promise(resolve => setTimeout(resolve, 1500));
-      setLoading(false)
+      setLoading(false);
       window.location.href = '/dashboard';
     } catch (error) {
       console.error('Error signing in:', error);
-      setError(error.message);
+      if (error.message === "There is already a signed in user.") {
+        // If there is already a signed-in user, sign them out first and then attempt login again
+        try {
+          await signOut(); // Sign out the current user
+          // Now attempt login again
+          await handleLogin(e);
+        } catch (signOutError) {
+          console.error('Error signing out:', signOutError);
+          setError(signOutError.message);
+        }
+      } else {
+        setError(error.message);
+      }
     }
   };
+  
 
   return (
     <div className="login-container">

@@ -13,24 +13,37 @@ import './App.css';
 import { getCurrentUser } from 'aws-amplify/auth';
 import config from './aws-exports';
 import { Amplify } from 'aws-amplify';
+import { fetchAuthSession } from 'aws-amplify/auth';
+import { CookieStorage } from 'aws-amplify/utils';
+import { cognitoUserPoolsTokenProvider } from 'aws-amplify/auth/cognito';
 Amplify.configure(config);
-
+cognitoUserPoolsTokenProvider.setKeyValueStorage(new CookieStorage());
 // App.js
 
 
+async function currentSession() {
+  try {
+    const { accessToken, idToken } = (await fetchAuthSession()).tokens ?? {};
+    console.log("SESSION", accessToken)
+  } catch (err) {
+    console.log(err);
+  }
+}
+currentSession()
 
 
-function App({ }) {
+function App({ signOut}) {
   const [user, setUser] = React.useState(null);
  
   useEffect(() => {
     const currentAuthenticatedUser = async () => {
       try {
-        const { username, userId, signInDetails } = await getCurrentUser();
-        console.log(`The username: ${username}`);
-        console.log(`The userId: ${userId}`);
-        console.log(`The signInDetails: ${JSON.stringify(signInDetails)}`);
-        setUser(signInDetails.loginId)
+        const username = await getCurrentUser();
+        console.log(`The username: ${JSON.stringify(username)}`);
+        //console.log(`The userId: ${userId}`);
+        //console.log(`The signInDetails: ${JSON.stringify(signInDetails)}`);
+       // console.log(name)
+       setUser(username.signInDetails.loginId)
       } catch (err) {
         console.log(err);
       }
@@ -41,7 +54,7 @@ function App({ }) {
   }, [])
   return (
     <Router >
-           <Navbar user={user} style={{zIndex:100}}/>
+           <Navbar user={user}style={{zIndex:100}}/>
       <div style={{minHeight: '90vh',height:"auto",background: 'linear-gradient(to right, rgba(80, 63, 159,0.18), rgba(255, 81, 181,0.18))',paddingBottom:"10%",paddingTop:"6%"}} >
    
         <br></br>

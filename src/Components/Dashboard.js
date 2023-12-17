@@ -1,129 +1,155 @@
-import React, { useState, useEffect } from 'react';
-import { Container, Typography, Button, Grid, Paper, Table, TableContainer, TableHead, TableRow, TableCell, TableBody } from '@mui/material';
-import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
+import React, { useState } from 'react';
+import { Typography, Box, Collapse, Paper, Avatar,Grid, Skeleton } from '@mui/material';
 import { styled } from '@mui/system';
-import { fetchAuthSession } from 'aws-amplify/auth';
+import PeopleIcon from '@mui/icons-material/People';
 
-const DashboardContainer = styled(Container)({
+const DashboardContainer = styled(Box)({
   textAlign: 'center',
   marginTop: '20px',
+  width: '50%',
+  background: 'linear-gradient(to right, rgba(80, 63, 159,0.1), rgba(255, 81, 181,0.1))',
+  boxShadow: '4px 4px 8px rgba(0, 0, 0, 0.3)',
 });
 
-const DashboardPaper = styled(Paper)({
-  padding: '20px',
-  marginBottom: '20px',
-  borderRadius: '15px',
-  background: 'linear-gradient(to bottom, #F5F5F5, #F3ECFF)',
-});
+const DashboardHeader = styled(Paper)({
+  width: '90%',
+  margin: '0 auto',
 
-const DashboardCard = styled(Paper)({
-  padding: '30px',
-  marginBottom: '20px',
-  minHeight: '150px',
-  borderRadius: '11px',
-  transition: 'transform 0.3s, box-shadow 0.3s',
-  '&:hover': {
-    transform: 'scale(1.05)',
-    boxShadow: '0px 4px 20px rgba(0, 0, 0, 0.1)',
+
+  borderRadius: '0px',
+  borderBottomLeftRadius: '5px',
+  borderBottomRightRadius: '10px',
+  background: 'linear-gradient(to bottom right, rgba(74, 158, 226,0.6),rgba(90, 63, 192,0.6))',
+  color:"#f8f8f8",
+  fontSize: '24px',
+  fontWeight: 'bold',
+  fontFamily: 'Poppins, sans-serif',
+  '& > *': {
+    fontFamily: 'inherit',
+    fontSize: '18px',
   },
+  padding: '5%',
 });
 
+const EventContainer = styled(Paper)({
+  width: '100%',
+  margin: '0 auto',
 
+  borderRadius: '0px',
+  borderBottomLeftRadius: '5px',
+  borderBottomRightRadius: '10px',
+  fontFamily: 'Poppins, sans-serif',
+  color: '#000',
+  cursor: 'pointer',
+  
+  boxShadow: '0px 4px 10px rgba(0, 0, 0, 0.1)',
+  
+});
 
-const items = [
-  { id: 1, name: 'Event 1', date: '2023-01-15' },
-  { id: 2, name: 'Event 2', date: '2023-02-20' },
-  { id: 3, name: 'Event 3', date: '2023-03-10' },
-];
+const Event = styled(Box)({
+  margin: '0px 0',
+  width: '90%',
+  
+  borderBottom: '1px solid #BDBDBD',
+  padding: '10px 0',
+  padding: '5%',
+  display: 'flex',
+  fontFamily: 'Poppins, sans-serif',
+  alignItems: 'center',
+  background: 'linear-gradient(to bottom right, rgba(74, 158, 226,0.3),rgba(90, 63, 192,0.3))',
+  '& > *': {
+    fontFamily: 'inherit',
+    fontSize: '18px',
+  },
+  justifyContent: 'space-between',
+  cursor: 'pointer',
+});
+
+const EventDetails = styled(Box)({
+  padding: '10px',
+  fontFamily: 'Poppins, sans-serif',
+ 
+});
+
+const ParticipantCount = styled(Box)({
+  display: 'flex',
+  fontFamily: 'Poppins, sans-serif',
+  alignItems: 'center',
+});
+
+const ImageSkeleton = styled(Skeleton)({
+  width: '100%',
+  height: '100px',
+  marginBottom: '10px',
+});
 
 const Dashboard = () => {
-  const [showDashboard, setShowDashboard] = useState(false);
+  const [expandedEvent, setExpandedEvent] = useState(null);
 
-  useEffect(() => {
-    async function checkSession() {
-      try {
-        const { accessToken, idToken } = (await fetchAuthSession()).tokens ?? {};
-        if (accessToken && idToken) {
-          setShowDashboard(true);
-        }
-      } catch (err) {
-        console.log(err);
-      }
-    }
+  const events = [
+    {
+      id: 1,
+      date: '2023-01-15',
+      title: 'Event 1',
+      participants: ['Participant 1', 'Participant 2', 'Participant 3'],
+      maxParticipants: 4,
+      description: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec ac libero dapibus, accumsan velit at, tincidunt magna. Nulla sed justo ipsum. Nullam malesuada ac nibh cursus euismod. Nam cursus enim vel lectus ultricies malesuada.',
+      author: 'Organizer A',
+    },
+    {
+      id: 2,
+      date: '2023-02-20',
+      title: 'Event 2',
+      participants: ['Participant A', 'Participant B', 'Participant C', 'Participant D'],
+      maxParticipants: 5,
+      description: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec ac libero dapibus, accumsan velit at, tincidunt magna. Nulla sed justo ipsum. Nullam malesuada ac nibh cursus euismod. Nam cursus enim vel lectus ultricies malesuada.',
+      author: 'Organizer B',
+    },
+    {
+      id: 3,
+      date: '2023-03-10',
+      title: 'Event 3',
+      participants: ['Person X', 'Person Y', 'Person Z'],
+      maxParticipants: 4,
+      description: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec ac libero dapibus, accumsan velit at, tincidunt magna. Nulla sed justo ipsum. Nullam malesuada ac nibh cursus euismod. Nam cursus enim vel lectus ultricies malesuada.',
+      author: 'Organizer C',
+    },
+  ];
 
-    checkSession();
-  }, []);
+  const handleEventClick = (eventId) => {
+    setExpandedEvent(expandedEvent === eventId ? null : eventId);
+  };
 
-  if (!showDashboard) {
-    return(
-        <Container
-      style={{
-        display: 'flex',
-        flexDirection: 'column',
-        alignItems: 'center',
-        justifyContent: 'center',
-        height: '50vh', // Adjust the height based on your design preference
-      }}
-    >
-      <Typography
-        variant="h4"
-        gutterBottom
-        style={{ fontFamily: 'Poppins, sans-serif' }}
-      >
-        Not Authorized
-      </Typography>
-      <Typography
-        variant="body1"
-        align="center"
-        style={{ fontFamily: 'Poppins, sans-serif' }}
-      >
-        You do not have permission to access this page.
-      </Typography>
-      {/* You can add more styling or components as needed */}
-    </Container>
-
-    )
-  }
   return (
-    <DashboardContainer maxWidth="md">
-      <DashboardPaper elevation={3}>
-      <Typography variant="h3" component="div" gutterBottom style={{ fontFamily: 'Poppins, sans-serif', fontWeight: 'bold', color: '#333' }}>
-       Welcome to Your Dashboard
-      </Typography>
-        <Typography variant="h6" color="textSecondary" style={{ marginTop: '20px' }}>
-          Explore and manage your events effortlessly.
-        </Typography>
-      </DashboardPaper>
+    <DashboardContainer>
+      <DashboardHeader elevation={3}>Welcome to Your Dashboard</DashboardHeader>
 
-      <Grid container spacing={3} justifyContent="center">
-        <Grid item xs={12} md={4}>
-          <DashboardCard elevation={3}>
-            <Typography variant="h6">Event List</Typography>
-            <TableContainer>
-              <Table>
-                <TableHead>
-                  <TableRow>
-                    <TableCell>ID</TableCell>
-                    <TableCell>Name</TableCell>
-                    <TableCell>Date</TableCell>
-                  </TableRow>
-                </TableHead>
-                <TableBody>
-                  {items.map((item) => (
-                    <TableRow key={item.id}>
-                      <TableCell>{item.id}</TableCell>
-                      <TableCell>{item.name}</TableCell>
-                      <TableCell>{item.date}</TableCell>
-                    </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
-            </TableContainer>
-          </DashboardCard>
+      {events.map((event) => (
+        <EventContainer key={event.id} elevation={3}>
+          <Event onClick={() => handleEventClick(event.id)}>
+            <Typography>{event.date}</Typography>
+            <Typography>{event.title}</Typography>
+            <ParticipantCount>
+              {`${event.participants.length}/${event.maxParticipants}`}
+              <PeopleIcon style={{ fontSize: '28px' }} />
+            </ParticipantCount>
+          </Event>
+
+          <Collapse style={{ background:'linear-gradient(to bottom right, rgba(74, 158, 226,0.1),rgba(90, 63, 192,0.1 ))',}} in={expandedEvent === event.id}>
+          <Grid container spacing={2}>
+          <Grid item xs={4}>
+              <ImageSkeleton animation="wave" variant="rectangular" />
+              <Typography style={{ marginTop: '10px' }}>Organizer: {event.author}</Typography>
+            </Grid>
+          <Grid item xs={8}>
+            <EventDetails>
+              <Typography>{event.description}</Typography>
+            </EventDetails>
         </Grid>
-      </Grid>
-
-      
+        </Grid>
+          </Collapse>
+        </EventContainer>
+      ))}
     </DashboardContainer>
   );
 };
