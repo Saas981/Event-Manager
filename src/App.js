@@ -10,20 +10,18 @@ import Dashboard from './Components/Dashboard'
 import { Container, Grid } from '@mui/material';
 import './App.css'; 
 
-import { getCurrentUser } from 'aws-amplify/auth';
+import { Auth } from 'aws-amplify';
 import config from './aws-exports';
 import { Amplify } from 'aws-amplify';
-import { fetchAuthSession } from 'aws-amplify/auth';
-import { CookieStorage } from 'aws-amplify/utils';
-import { cognitoUserPoolsTokenProvider } from 'aws-amplify/auth/cognito';
+
+
 Amplify.configure(config);
-cognitoUserPoolsTokenProvider.setKeyValueStorage(new CookieStorage());
 // App.js
 
 
 async function currentSession() {
   try {
-    const { accessToken, idToken } = (await fetchAuthSession()).tokens ?? {};
+    const { accessToken, idToken } = (await Auth.currentSession()).tokens ?? {};
     console.log("SESSION", accessToken)
   } catch (err) {
     console.log(err);
@@ -38,12 +36,12 @@ function App({ signOut}) {
   useEffect(() => {
     const currentAuthenticatedUser = async () => {
       try {
-        const username = await getCurrentUser();
-        console.log(`The username: ${JSON.stringify(username)}`);
+        const userDetails = await Auth.currentAuthenticatedUser();
+        console.log(`The username: ${JSON.stringify(userDetails.username)}`);
         //console.log(`The userId: ${userId}`);
         //console.log(`The signInDetails: ${JSON.stringify(signInDetails)}`);
        // console.log(name)
-       setUser(username.signInDetails.loginId)
+       setUser(userDetails.username)
       } catch (err) {
         console.log(err);
       }
