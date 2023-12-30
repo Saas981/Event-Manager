@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { signUp, confirmSignUp, signIn } from 'aws-amplify/auth';
+import { Auth } from 'aws-amplify';
 import { TextField, Button, Alert, CircularProgress } from '@mui/material';
 import '../Styles/SignUp.css';
 import PersonAddAltSharpIcon from '@mui/icons-material/PersonAddAltSharp';
@@ -21,7 +21,7 @@ function SignUp() {
     try {
       const { email, password } = formData;
       const username = email;
-      await signIn({username, password});
+      await Auth.signIn({username, password});
       console.log('Auto sign-in success');
     } catch (error) {
       console.log('Auto sign-in error:', error);
@@ -41,7 +41,7 @@ function SignUp() {
     const { email, password } = formData;
     const username = email;
     try {
-      await signUp({
+      await Auth.signUp({
         username,
         password,
         attributes: {
@@ -73,7 +73,7 @@ function SignUp() {
     const cleanedConfirmationCode = confirmationCode.replace(/\D/g, '');
 
     try {
-      await confirmSignUp({ username: email, confirmationCode: cleanedConfirmationCode });
+      await Auth.confirmSignUp({ username: email, confirmationCode: cleanedConfirmationCode });
       console.log('Confirmation success');
       await handleAutoSignIn()
       setError(null)

@@ -5,7 +5,7 @@ import { Home, Info, ContactMail,Person, Login, Logout, PersonAdd, Menu as MenuI
 import useScrollTrigger from '@mui/material/useScrollTrigger';
 import { styled } from '@mui/material/styles';
 import { Link } from 'react-router-dom';
-import { signOut } from 'aws-amplify/auth';
+import { Auth } from 'aws-amplify';
 
 import '../Styles/Navbar.css';
 
@@ -52,7 +52,7 @@ const Navbar = ({ user }) => {
   async function handleSignOut() {
     try {
       setLoading(true); // Set loading to true when starting sign-out
-      await signOut();
+      await Auth.signOut();
       await new Promise(resolve => setTimeout(resolve, 1500));
       window.location.reload(); // Reload the page after successful sign-out
       window.location.href = '/login';

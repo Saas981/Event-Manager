@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { TextField, Button, Alert, CircularProgress } from '@mui/material';
 import '../Styles/Login.css';
-import {signIn,signOut } from 'aws-amplify/auth'; // Import Auth from aws-amplify
+import {Auth } from 'aws-amplify'; // Import Auth from aws-amplify
 
 function Login() {
   const [loading, setLoading] = useState(false);
@@ -23,7 +23,7 @@ function Login() {
   async function handleSignOut() {
     try {
       setLoading(true); // Set loading to true when starting sign-out
-      await signOut();
+      await Auth.signOut();
       await new Promise(resolve => setTimeout(resolve, 1500));
       window.location.reload(); // Reload the page after successful sign-out
       window.location.href = '/login';
@@ -42,7 +42,7 @@ function Login() {
     const { username, password } = formData;
   
     try {
-      await signIn({username, password});
+      await Auth.signIn({username, password});
       setError(null);
       setLoading(true);
       await new Promise(resolve => setTimeout(resolve, 1500));
@@ -53,7 +53,7 @@ function Login() {
       if (error.message === "There is already a signed in user.") {
         // If there is already a signed-in user, sign them out first and then attempt login again
         try {
-          await signOut(); // Sign out the current user
+          await Auth.signOut(); // Sign out the current user
           // Now attempt login again
           await handleLogin(e);
         } catch (signOutError) {
