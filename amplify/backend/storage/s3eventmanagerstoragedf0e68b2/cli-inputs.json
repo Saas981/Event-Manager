@@ -1,0 +1,12 @@
+{
+  "resourceName": "s3eventmanagerstoragedf0e68b2",
+  "bucketName": "event-manager-storage-df0e68b2",
+  "policyUUID": "4bce1a72",
+  "storageAccess": "auth",
+  "guestAccess": [],
+  "authAccess": [
+    "CREATE_AND_UPDATE",
+    "READ",
+    "DELETE"
+  ]
+}

@@ -6,6 +6,8 @@ import About from './Components/About';
 import Contact from './Components/Contact';
 import Login from './Components/Login';
 import SignUp from './Components/Signup';
+import CreateEvent from './Components/CreateEvent';
+
 import Dashboard from './Components/Dashboard'
 import { Container, Grid } from '@mui/material';
 import './App.css'; 
@@ -70,7 +72,8 @@ function App({ signOut}) {
               <Route path="/contact" element={<Contact />} />
               <Route path="/login" element={<Login />} />
               <Route path="/signup" element={<SignUp />} />
-              <Route path="/dashboard" element={<Dashboard />} />
+              <Route path="/dashboard" element={<Dashboard userId={user} />} />
+              <Route path="/create" element={<CreateEvent userId={user}/>} />
             </Routes>
           </Grid>
       

@@ -15,6 +15,9 @@
       "auth": {
         "eventmanagerec23f517": {},
         "EventManager": {}
+      },
+      "storage": {
+        "s3eventmanagerstoragedf0e68b2": {}
       }
     }
   },
