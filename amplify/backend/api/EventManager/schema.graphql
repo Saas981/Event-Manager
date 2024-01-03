@@ -6,12 +6,12 @@ type User @model @auth(rules: [{allow: public}]) {
 
 type Event @model @auth(rules: [{allow: public}]) {
   id: ID!
-  title: String!
-  startTime: AWSDateTime!
-  location: String!
+  title: String
+  startTime: AWSDateTime
+  location: String
   reoccuring: Boolean
   endTime: AWSDateTime
-  participants: [AWSJSON]
+  participants: String
   capacity: Int
   description: String
   organizer: String

@@ -5,7 +5,7 @@
  **************************************************************************/
 
 import * as React from "react";
-import { GridProps, SwitchFieldProps, TextAreaFieldProps, TextFieldProps } from "@aws-amplify/ui-react";
+import { GridProps, SwitchFieldProps, TextFieldProps } from "@aws-amplify/ui-react";
 import { EscapeHatchProps } from "@aws-amplify/ui-react/internal";
 import { Event } from "../models";
 export declare type ValidationResponse = {
@@ -19,7 +19,7 @@ export declare type EventUpdateFormInputValues = {
     location?: string;
     reoccuring?: boolean;
     endTime?: string;
-    participants?: string[];
+    participants?: string;
     capacity?: number;
     description?: string;
     organizer?: string;
@@ -45,7 +45,7 @@ export declare type EventUpdateFormOverridesProps = {
     location?: PrimitiveOverrideProps<TextFieldProps>;
     reoccuring?: PrimitiveOverrideProps<SwitchFieldProps>;
     endTime?: PrimitiveOverrideProps<TextFieldProps>;
-    participants?: PrimitiveOverrideProps<TextAreaFieldProps>;
+    participants?: PrimitiveOverrideProps<TextFieldProps>;
     capacity?: PrimitiveOverrideProps<TextFieldProps>;
     description?: PrimitiveOverrideProps<TextFieldProps>;
     organizer?: PrimitiveOverrideProps<TextFieldProps>;

@@ -9,6 +9,8 @@ import { purple } from '@mui/material/colors';
 import { DateTimePicker } from '@mui/x-date-pickers/DateTimePicker';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import FileCopyIcon from '@mui/icons-material/FileCopy';
+import { API, graphqlOperation } from 'aws-amplify';
+import * as mutations from '../graphql/mutations';
 
 
 
@@ -22,11 +24,45 @@ const CreateEvent = () => {
     reoccuring: false,
     endTime: dayjs('2024-01-2T12:30'),
     capacity: 0,
+    "participants":'[ { "24124129029109210910e-d50e0fbe7af1": { "permissions": "view" }, "111ea5db-7094-443d-b48e-d50e0fbe7af1": { "permissions": "view" } } ]',
     description: '',
     organizer: '',
   });
+  
 
-  const totalSteps =4;
+
+  const handleFinish = async () => {
+    // Assuming you have the mutation defined, replace 'createEvent' with your actual mutation
+    try {
+        const todoDetails = {
+            title: 'Todo 1',
+            description: 'Learn AWS AppSync'
+          };
+        console.log("EVENT DETAILS CREATING ",eventDetails)
+      const createEventResponse = await API.graphql({ 
+        query: mutations.createEvent,
+        variables: {
+            input: eventDetails
+        }
+      });
+      const eventId = createEventResponse.data.createEvent.id;
+
+    //{"24124129029109210910e-d50e0fbe7af1":{"permissions":"view"},"111ea5db-7094-443d-b48e-d50e0fbe7af1":{"permissions":"view"}}
+
+      // Access the created event if needed
+      const createdEvent = createEventResponse.data.createEvent;
+  
+      // Handle success, reset form, or navigate to another page
+      console.log('Event created successfully:', createdEvent);
+    } catch (error) {
+      // Handle error
+      console.error('Error creating event:', error);
+    }
+  };
+
+  
+
+  const totalSteps =3;
 
   const handleNext = () => {
     setActiveStep((prevActiveStep) => prevActiveStep + 1);
@@ -93,7 +129,7 @@ const CreateEvent = () => {
       label="Organizer Name"
       fullWidth
       variant="outlined"
-      value={eventDetails.location}
+      value={eventDetails.organizer}
       onChange={(e) => handleChange('organizer', e.target.value)}
       sx={{ fontFamily: 'Poppins', mb: 2 }}
     />
@@ -269,13 +305,13 @@ const CreateEvent = () => {
               }}
             >
               <Typography variant="h5" style={{ color: "#f8f8f8", fontWeight: "550", marginLeft: '10px', fontFamily: 'Poppins, sans-serif' }}>
-                Invite Friends
+                Send Invitations
               </Typography>
             </Box>
             <Grid container spacing={2} sx={{ padding: "24px", paddingTop: "0px", paddingBottom: "0px", margin: 'auto', }}>
               <Grid item xs={12}>
                 <Typography variant="body1" sx={{ fontFamily: 'Poppins', mb: 2 }}>
-                  Share the following link with your friends:
+                  Share the following link with your attendees:
                 </Typography>
               </Grid>
               <Grid item xs={12}>
@@ -296,6 +332,38 @@ const CreateEvent = () => {
             </Grid>
           </>
         )
+        case 3:
+            return(
+                <>
+                <Box
+                  sx={{
+                    width: "auto",
+                    backgroundColor: '#f4f4f4',
+                    borderRadius: '10px',
+                    borderBottomLeftRadius: '0px',
+                    WebkitBorderBottomRightRadius: '0px',
+                    padding: '25px',
+                    paddingBottom: '30px',
+                    background: "linear-gradient(to bottom right, rgba(74, 158, 226,0.6),rgba(90, 63, 192,0.6))",
+                    boxShadow: '0 4px 10px rgba(0, 0, 0, 0.05)',
+                    marginBottom: '10px',
+                    margin: 'auto',
+                  }}
+                >
+                  <Typography variant="h5" style={{ color: "#f8f8f8", fontWeight: "550", marginLeft: '10px', fontFamily: 'Poppins, sans-serif' }}>
+                    Create Event
+                  </Typography>
+                </Box>
+                <Grid container spacing={2} sx={{ padding: "24px", paddingTop: "0px", paddingBottom: "0px", margin: 'auto', }}>
+                  <Grid item xs={12}>
+                    <Typography variant="body1" sx={{ fontFamily: 'Poppins', mb: 2, fontSize:"24px" }}>
+                     Thats it!.
+                    </Typography>
+                  </Grid>
+             
+                </Grid>
+              </>
+            )
       default:
         return null;
     }
@@ -327,10 +395,11 @@ const CreateEvent = () => {
             <Button disabled={activeStep === 0} onClick={handleBack}>
               Back
             </Button>
-            {activeStep === totalSteps - 1 ? (
-              <Button variant="contained" color="primary" onClick={handleNext}>
-                Finish
-              </Button>
+            {activeStep === totalSteps  ? (
+             <Button variant="contained" color="primary" onClick={handleFinish}>
+             Finish
+           </Button>
+           
             ) : (
               <Button variant="contained" color="primary" onClick={handleNext}>
                 Next

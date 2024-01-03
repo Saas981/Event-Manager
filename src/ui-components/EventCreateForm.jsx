@@ -7,181 +7,16 @@
 /* eslint-disable */
 import * as React from "react";
 import {
-  Badge,
   Button,
-  Divider,
   Flex,
   Grid,
-  Icon,
-  ScrollView,
   SwitchField,
-  Text,
-  TextAreaField,
   TextField,
-  useTheme,
 } from "@aws-amplify/ui-react";
 import { getOverrideProps } from "@aws-amplify/ui-react/internal";
 import { Event } from "../models";
 import { fetchByPath, validateField } from "./utils";
 import { DataStore } from "aws-amplify";
-function ArrayField({
-  items = [],
-  onChange,
-  label,
-  inputFieldRef,
-  children,
-  hasError,
-  setFieldValue,
-  currentFieldValue,
-  defaultFieldValue,
-  lengthLimit,
-  getBadgeText,
-  errorMessage,
-}) {
-  const labelElement = <Text>{label}</Text>;
-  const {
-    tokens: {
-      components: {
-        fieldmessages: { error: errorStyles },
-      },
-    },
-  } = useTheme();
-  const [selectedBadgeIndex, setSelectedBadgeIndex] = React.useState();
-  const [isEditing, setIsEditing] = React.useState();
-  React.useEffect(() => {
-    if (isEditing) {
-      inputFieldRef?.current?.focus();
-    }
-  }, [isEditing]);
-  const removeItem = async (removeIndex) => {
-    const newItems = items.filter((value, index) => index !== removeIndex);
-    await onChange(newItems);
-    setSelectedBadgeIndex(undefined);
-  };
-  const addItem = async () => {
-    if (
-      currentFieldValue !== undefined &&
-      currentFieldValue !== null &&
-      currentFieldValue !== "" &&
-      !hasError
-    ) {
-      const newItems = [...items];
-      if (selectedBadgeIndex !== undefined) {
-        newItems[selectedBadgeIndex] = currentFieldValue;
-        setSelectedBadgeIndex(undefined);
-      } else {
-        newItems.push(currentFieldValue);
-      }
-      await onChange(newItems);
-      setIsEditing(false);
-    }
-  };
-  const arraySection = (
-    <React.Fragment>
-      {!!items?.length && (
-        <ScrollView height="inherit" width="inherit" maxHeight={"7rem"}>
-          {items.map((value, index) => {
-            return (
-              <Badge
-                key={index}
-                style={{
-                  cursor: "pointer",
-                  alignItems: "center",
-                  marginRight: 3,
-                  marginTop: 3,
-                  backgroundColor:
-                    index === selectedBadgeIndex ? "#B8CEF9" : "",
-                }}
-                onClick={() => {
-                  setSelectedBadgeIndex(index);
-                  setFieldValue(items[index]);
-                  setIsEditing(true);
-                }}
-              >
-                {getBadgeText ? getBadgeText(value) : value.toString()}
-                <Icon
-                  style={{
-                    cursor: "pointer",
-                    paddingLeft: 3,
-                    width: 20,
-                    height: 20,
-                  }}
-                  viewBox={{ width: 20, height: 20 }}
-                  paths={[
-                    {
-                      d: "M10 10l5.09-5.09L10 10l5.09 5.09L10 10zm0 0L4.91 4.91 10 10l-5.09 5.09L10 10z",
-                      stroke: "black",
-                    },
-                  ]}
-                  ariaLabel="button"
-                  onClick={(event) => {
-                    event.stopPropagation();
-                    removeItem(index);
-                  }}
-                />
-              </Badge>
-            );
-          })}
-        </ScrollView>
-      )}
-      <Divider orientation="horizontal" marginTop={5} />
-    </React.Fragment>
-  );
-  if (lengthLimit !== undefined && items.length >= lengthLimit && !isEditing) {
-    return (
-      <React.Fragment>
-        {labelElement}
-        {arraySection}
-      </React.Fragment>
-    );
-  }
-  return (
-    <React.Fragment>
-      {labelElement}
-      {isEditing && children}
-      {!isEditing ? (
-        <>
-          <Button
-            onClick={() => {
-              setIsEditing(true);
-            }}
-          >
-            Add item
-          </Button>
-          {errorMessage && hasError && (
-            <Text color={errorStyles.color} fontSize={errorStyles.fontSize}>
-              {errorMessage}
-            </Text>
-          )}
-        </>
-      ) : (
-        <Flex justifyContent="flex-end">
-          {(currentFieldValue || isEditing) && (
-            <Button
-              children="Cancel"
-              type="button"
-              size="small"
-              onClick={() => {
-                setFieldValue(defaultFieldValue);
-                setIsEditing(false);
-                setSelectedBadgeIndex(undefined);
-              }}
-            ></Button>
-          )}
-          <Button
-            size="small"
-            variation="link"
-            isDisabled={hasError}
-            onClick={addItem}
-          >
-            {selectedBadgeIndex !== undefined ? "Save" : "Add"}
-          </Button>
-        </Flex>
-      )}
-      {arraySection}
-    </React.Fragment>
-  );
-}
 export default function EventCreateForm(props) {
   const {
     clearOnSuccess = true,
@@ -199,7 +34,7 @@ export default function EventCreateForm(props) {
     location: "",
     reoccuring: false,
     endTime: "",
-    participants: [],
+    participants: "",
     capacity: "",
     description: "",
     organizer: "",
@@ -227,23 +62,19 @@ export default function EventCreateForm(props) {
     setReoccuring(initialValues.reoccuring);
     setEndTime(initialValues.endTime);
     setParticipants(initialValues.participants);
-    setCurrentParticipantsValue("");
     setCapacity(initialValues.capacity);
     setDescription(initialValues.description);
     setOrganizer(initialValues.organizer);
     setRating(initialValues.rating);
     setErrors({});
   };
-  const [currentParticipantsValue, setCurrentParticipantsValue] =
-    React.useState("");
-  const participantsRef = React.createRef();
   const validations = {
-    title: [{ type: "Required" }],
-    startTime: [{ type: "Required" }],
-    location: [{ type: "Required" }],
+    title: [],
+    startTime: [],
+    location: [],
     reoccuring: [],
     endTime: [],
-    participants: [{ type: "JSON" }],
+    participants: [],
     capacity: [],
     description: [],
     organizer: [],
@@ -349,7 +180,7 @@ export default function EventCreateForm(props) {
     >
       <TextField
         label="Title"
-        isRequired={true}
+        isRequired={false}
         isReadOnly={false}
         value={title}
         onChange={(e) => {
@@ -382,7 +213,7 @@ export default function EventCreateForm(props) {
       ></TextField>
       <TextField
         label="Start time"
-        isRequired={true}
+        isRequired={false}
         isReadOnly={false}
         type="datetime-local"
         value={startTime && convertToLocal(new Date(startTime))}
@@ -417,7 +248,7 @@ export default function EventCreateForm(props) {
       ></TextField>
       <TextField
         label="Location"
-        isRequired={true}
+        isRequired={false}
         isReadOnly={false}
         value={location}
         onChange={(e) => {
@@ -516,9 +347,13 @@ export default function EventCreateForm(props) {
         hasError={errors.endTime?.hasError}
         {...getOverrideProps(overrides, "endTime")}
       ></TextField>
-      <ArrayField
-        onChange={async (items) => {
-          let values = items;
+      <TextField
+        label="Participants"
+        isRequired={false}
+        isReadOnly={false}
+        value={participants}
+        onChange={(e) => {
+          let { value } = e.target;
           if (onChange) {
             const modelFields = {
               title,
@@ -526,49 +361,25 @@ export default function EventCreateForm(props) {
               location,
               reoccuring,
               endTime,
-              participants: values,
+              participants: value,
               capacity,
               description,
               organizer,
               rating,
             };
             const result = onChange(modelFields);
-            values = result?.participants ?? values;
+            value = result?.participants ?? value;
           }
-          setParticipants(values);
-          setCurrentParticipantsValue("");
+          if (errors.participants?.hasError) {
+            runValidationTasks("participants", value);
+          }
+          setParticipants(value);
         }}
-        currentFieldValue={currentParticipantsValue}
-        label={"Participants"}
-        items={participants}
-        hasError={errors?.participants?.hasError}
-        errorMessage={errors?.participants?.errorMessage}
-        setFieldValue={setCurrentParticipantsValue}
-        inputFieldRef={participantsRef}
-        defaultFieldValue={""}
-      >
-        <TextAreaField
-          label="Participants"
-          isRequired={false}
-          isReadOnly={false}
-          value={currentParticipantsValue}
-          onChange={(e) => {
-            let { value } = e.target;
-            if (errors.participants?.hasError) {
-              runValidationTasks("participants", value);
-            }
-            setCurrentParticipantsValue(value);
-          }}
-          onBlur={() =>
-            runValidationTasks("participants", currentParticipantsValue)
-          }
-          errorMessage={errors.participants?.errorMessage}
-          hasError={errors.participants?.hasError}
-          ref={participantsRef}
-          labelHidden={true}
-          {...getOverrideProps(overrides, "participants")}
-        ></TextAreaField>
-      </ArrayField>
+        onBlur={() => runValidationTasks("participants", participants)}
+        errorMessage={errors.participants?.errorMessage}
+        hasError={errors.participants?.hasError}
+        {...getOverrideProps(overrides, "participants")}
+      ></TextField>
       <TextField
         label="Capacity"
         isRequired={false}
