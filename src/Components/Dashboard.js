@@ -20,10 +20,10 @@ const Dashboard = ({userId}) => {
         console.log("RETRIEVED USERID", userId)
         const moddedData = data.listEvents.items.filter(event => {
           // Convert participants from string to object
-          const participants = JSON.parse(event.participants[0]);
-        
+          const participants = JSON.parse(event.participants);
+              
           // Check if userId exists in participants object keys
-          return participants.hasOwnProperty(userId);
+          return participants[0].hasOwnProperty(userId);
         });
         
         console.log("Filtered Data:", moddedData);

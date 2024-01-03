@@ -55,10 +55,7 @@ export const createEvent = /* GraphQL */ `
       location
       reoccuring
       endTime
-      participants {
-        id
-        name
-      }
+      participants
       capacity
       description
       organizer
@@ -80,10 +77,7 @@ export const updateEvent = /* GraphQL */ `
       location
       reoccuring
       endTime
-      participants {
-        id
-        name
-      }
+      participants
       capacity
       description
       organizer
@@ -105,10 +99,7 @@ export const deleteEvent = /* GraphQL */ `
       location
       reoccuring
       endTime
-      participants {
-        id
-        name
-      }
+      participants
       capacity
       description
       organizer

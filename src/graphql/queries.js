@@ -39,10 +39,7 @@ export const getEvent = /* GraphQL */ `
       location
       reoccuring
       endTime
-      participants {
-        id
-        name
-      }
+      participants
       capacity
       description
       organizer
@@ -66,13 +63,13 @@ export const listEvents = /* GraphQL */ `
         location
         reoccuring
         endTime
+        participants
         capacity
         description
         organizer
         rating
         createdAt
         updatedAt
-        participants
       }
       nextToken
     }
