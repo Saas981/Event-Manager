@@ -4,11 +4,6 @@ type User @model @auth(rules: [{allow: public}]) {
   name: String
 }
 
-type Participants {
-  id: String
-  name: String
-}
-
 type Event @model @auth(rules: [{allow: public}]) {
   id: ID!
   title: String!
@@ -16,7 +11,7 @@ type Event @model @auth(rules: [{allow: public}]) {
   location: String!
   reoccuring: Boolean
   endTime: AWSDateTime
-  participants: [Participants]
+  participants: [AWSJSON]
   capacity: Int
   description: String
   organizer: String

@@ -72,6 +72,7 @@ export const listEvents = /* GraphQL */ `
         rating
         createdAt
         updatedAt
+        participants
       }
       nextToken
     }
