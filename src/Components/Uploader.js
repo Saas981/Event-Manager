@@ -3,7 +3,7 @@ import { Box, Paper, Typography, IconButton } from '@mui/material';
 import CloudUploadOutlinedIcon from '@mui/icons-material/CloudUploadOutlined';
 import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline';
 
-const Uploader = () => {
+const Uploader = ({savedFile,setSavedFile}) => {
   const [file, setFile] = useState(null);
 
   const handleDrop = (event) => {
@@ -38,16 +38,16 @@ const Uploader = () => {
           position: 'relative',
         }}
       >
-        {file ? (
+        {savedFile ? (
           <>
             <Box sx={{ maxHeight: '80px' }}>
               <img
-                src={URL.createObjectURL(file)}
+                src={URL.createObjectURL(savedFile)}
                 alt="Uploaded"
                 style={{ maxWidth: '100%', maxHeight: '80px', borderRadius: '10px' }}
               />
             </Box>
-            <Typography variant="body1">{file.name}</Typography>
+            <Typography variant="body1">{savedFile.name}</Typography>
             <IconButton
               onClick={handleDelete}
               sx={{ position: 'absolute', top: '8px', right: '8px', color: 'rgba(0, 0, 0, 0.5)' }}
@@ -68,7 +68,9 @@ const Uploader = () => {
                 id="upload-input"
                 accept="image/*"
                 style={{ display: 'none' }}
-                onChange={(e) => setFile(e.target.files[0])}
+                onChange={(e) =>{ setFile(e.target.files[0])
+                    setSavedFile(e.target.files[0])
+                }}
               />
             </IconButton>
             <Typography sx={{ fontFamily: "Poppins", fontSize: "16px" }} variant="body1">Drag & Drop or Click to Upload</Typography>
