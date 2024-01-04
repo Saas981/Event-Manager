@@ -40,6 +40,7 @@ export default function EventUpdateForm(props) {
     description: "",
     organizer: "",
     rating: "",
+    coverImage: "",
   };
   const [title, setTitle] = React.useState(initialValues.title);
   const [startTime, setStartTime] = React.useState(initialValues.startTime);
@@ -55,6 +56,7 @@ export default function EventUpdateForm(props) {
   );
   const [organizer, setOrganizer] = React.useState(initialValues.organizer);
   const [rating, setRating] = React.useState(initialValues.rating);
+  const [coverImage, setCoverImage] = React.useState(initialValues.coverImage);
   const [errors, setErrors] = React.useState({});
   const resetStateValues = () => {
     const cleanValues = eventRecord
@@ -70,6 +72,7 @@ export default function EventUpdateForm(props) {
     setDescription(cleanValues.description);
     setOrganizer(cleanValues.organizer);
     setRating(cleanValues.rating);
+    setCoverImage(cleanValues.coverImage);
     setErrors({});
   };
   const [eventRecord, setEventRecord] = React.useState(eventModelProp);
@@ -94,6 +97,7 @@ export default function EventUpdateForm(props) {
     description: [],
     organizer: [],
     rating: [],
+    coverImage: [],
   };
   const runValidationTasks = async (
     fieldName,
@@ -148,6 +152,7 @@ export default function EventUpdateForm(props) {
           description,
           organizer,
           rating,
+          coverImage,
         };
         const validationResponses = await Promise.all(
           Object.keys(validations).reduce((promises, fieldName) => {
@@ -213,6 +218,7 @@ export default function EventUpdateForm(props) {
               description,
               organizer,
               rating,
+              coverImage,
             };
             const result = onChange(modelFields);
             value = result?.title ?? value;
@@ -248,6 +254,7 @@ export default function EventUpdateForm(props) {
               description,
               organizer,
               rating,
+              coverImage,
             };
             const result = onChange(modelFields);
             value = result?.startTime ?? value;
@@ -281,6 +288,7 @@ export default function EventUpdateForm(props) {
               description,
               organizer,
               rating,
+              coverImage,
             };
             const result = onChange(modelFields);
             value = result?.location ?? value;
@@ -314,6 +322,7 @@ export default function EventUpdateForm(props) {
               description,
               organizer,
               rating,
+              coverImage,
             };
             const result = onChange(modelFields);
             value = result?.reoccuring ?? value;
@@ -349,6 +358,7 @@ export default function EventUpdateForm(props) {
               description,
               organizer,
               rating,
+              coverImage,
             };
             const result = onChange(modelFields);
             value = result?.endTime ?? value;
@@ -382,6 +392,7 @@ export default function EventUpdateForm(props) {
               description,
               organizer,
               rating,
+              coverImage,
             };
             const result = onChange(modelFields);
             value = result?.participants ?? value;
@@ -419,6 +430,7 @@ export default function EventUpdateForm(props) {
               description,
               organizer,
               rating,
+              coverImage,
             };
             const result = onChange(modelFields);
             value = result?.capacity ?? value;
@@ -452,6 +464,7 @@ export default function EventUpdateForm(props) {
               description: value,
               organizer,
               rating,
+              coverImage,
             };
             const result = onChange(modelFields);
             value = result?.description ?? value;
@@ -485,6 +498,7 @@ export default function EventUpdateForm(props) {
               description,
               organizer: value,
               rating,
+              coverImage,
             };
             const result = onChange(modelFields);
             value = result?.organizer ?? value;
@@ -522,6 +536,7 @@ export default function EventUpdateForm(props) {
               description,
               organizer,
               rating: value,
+              coverImage,
             };
             const result = onChange(modelFields);
             value = result?.rating ?? value;
@@ -535,6 +550,40 @@ export default function EventUpdateForm(props) {
         errorMessage={errors.rating?.errorMessage}
         hasError={errors.rating?.hasError}
         {...getOverrideProps(overrides, "rating")}
+      ></TextField>
+      <TextField
+        label="Cover image"
+        isRequired={false}
+        isReadOnly={false}
+        value={coverImage}
+        onChange={(e) => {
+          let { value } = e.target;
+          if (onChange) {
+            const modelFields = {
+              title,
+              startTime,
+              location,
+              reoccuring,
+              endTime,
+              participants,
+              capacity,
+              description,
+              organizer,
+              rating,
+              coverImage: value,
+            };
+            const result = onChange(modelFields);
+            value = result?.coverImage ?? value;
+          }
+          if (errors.coverImage?.hasError) {
+            runValidationTasks("coverImage", value);
+          }
+          setCoverImage(value);
+        }}
+        onBlur={() => runValidationTasks("coverImage", coverImage)}
+        errorMessage={errors.coverImage?.errorMessage}
+        hasError={errors.coverImage?.hasError}
+        {...getOverrideProps(overrides, "coverImage")}
       ></TextField>
       <Flex
         justifyContent="space-between"

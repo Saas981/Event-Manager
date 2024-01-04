@@ -44,6 +44,7 @@ export const getEvent = /* GraphQL */ `
       description
       organizer
       rating
+      coverImage
       createdAt
       updatedAt
     }
@@ -68,6 +69,7 @@ export const listEvents = /* GraphQL */ `
         description
         organizer
         rating
+        coverImage
         createdAt
         updatedAt
       }

@@ -60,6 +60,7 @@ export const createEvent = /* GraphQL */ `
       description
       organizer
       rating
+      coverImage
       createdAt
       updatedAt
     }
@@ -82,6 +83,7 @@ export const updateEvent = /* GraphQL */ `
       description
       organizer
       rating
+      coverImage
       createdAt
       updatedAt
     }
@@ -104,6 +106,7 @@ export const deleteEvent = /* GraphQL */ `
       description
       organizer
       rating
+      coverImage
       createdAt
       updatedAt
     }
