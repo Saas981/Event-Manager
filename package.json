@@ -4,10 +4,12 @@
   "private": true,
   "dependencies": {
     "@aws-amplify/ui-react": "^4.0.1",
-    "@emotion/react": "^11.11.1",
+    "@emotion/react": "^11.11.3",
     "@emotion/styled": "^11.11.0",
+    "@fontsource/inter": "^5.0.16",
     "@fontsource/poppins": "^5.0.8",
     "@mui/icons-material": "^5.14.19",
+    "@mui/joy": "^5.0.0-beta.21",
     "@mui/material": "^5.14.19",
     "@mui/system": "^5.14.20",
     "@mui/x-date-pickers": "^7.0.0-alpha.6",

@@ -9,6 +9,8 @@ import { listEvents } from '../graphql/queries';
 const Dashboard = ({userId}) => {
   const [events, setEvents] = useState([]);
 
+
+  //DO NOT TOUCH
   useEffect(() => {
     const fetchEvents = async () => {
       try {
@@ -36,6 +38,13 @@ const Dashboard = ({userId}) => {
     fetchEvents();
   }, [userId]);
   
+
+
+
+
+
+
+
   // Now 'events' state contains all the Event items
   const handleEventClick = (eventId) => {
     setExpandedEvent(expandedEvent === eventId ? null : eventId);
