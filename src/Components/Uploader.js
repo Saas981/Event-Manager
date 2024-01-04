@@ -4,13 +4,12 @@ import CloudUploadOutlinedIcon from '@mui/icons-material/CloudUploadOutlined';
 import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline';
 
 const Uploader = ({savedFile,setSavedFile}) => {
-  const [file, setFile] = useState(null);
 
   const handleDrop = (event) => {
     event.preventDefault();
 
     const droppedFile = event.dataTransfer.files[0];
-    setFile(droppedFile);
+    setSavedFile(droppedFile);
   };
 
   const handleDragOver = (event) => {
@@ -18,7 +17,7 @@ const Uploader = ({savedFile,setSavedFile}) => {
   };
 
   const handleDelete = () => {
-    setFile(null);
+    setSavedFile(null);
   };
 
   return (
@@ -40,18 +39,20 @@ const Uploader = ({savedFile,setSavedFile}) => {
       >
         {savedFile ? (
           <>
-            <Box sx={{ maxHeight: '80px' }}>
+            <Box sx={{ maxHeight: '80px',paddingBottom:'12%' }}>
               <img
                 src={URL.createObjectURL(savedFile)}
                 alt="Uploaded"
-                style={{ maxWidth: '100%', maxHeight: '80px', borderRadius: '10px' }}
+                style={{ maxWidth: '100%', maxHeight: '120px', borderRadius: '10px', }}
               />
+              
             </Box>
-            <Typography variant="body1">{savedFile.name}</Typography>
+           
             <IconButton
               onClick={handleDelete}
               sx={{ position: 'absolute', top: '8px', right: '8px', color: 'rgba(0, 0, 0, 0.5)' }}
             >
+        
               <DeleteOutlineIcon />
             </IconButton>
           </>
@@ -68,7 +69,7 @@ const Uploader = ({savedFile,setSavedFile}) => {
                 id="upload-input"
                 accept="image/*"
                 style={{ display: 'none' }}
-                onChange={(e) =>{ setFile(e.target.files[0])
+                onChange={(e) =>{ 
                     setSavedFile(e.target.files[0])
                 }}
               />

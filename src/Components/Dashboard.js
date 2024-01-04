@@ -5,6 +5,7 @@ import PeopleIcon from '@mui/icons-material/People';
 import { API, graphqlOperation } from 'aws-amplify';
 import { Link } from 'react-router-dom'; 
 import { listEvents } from '../graphql/queries';
+     import { Storage } from 'aws-amplify';
 
 const Dashboard = ({userId}) => {
   const [events, setEvents] = useState([]);
@@ -16,18 +17,36 @@ const Dashboard = ({userId}) => {
       try {
         console.log("FETCHING GRAPHQL API");
         const { data } = await API.graphql(graphqlOperation(listEvents));
-         // Ensure data.listEvents.items is an array
-        console.log("EVENTS", data.listEvents.items);
-        console.log("PARTICIPANTS", data.listEvents.items[0].participants)
-        console.log("RETRIEVED USERID", userId)
-        const moddedData = data.listEvents.items.filter(event => {
+  
+        //ONLY SHOW TO People that can view it which are participants
+        let moddedData = data.listEvents.items.filter(event => {
           // Convert participants from string to object
           const participants = JSON.parse(event.participants);
               
           // Check if userId exists in participants object keys
           return participants[0].hasOwnProperty(userId);
         });
+
+        moddedData = await Promise.all(moddedData.map(async (event) => {
+          console.log("COVER IAMGE ", event)
+          if (event.coverImage) {
+            // If coverImage attribute is present, fetch the URL
+            try {
+              const imgUrl = await Storage.get(event.coverImage);
+              // Add the imgUrl attribute to the event object
+             
+              return { ...event, imgUrl };
+            } catch (error) {
+              console.error('Error fetching image URL:', error);
+              // Handle error appropriately
+            }
+          }
         
+          // If coverImage is not present, return the event object without changes
+          return event;
+        }));
+
+     
         console.log("Filtered Data:", moddedData);
         setEvents(moddedData)
       } catch (error) {
@@ -73,20 +92,24 @@ const Dashboard = ({userId}) => {
           </ParticipantCount>
         </EventBox>
 
+        <Collapse style={{ background: 'linear-gradient(to bottom right, rgba(74, 158, 226,0.1),rgba(90, 63, 192,0.1 ))' }} in={expandedEvent === event.id}>
+  <Grid container spacing={2}>
+    <Grid item xs={4}>
+      {event.imgUrl ? (
+        <img src={event.imgUrl} alt="Event Cover" style={{ width: '50%',margin:"10px", borderRadius: '8px' }} />
+      ) : (
+        <ImageSkeleton width={"50%"}  sx={{margin:"10px", borderRadius: '8px'}} animation="wave" variant="rectangular" />
+      )}
+      <Typography style={{ marginTop: '10px' }}>Organizer: {event.author}</Typography>
+    </Grid>
+    <Grid item xs={8}>
+      <EventDetails>
+        <Typography>{event.description}</Typography>
+      </EventDetails>
+    </Grid>
+  </Grid>
+</Collapse>
 
-        <Collapse style={{ background:'linear-gradient(to bottom right, rgba(74, 158, 226,0.1),rgba(90, 63, 192,0.1 ))',}} in={expandedEvent === event.id}>
-        <Grid container spacing={2}>
-        <Grid item xs={4}>
-            <ImageSkeleton animation="wave" variant="rectangular" />
-            <Typography style={{ marginTop: '10px' }}>Organizer: {event.author}</Typography>
-          </Grid>
-        <Grid item xs={8}>
-          <EventDetails>
-            <Typography>{event.description}</Typography>
-          </EventDetails>
-      </Grid>
-      </Grid>
-        </Collapse>
       </EventContainer>
     ))}
    

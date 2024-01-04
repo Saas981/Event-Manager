@@ -16,5 +16,6 @@ type Event @model @auth(rules: [{allow: public}]) {
   description: String
   organizer: String
   rating: Float
+  coverImage: String
 }
  

@@ -23,6 +23,7 @@ export declare type EventCreateFormInputValues = {
     description?: string;
     organizer?: string;
     rating?: number;
+    coverImage?: string;
 };
 export declare type EventCreateFormValidationValues = {
     title?: ValidationFunction<string>;
@@ -35,6 +36,7 @@ export declare type EventCreateFormValidationValues = {
     description?: ValidationFunction<string>;
     organizer?: ValidationFunction<string>;
     rating?: ValidationFunction<number>;
+    coverImage?: ValidationFunction<string>;
 };
 export declare type PrimitiveOverrideProps<T> = Partial<T> & React.DOMAttributes<HTMLDivElement>;
 export declare type EventCreateFormOverridesProps = {
@@ -49,6 +51,7 @@ export declare type EventCreateFormOverridesProps = {
     description?: PrimitiveOverrideProps<TextFieldProps>;
     organizer?: PrimitiveOverrideProps<TextFieldProps>;
     rating?: PrimitiveOverrideProps<TextFieldProps>;
+    coverImage?: PrimitiveOverrideProps<TextFieldProps>;
 } & EscapeHatchProps;
 export declare type EventCreateFormProps = React.PropsWithChildren<{
     overrides?: EventCreateFormOverridesProps | undefined | null;

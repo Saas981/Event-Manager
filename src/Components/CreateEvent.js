@@ -19,13 +19,14 @@ import Sheet from '@mui/joy/Sheet';
 import SaveAsIcon from '@mui/icons-material/SaveAs';
 import ModalDialog from '@mui/joy/ModalDialog';
 import Box from '@mui/joy/Box';
-
+import { Storage } from 'aws-amplify';
 
 
 const CreateEvent = () => {
   const [activeStep, setActiveStep] = useState(0);
   const [progress, setProgress] = useState(0);
   const [open, setOpen] = React.useState(false);
+  const [loadCreateButton, setLoadCreateButton] = React.useState(false)
   const [savedFile, setSavedFile]= React.useState();
 
   const [eventDetails, setEventDetails] = useState({
@@ -38,6 +39,7 @@ const CreateEvent = () => {
     "participants":'[ { "24124129029109210910e-d50e0fbe7af1": { "permissions": "view" }, "111ea5db-7094-443d-b48e-d50e0fbe7af1": { "permissions": "view" } } ]',
     description: '',
     organizer: '',
+    coverImage:'',
   });
   
 
@@ -45,17 +47,43 @@ const CreateEvent = () => {
   const handleFinish = async () => {
     // Assuming you have the mutation defined, replace 'createEvent' with your actual mutation
     try {
-      
+      if(savedFile){
+        setEventDetails((prevDetails) => ({ ...prevDetails, ["coverImage"]: savedFile.name }))
+      }
+      console.log("FILE", savedFile)
+        try {
+          await Storage.put(savedFile.name, savedFile, {
+            contentType: "image/png", // contentType is optional
+          });
+        } catch (error) {
+          console.log("Error uploading file: ", error);
+        }
+
+    //  Storage.put(savedFile,savedFile.name)
+    
 
        console.log("EVENT DETAILS CREATING ",eventDetails)
-      const createEventResponse = await API.graphql({ 
-        query: mutations.createEvent,
-        variables: {
-            input: eventDetails
-        }
-      });
+
+      let updatedEventDetails = eventDetails
+      if(savedFile){
+        updatedEventDetails = { ...eventDetails, coverImage: savedFile.name };
+      }
+
+       const createEventResponse = await API.graphql({ 
+         query: mutations.createEvent,
+         variables: {
+           input: updatedEventDetails,
+         }
+       });
       const eventId = createEventResponse.data.createEvent.id;
-      window.location.href = '/dashboard';
+      setLoadCreateButton(true);
+
+setTimeout(() => {
+  // After 3 seconds, set createLoadButton to false and redirect to the dashboard
+  setLoadCreateButton(false);
+  window.location.href = '/dashboard';
+
+}, 3000);
     } catch (error) {
       // Handle error
       console.error('Error creating event:', error);
@@ -109,11 +137,11 @@ const CreateEvent = () => {
    marginBottom: '10px',}}
    >
     
-     <Typography variant="h5" style={{ color:"#f8f8f8", fontWeight:"550", marginLeft: '10px', fontFamily: 'Inter, sans-serif' }}>
+     <Typography level="h3" style={{ color:"#f8f8f8", fontWeight:"550", marginLeft: '10px', fontFamily: 'Inter, sans-serif' }}>
               Event Creation 
             </Typography>
      </Box>
-<Grid container spacing={2} sx={{padding:"24px",paddingTop:"0px",paddingBottom:"0px"}}>
+<Grid container spacing={2} sx={{padding:"24px",paddingTop:"10px",paddingBottom:"0px"}}>
 
 <Grid item xs={6} sx={{marginTop:"10px"}}>
   <Grid item xs={12}>
@@ -176,7 +204,7 @@ const CreateEvent = () => {
       marginBottom: '10px',
     }}
   >
-    <Typography variant="h4" style={{ color: "#f8f8f8", fontWeight: "550", marginLeft: '10px', fontFamily: 'Inter' }}>
+    <Typography level="h3" style={{ color: "#f8f8f8", fontWeight: "550", marginLeft: '10px', fontFamily: 'Inter' }}>
       Event Creation
     </Typography>
   </Box>
@@ -306,7 +334,7 @@ const CreateEvent = () => {
                 margin: 'auto',
               }}
             >
-              <Typography variant="h4" style={{ color: "#f8f8f8", fontWeight: "550", marginLeft: '10px', fontFamily: 'Poppins, sans-serif' }}>
+              <Typography level="h3" style={{ color: "#f8f8f8", fontWeight: "550", marginLeft: '10px', fontFamily: 'Poppins, sans-serif' }}>
                 Send Invitations
               </Typography>
             </Box>
@@ -404,12 +432,21 @@ const CreateEvent = () => {
               flexDirection: { xs: 'column', sm: 'row-reverse' },
             }}
           >
-            <Button variant="soft" color="success" onClick={() => handleFinish()}>
+            {!loadCreateButton? 
+              <Button variant="soft" color="success" onClick={() => handleFinish()}>
               Create
             </Button>
+            :
+            
+            
+            <Button loading variant="solid" color="success" onClick={() => handleFinish()}>
+            Create
+          </Button>
+            }
+          
             <Button
-              variant="outlined"
-              color="neutral"
+              variant="soft"
+              color="danger"
               onClick={() => setOpen(false)}
             >
               Cancel
