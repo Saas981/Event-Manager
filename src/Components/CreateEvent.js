@@ -22,13 +22,13 @@ import Box from '@mui/joy/Box';
 import { Storage } from 'aws-amplify';
 
 
-const CreateEvent = () => {
+const CreateEvent = ({userId}) => {
   const [activeStep, setActiveStep] = useState(0);
   const [progress, setProgress] = useState(0);
   const [open, setOpen] = React.useState(false);
   const [loadCreateButton, setLoadCreateButton] = React.useState(false)
   const [savedFile, setSavedFile]= React.useState();
-
+  const [eventId,setEventId]= React.useState();
   const [eventDetails, setEventDetails] = useState({
     title: '',
     startTime: dayjs('2024-01-1T12:30'),
@@ -36,7 +36,7 @@ const CreateEvent = () => {
     reoccuring: false,
     endTime: dayjs('2024-01-2T12:30'),
     capacity: 0,
-    "participants":'[ { "24124129029109210910e-d50e0fbe7af1": { "permissions": "view" }, "111ea5db-7094-443d-b48e-d50e0fbe7af1": { "permissions": "view" } } ]',
+    participants:`[ { "${userId}": { "permissions": "admin" } } ]`,
     description: '',
     organizer: '',
     coverImage:'',
@@ -47,12 +47,13 @@ const CreateEvent = () => {
   const handleFinish = async () => {
     // Assuming you have the mutation defined, replace 'createEvent' with your actual mutation
     try {
+      setLoadCreateButton(true);
       if(savedFile){
-        setEventDetails((prevDetails) => ({ ...prevDetails, ["coverImage"]: savedFile.name }))
+        setEventDetails((prevDetails) => ({ ...prevDetails, ["coverImage"]: eventDetails.title+eventDetails.organizer+savedFile.name }))
       }
       console.log("FILE", savedFile)
         try {
-          await Storage.put(savedFile.name, savedFile, {
+          await Storage.put(eventDetails.title+eventDetails.organizer+savedFile.name , savedFile, {
             contentType: "image/png", // contentType is optional
           });
         } catch (error) {
@@ -66,7 +67,7 @@ const CreateEvent = () => {
 
       let updatedEventDetails = eventDetails
       if(savedFile){
-        updatedEventDetails = { ...eventDetails, coverImage: savedFile.name };
+        updatedEventDetails = { ...eventDetails, coverImage: eventDetails.title+eventDetails.organizer+savedFile.name  };
       }
 
        const createEventResponse = await API.graphql({ 
@@ -75,15 +76,18 @@ const CreateEvent = () => {
            input: updatedEventDetails,
          }
        });
-      const eventId = createEventResponse.data.createEvent.id;
-      setLoadCreateButton(true);
+      const thisEventId = createEventResponse.data.createEvent.id;
+      setEventId(thisEventId)
+   
 
 setTimeout(() => {
   // After 3 seconds, set createLoadButton to false and redirect to the dashboard
   setLoadCreateButton(false);
-  window.location.href = '/dashboard';
+  setOpen(false);
+  handleNext()
+  // window.location.href = '/dashboard';
 
-}, 3000);
+}, 100);
     } catch (error) {
       // Handle error
       console.error('Error creating event:', error);
@@ -348,11 +352,11 @@ setTimeout(() => {
                 <TextField
                   label="Invite Link"
                   fullWidth
-                  value="link/xyz" // Placeholder link
+                  value={`link/${eventId}`}  // Placeholder link
                   sx={{ fontFamily: 'Poppins', mb: 2, width: '50%' }}
                   InputProps={{
                     endAdornment: (
-                      <IconButton aria-label="copy" onClick={() => navigator.clipboard.writeText("link/xyz")}>
+                      <IconButton aria-label="copy" onClick={() => navigator.clipboard.writeText(`${window.location.origin}/join/${eventId}`)}>
                         <FileCopyIcon />
                       </IconButton>
                     ),
@@ -478,15 +482,27 @@ setTimeout(() => {
             <Button variant="soft" disabled={activeStep === 0} onClick={handleBack}>
               Back
             </Button>
-            {activeStep === totalSteps  ? (
+            {activeStep === totalSteps-1  ? (
              <Button variant="soft" color="primary" onClick={()=>{      setOpen(true)}} startDecorator={<SaveAsIcon/>}>
              Finish
            </Button>
            
             ) : (
-              <Button variant="soft" color="primary" onClick={handleNext}>
+              <>
+              {activeStep === totalSteps  ? ( 
+                <Button variant="soft" color="primary" onClick={()=> window.location.href = '/dashboard'}>
+                Done?
+              </Button>
+              ):(
+
+                <Button variant="soft" color="primary" onClick={handleNext}>
                 Next
               </Button>
+
+              )}
+
+              </>
+             
             )}
           </Box>
         </Box>

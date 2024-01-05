@@ -7,6 +7,7 @@ import Contact from './Components/Contact';
 import Login from './Components/Login';
 import SignUp from './Components/Signup';
 import CreateEvent from './Components/CreateEvent';
+import JoinEventPage from './Components/JoinEvent';
 
 
 import Dashboard from './Components/Dashboard'
@@ -75,6 +76,8 @@ function App({ signOut}) {
               <Route path="/signup" element={<SignUp />} />
               <Route path="/dashboard" element={<Dashboard userId={user} />} />
               <Route path="/create" element={<CreateEvent userId={user}/>} />
+              <Route path="/join/:eventId" element={<JoinEventPage user={user}/>} />
+
             </Routes>
           </Grid>
       

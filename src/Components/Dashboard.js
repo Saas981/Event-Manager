@@ -87,7 +87,7 @@ const Dashboard = ({userId}) => {
           <Typography>{event.date}</Typography>
           <Typography>{event.title}</Typography>
           <ParticipantCount>
-            {`0/${event.capacity}`}
+            {`${Object.keys(JSON.parse(event.participants)[0]).length}/${event.capacity}`}
             <PeopleIcon style={{ fontSize: '28px' }} />
           </ParticipantCount>
         </EventBox>

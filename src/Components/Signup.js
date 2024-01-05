@@ -71,9 +71,10 @@ function SignUp() {
 
     const { email, confirmationCode } = formData;
     const cleanedConfirmationCode = confirmationCode.replace(/\D/g, '');
+    console.log(cleanedConfirmationCode)
 
     try {
-      await Auth.confirmSignUp({ username: email, confirmationCode: cleanedConfirmationCode });
+      await Auth.confirmSignUp( email,  cleanedConfirmationCode );
       console.log('Confirmation success');
       await handleAutoSignIn()
       setError(null)
