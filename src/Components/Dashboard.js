@@ -34,8 +34,10 @@ const Dashboard = ({userId}) => {
             try {
               const imgUrl = await Storage.get(event.coverImage);
               // Add the imgUrl attribute to the event object
+              const isAdmin =(JSON.parse(event.participants)[0].userId=="admin")
+              
              
-              return { ...event, imgUrl };
+              return { ...event, imgUrl,isAdmin };
             } catch (error) {
               console.error('Error fetching image URL:', error);
               // Handle error appropriately
@@ -84,12 +86,21 @@ const Dashboard = ({userId}) => {
     {events.map((event) => (
       <EventContainer key={event.id} elevation={3}>
         <EventBox onClick={() => handleEventClick(event.id)}>
-          <Typography>{event.date}</Typography>
-          <Typography>{event.title}</Typography>
-          <ParticipantCount>
+          <Grid container>
+        <Grid xs={4} >   <Typography sx={{fontSize:"14px",textAlign:"left"}}>{new Date(event.startTime).toLocaleString()}</Typography>
+        </Grid>
+        <Grid xs={5}> <Typography sx={{textAlign:"center"}}>{event.title}</Typography>
+        </Grid>
+        <Grid xs={3}>
+        <ParticipantCount>
             {`${Object.keys(JSON.parse(event.participants)[0]).length}/${event.capacity}`}
             <PeopleIcon style={{ fontSize: '28px' }} />
           </ParticipantCount>
+        </Grid>
+          </Grid>
+       
+         
+         
         </EventBox>
 
         <Collapse style={{ background: 'linear-gradient(to bottom right, rgba(74, 158, 226,0.1),rgba(90, 63, 192,0.1 ))' }} in={expandedEvent === event.id}>
@@ -100,7 +111,7 @@ const Dashboard = ({userId}) => {
       ) : (
         <ImageSkeleton width={"50%"}  sx={{margin:"10px", borderRadius: '8px'}} animation="wave" variant="rectangular" />
       )}
-      <Typography style={{ marginTop: '10px' }}>Organizer: {event.author}</Typography>
+      <Typography style={{ marginTop: '10px' }}>Organizer: {event.organizer}</Typography>
     </Grid>
     <Grid item xs={8}>
       <EventDetails>
@@ -199,7 +210,9 @@ const EventDetails = styled(Box)({
 const ParticipantCount = styled(Box)({
   display: 'flex',
   fontFamily: 'Poppins, sans-serif',
-  alignItems: 'center',
+  alignItems: 'right',
+  justifyContent:"right",
+
 });
 
 const ImageSkeleton = styled(Skeleton)({
