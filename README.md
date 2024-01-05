@@ -2,7 +2,7 @@
 
 The Event Manager App is a platform that allows users to create, manage, and attend events seamlessly. Whether you're organizing a public gathering or hosting a private get-together, this app provides a feature-rich environment to streamline the entire event process.
 
-## Features
+## Featuress
 
 ### Stage 1: Minimum Viable Product (MVP)
 
