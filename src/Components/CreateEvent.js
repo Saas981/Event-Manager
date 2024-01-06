@@ -31,10 +31,10 @@ const CreateEvent = ({userId}) => {
   const [eventId,setEventId]= React.useState();
   const [eventDetails, setEventDetails] = useState({
     title: '',
-    startTime: dayjs('2024-01-1T12:30'),
+    startTime: dayjs(),
     location: '',
     reoccuring: false,
-    endTime: dayjs('2024-01-2T12:30'),
+    endTime: dayjs().add(1,'day'),
     capacity: 0,
     participants:`[ { "${userId}": { "permissions": "admin" } } ]`,
     description: '',
