@@ -556,7 +556,7 @@ setTimeout(() => {
           </Button>
         }
       >
-        Your message was sent successfully.
+        Please fill in the required fields: Title and Organizer.
       </Snackbar>
 
 
