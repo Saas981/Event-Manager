@@ -99,9 +99,20 @@ setTimeout(() => {
   const totalSteps =2;
 
   const handleNext = () => {
+    if (activeStep === 0) {
+      // Check if title and organizer are provided before moving to the next step
+      if (!eventDetails.title || !eventDetails.organizer) {
+        console.error("Please fill in the required fields: Title and Organizer.");
+        // You can also set an error state here and display it in your UI
+        return;
+      }
+    }
+  
     setActiveStep((prevActiveStep) => prevActiveStep + 1);
     setProgress((prevProgress) => (prevProgress + 100 / totalSteps > 100 ? 100 : prevProgress + 100 / totalSteps));
   };
+  
+  
 
   const handleBack = () => {
     setActiveStep((prevActiveStep) => prevActiveStep - 1);
