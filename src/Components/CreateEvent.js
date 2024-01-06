@@ -114,13 +114,22 @@ setTimeout(() => {
   };
 
   const handleChange = (field, value) => {
-    if(field.includes("time")){
-        //setEventDetails((prevDetails) => ({ ...prevDetails, [field]: dayjs(value) }));
-    }else{
+    if (field.includes("time")) {
+        // Handle time-related updates if needed
+    } else if (field === "capacity") {
+        // Validate and only accept positive integers for the "Capacity" field
+        const intValue = parseInt(value);
+
+        if (!isNaN(intValue) && intValue >= 0) {
+            setEventDetails((prevDetails) => ({ ...prevDetails, [field]: intValue }));
+        } else {
+            // Handle the case where the entered value is not a positive integer
+            console.error("Please enter a positive integer for Capacity.");
+        }
+    } else {
         setEventDetails((prevDetails) => ({ ...prevDetails, [field]: value }));
     }
-    
-  };
+};
 
   const renderStepContent = (step) => {
     switch (step) {
