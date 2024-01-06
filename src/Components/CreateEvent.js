@@ -1,11 +1,13 @@
 import React, { useState } from 'react';
 import { Container, TextField, Grid, LinearProgress,Stack,Switch,IconButton } from '@mui/material';
 import Uploader from "./Uploader"
+import Snackbar from '@mui/joy/Snackbar';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import dayjs from 'dayjs';
 import FormControlLabel from '@mui/material/FormControlLabel';
 import { alpha, styled } from '@mui/material/styles';
 import { purple } from '@mui/material/colors';
+import ErrorOutlineSharpIcon from '@mui/icons-material/ErrorOutlineSharp';
 import { DateTimePicker } from '@mui/x-date-pickers/DateTimePicker';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import FileCopyIcon from '@mui/icons-material/FileCopy';
@@ -41,8 +43,15 @@ const CreateEvent = ({userId}) => {
     organizer: '',
     coverImage:'',
   });
+  const [snackbarOpen, setSnackbarOpen] = useState(false);
+const [snackbarMessage, setSnackbarMessage] = useState('');
+
   
 
+const openSnackbar = (message) => {
+  setSnackbarMessage(message);
+  setSnackbarOpen(true);
+};
 
   const handleFinish = async () => {
     // Assuming you have the mutation defined, replace 'createEvent' with your actual mutation
@@ -102,8 +111,7 @@ setTimeout(() => {
     if (activeStep === 0) {
       // Check if title and organizer are provided before moving to the next step
       if (!eventDetails.title || !eventDetails.organizer) {
-        console.error("Please fill in the required fields: Title and Organizer.");
-        // You can also set an error state here and display it in your UI
+        openSnackbar("Please fill in the required fields: Title and Organizer.");
         return;
       }
     }
@@ -111,6 +119,7 @@ setTimeout(() => {
     setActiveStep((prevActiveStep) => prevActiveStep + 1);
     setProgress((prevProgress) => (prevProgress + 100 / totalSteps > 100 ? 100 : prevProgress + 100 / totalSteps));
   };
+  
   
   
 
@@ -515,7 +524,7 @@ setTimeout(() => {
               </Button>
               ):(
 
-                <Button variant="soft" color="primary" onClick={handleNext}>
+                <Button variant="soft" color="primary"   onClick={handleNext}>
                 Next
               </Button>
 
@@ -528,6 +537,29 @@ setTimeout(() => {
         </Box>
         
       </Box>
+      
+  <Snackbar
+        variant="soft"
+        color="danger"
+        open={snackbarOpen}
+        onClose={() => setSnackbarOpen(false)}
+        anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
+        startDecorator={<ErrorOutlineSharpIcon />}
+        endDecorator={
+          <Button
+            onClick={() => setSnackbarOpen(false)}
+            size="sm"
+            variant="soft"
+            color="danger"
+          >
+            Dismiss
+          </Button>
+        }
+      >
+        Your message was sent successfully.
+      </Snackbar>
+
+
     </Container>
   );
 };
