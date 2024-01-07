@@ -78,6 +78,7 @@ const openSnackbar = (message) => {
       if(savedFile){
         updatedEventDetails = { ...eventDetails, coverImage: eventDetails.title+eventDetails.organizer+savedFile.name  };
       }
+      console.log("USER ID RIGHT NOW ", userId)
 
        const createEventResponse = await API.graphql({ 
          query: mutations.createEvent,
@@ -109,6 +110,8 @@ setTimeout(() => {
 
   const handleNext = () => {
     if (activeStep === 0) {
+      handleChange("participants",`[ { "${userId}": { "permissions": "admin" } } ]`)
+
       // Check if title and organizer are provided before moving to the next step
       if (!eventDetails.title || !eventDetails.organizer) {
         openSnackbar("Please fill in the required fields: Title and Organizer.");
