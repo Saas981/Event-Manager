@@ -1,19 +1,20 @@
 import React, { useState, useEffect } from 'react';
-import { Typography, Box, Collapse, Paper, Avatar, Grid, Skeleton,Button } from '@mui/material';
+import { Typography, Box, Collapse, Paper, Avatar, Grid, Skeleton, } from '@mui/material';
 import { styled } from '@mui/system';
 import PeopleIcon from '@mui/icons-material/People';
 import { API, graphqlOperation } from 'aws-amplify';
 import { Link } from 'react-router-dom'; 
 import { listEvents } from '../graphql/queries';
+import { deleteEvent } from '../graphql/mutations';
      import { Storage } from 'aws-amplify';
+     import  Button from '@mui/joy/Button'
+     import DeleteRoundedIcon from '@mui/icons-material/DeleteRounded';
 
 const Dashboard = ({userId}) => {
   const [events, setEvents] = useState([]);
 
 
-  //DO NOT TOUCH
-  useEffect(() => {
-    const fetchEvents = async () => {
+      const fetchEvents = async () => {
       try {
         console.log("FETCHING GRAPHQL API");
         const { data } = await API.graphql(graphqlOperation(listEvents));
@@ -55,12 +56,30 @@ const Dashboard = ({userId}) => {
         console.error('Error fetching events:', error);
       }
     };
+
+  //DO NOT TOUCH
+  useEffect(() => {
+
   
     fetchEvents();
   }, [userId]);
   
 
+  //DELETE FUNCTION for deleting events
+  const handleDelete = async (eventId) => {
+    try {
+      // Use GraphQL mutation to delete the event
+      const response = await API.graphql(graphqlOperation(deleteEvent, { input: { id: eventId } }));
 
+      // Log the response (you can handle success in your specific way)
+      console.log('Event deleted successfully:', response);
+
+      // Fetch the updated list of events after deletion
+      fetchEvents();
+    } catch (error) {
+      console.error('Error deleting event:', error);
+    }
+  };
 
 
 
@@ -75,16 +94,21 @@ const Dashboard = ({userId}) => {
     <DashboardContainer>
       
     <DashboardHeader elevation={3}> Welcome to Your Dashboard<Box>
-    <Button component={Link} to="/create" variant="" color="primary">
-            Create Event
-          </Button>
+    
         </Box>
  
         
         </DashboardHeader>
+        <Box sx={{width:"100%"}}>
+<Button component="a" href="/create" variant="soft" color="primary" sx={{width:"100%", borderRadius:"0px"}}>
+            Create Event
+          </Button>
+        </Box>
 
     {events.map((event) => (
+      
       <EventContainer key={event.id} elevation={3}>
+        
         <EventBox onClick={() => handleEventClick(event.id)}>
           <Grid container>
         <Grid xs={4} >   <Typography sx={{fontSize:"14px",textAlign:"left"}}>{new Date(event.startTime).toLocaleString()}</Typography>
@@ -104,21 +128,46 @@ const Dashboard = ({userId}) => {
         </EventBox>
 
         <Collapse style={{ background: 'linear-gradient(to bottom right, rgba(74, 158, 226,0.1),rgba(90, 63, 192,0.1 ))' }} in={expandedEvent === event.id}>
-  <Grid container spacing={2}>
-    <Grid item xs={4}>
+  <Grid container >
+    <Grid item xs={4} sx={ {border: '2px dashed #ccc'}}>
       {event.imgUrl ? (
         <img src={event.imgUrl} alt="Event Cover" style={{ width: '50%',margin:"10px", borderRadius: '8px' }} />
       ) : (
         <ImageSkeleton width={"50%"}  sx={{margin:"10px", borderRadius: '8px'}} animation="wave" variant="rectangular" />
       )}
-      <Typography style={{ marginTop: '10px' }}>Organizer: {event.organizer}</Typography>
+      <Typography  sx={ {border: '2px dashed #ccc'}} style={{ marginTop: '10px' }}>Organizer: {event.organizer}</Typography>
     </Grid>
-    <Grid item xs={8}>
-      <EventDetails>
+    <Grid item xs={8} sx={ {border: '2px dashed #ccc'}}>
+      <EventDetails sx={ {border: '2px dashed #ccc'}}>
         <Typography>{event.description}</Typography>
       </EventDetails>
     </Grid>
   </Grid>
+  {/* CHECKS IF the user is admin before providing delete button */}
+  {JSON.parse(event.participants)[0][userId]["permissions"]=="admin"  ? (
+  <Button
+    onClick={() => {
+      // handleDelete(event.id);
+            console.log("USERID ", userId )
+
+      console.log("EVENT ",JSON.parse(event.participants)[0] )
+       console.log("EVENT ",JSON.parse(event.participants)[0][userId]["permissions"]=="admin" )
+    }}
+    startDecorator={<DeleteRoundedIcon />}
+    color="danger"
+    variant="soft"
+    sx={{
+      width: "100%",
+      borderRadius: "0px",
+      marginTop: "3%",
+      "--Button-gap": "15px",
+    }}
+  >
+    Delete this Event
+  </Button>
+) : null}
+
+ 
 </Collapse>
 
       </EventContainer>
