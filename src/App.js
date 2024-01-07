@@ -8,7 +8,7 @@ import Login from './Components/Login';
 import SignUp from './Components/Signup';
 import CreateEvent from './Components/CreateEvent';
 import JoinEventPage from './Components/JoinEvent';
-
+import Profile from './Components/Profile'
 
 import Dashboard from './Components/Dashboard'
 import { Container, Grid } from '@mui/material';
@@ -77,6 +77,7 @@ function App({ signOut}) {
               <Route path="/dashboard" element={<Dashboard userId={user} />} />
               <Route path="/create" element={<CreateEvent userId={user}/>} />
               <Route path="/join/:eventId" element={<JoinEventPage user={user}/>} />
+              <Route path="/profile" element={<Profile />}/>
 
             </Routes>
           </Grid>
