@@ -37,7 +37,7 @@ const CreateEvent = ({userId,theme}) => {
     location: '',
     reoccuring: false,
     endTime: dayjs().add(1,'day'),
-    capacity: 0,
+    capacity: 1,
     participants:`[ { "${userId}": { "permissions": "admin" } } ]`,
     description: '',
     organizer: '',
@@ -142,17 +142,30 @@ setTimeout(() => {
     } else if (field === "capacity") {
         // Validate and only accept positive integers for the "Capacity" field
         const intValue = parseInt(value);
-
-        if (!isNaN(intValue) && intValue >= 0) {
-            setEventDetails((prevDetails) => ({ ...prevDetails, [field]: intValue }));
-        } else {
-            // Handle the case where the entered value is not a positive integer
-            console.error("Please enter a positive integer for Capacity.");
+        
+        if(intValue>=1 || isNaN(intValue)){
+ setEventDetails((prevDetails) => ({ ...prevDetails, [field]: intValue }));
         }
+ 
+
     } else {
         setEventDetails((prevDetails) => ({ ...prevDetails, [field]: value }));
     }
 };
+
+//On blur set capacity to default value of 1
+ const handleBlur = (field) => {
+    const value = eventDetails[field];
+
+    // Check if the value is less than 0 or not a number
+    if (isNaN(value) || value < 1) {
+      // Set the value to 0
+      handleChange(field, 1);
+    }
+  };
+
+
+
 
   const renderStepContent = (step) => {
     switch (step) {
@@ -323,6 +336,7 @@ setTimeout(() => {
           variant="outlined"
           value={eventDetails.capacity}
           onChange={(e) => handleChange('capacity', e.target.value)}
+          onBlur={() => handleBlur('capacity')}
           sx={{ fontFamily: 'Poppins', mb: 2 }}
         />
       </Grid>

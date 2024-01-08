@@ -72,6 +72,7 @@ function App({ signOut}) {
             ? 'linear-gradient(to right, #1d1629, #1e1e24 )'
             : 'linear-gradient(to right, rgba(80, 63, 159,0.18), rgba(255, 81, 181,0.18))',
           paddingBottom: "10%",
+          minHeight:"100vh"
         }}>   
         <br></br>
           <Grid

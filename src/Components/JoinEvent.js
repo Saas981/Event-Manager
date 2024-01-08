@@ -63,6 +63,9 @@ const JoinEventPage = ({user,theme}) => {
     fetchEventDetails();
   }, [eventId,user]);
 
+
+
+  
  const handleJoin = async () => {
   try {
     // Create a copy of the eventDetails to avoid modifying the state directly
