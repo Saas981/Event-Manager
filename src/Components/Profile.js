@@ -33,26 +33,59 @@ const EditButton = {
   border: 'none',
   borderRadius: '4px',
   cursor: 'pointer',
+  marginRight: '10px',
+};
+
+const SaveButton = {
+  backgroundColor: '#2196F3',
+  color: 'white',
+  padding: '10px 15px',
+  border: 'none',
+  borderRadius: '4px',
+  cursor: 'pointer',
 };
 
 const Profile = () => {
-  const [photo, setPhoto] = useState(null); // To store the profile photo (not implemented here)
-  const [username, setUsername] = useState('');
-  const [name, setName] = useState('John Doe'); // Static name for now
-  const [email, setEmail] = useState('');
+  const [isEditing, setIsEditing] = useState(false);
+  const [photo, setPhoto] = useState(null);
+  const [username, setUsername] = useState('Mike Oxlong');
+  const [name, setName] = useState('John Doe');
+  const [email, setEmail] = useState('example@gmail.com');
 
   useEffect(() => {
     const fetchData = async () => {
       try {
-        // Replace this with your actual data fetching logic
-        const response = await fetch('https://api.example.com/user/123');
-        const data = await response.json();
-        
-        setPhoto(data.photo); // Assuming the API returns a photo URL
-        setUsername(data.email); // Setting username to the email address
-        setEmail(data.email);
+        // Check if user data exists in localStorage
+        const storedData = localStorage.getItem('userData');
+        if (storedData) {
+          const parsedData = JSON.parse(storedData);
+          setPhoto(parsedData.photo);
+          setUsername(parsedData.username);
+          setName(parsedData.name);
+          setEmail(parsedData.email);
+        } else {
+          // If not, fetch from API
+          const response = await fetch('https://api.example.com/user/123');
+          const data = await response.json();
+
+          setPhoto(data.photo);
+          setUsername(data.username);
+          setName(data.name);
+          setEmail(data.email);
+
+          // Save fetched data to localStorage
+          localStorage.setItem(
+            'userData',
+            JSON.stringify({
+              photo: data.photo,
+              username: data.username,
+              name: data.name,
+              email: data.email,
+            })
+          );
+        }
       } catch (error) {
-        console.error('Error fetching user data:', error);
+        console.error('Error fetching or loading user data:', error);
       }
     };
 
@@ -60,8 +93,24 @@ const Profile = () => {
   }, []); // Empty dependency array ensures the effect runs only once, similar to componentDidMount
 
   const handleEditProfile = () => {
-    // Add logic to navigate to the edit profile page or show an edit modal
-    console.log('Edit Profile clicked!');
+    setIsEditing(true);
+  };
+
+  const handleSaveProfile = () => {
+    // Add logic to save the updated profile information
+    setIsEditing(false);
+    console.log('Profile Saved!');
+
+    // Update localStorage with the new data
+    localStorage.setItem(
+      'userData',
+      JSON.stringify({
+        photo,
+        username,
+        name,
+        email,
+      })
+    );
   };
 
   return (
@@ -69,20 +118,53 @@ const Profile = () => {
       <h2 style={ProfileHeader}>User Profile</h2>
       <div style={{ marginBottom: '15px' }}>
         <img
-          src={photo || 'https://via.placeholder.com/150'} // Placeholder image if no photo is available
+          src={photo || 'https://via.placeholder.com/150'}
           alt="Profile"
           style={{ width: '150px', borderRadius: '50%', marginBottom: '10px' }}
         />
       </div>
       <div style={ProfileSubheader}>Username:</div>
-      <p style={ProfileContent}>{username}</p>
+      {isEditing ? (
+        <input
+          type="text"
+          value={username}
+          onChange={(e) => setUsername(e.target.value)}
+          style={{ width: '100%', marginBottom: '10px' }}
+        />
+      ) : (
+        <p style={ProfileContent}>{username}</p>
+      )}
       <div style={ProfileSubheader}>Name:</div>
-      <p style={ProfileContent}>{name}</p>
+      {isEditing ? (
+        <input
+          type="text"
+          value={name}
+          onChange={(e) => setName(e.target.value)}
+          style={{ width: '100%', marginBottom: '10px' }}
+        />
+      ) : (
+        <p style={ProfileContent}>{name}</p>
+      )}
       <div style={ProfileSubheader}>Email:</div>
-      <p style={ProfileContent}>{email}</p>
-      <button style={EditButton} onClick={handleEditProfile}>
-        Edit Profile
-      </button>
+      {isEditing ? (
+        <input
+          type="email"
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+          style={{ width: '100%', marginBottom: '15px' }}
+        />
+      ) : (
+        <p style={ProfileContent}>{email}</p>
+      )}
+      {isEditing ? (
+        <button style={SaveButton} onClick={handleSaveProfile}>
+          Save Profile
+        </button>
+      ) : (
+        <button style={EditButton} onClick={handleEditProfile}>
+          Edit Profile
+        </button>
+      )}
     </div>
   );
 };
