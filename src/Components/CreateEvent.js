@@ -51,8 +51,12 @@ const [snackbarMessage, setSnackbarMessage] = useState('');
 const openSnackbar = (message) => {
   setSnackbarMessage(message);
   setSnackbarOpen(true);
-};
 
+  // Set a timeout to close the Snackbar after 5 seconds
+  setTimeout(() => {
+    setSnackbarOpen(false);
+  }, 5000);
+};
   const handleFinish = async () => {
     // Assuming you have the mutation defined, replace 'createEvent' with your actual mutation
     try {
@@ -154,16 +158,18 @@ setTimeout(() => {
 };
 
 //On blur set capacity to default value of 1
- const handleBlur = (field) => {
-    const value = eventDetails[field];
+const handleBlur = (field) => {
+  const value = eventDetails[field];
 
-    // Check if the value is less than 0 or not a number
-    if (isNaN(value) || value < 1) {
-      // Set the value to 0
-      handleChange(field, 1);
-    }
-  };
+  // Check if the value is less than 0 or not a number
+  if (isNaN(value) || value < 1 || value >= 1024) {
+    // Set the value to 0
+    handleChange(field, 1);
 
+    // Show Snackbar only when the input is invalid
+    openSnackbar("Please enter a number between 1 and 1024");
+  }
+};
 
 
 
@@ -559,7 +565,6 @@ setTimeout(() => {
         variant="soft"
         color="danger"
         open={snackbarOpen}
-        onClose={() => setSnackbarOpen(false)}
         anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
         startDecorator={<ErrorOutlineSharpIcon />}
         endDecorator={
@@ -573,7 +578,7 @@ setTimeout(() => {
           </Button>
         }
       >
-        Please fill in the required fields: Title and Organizer.
+        {snackbarMessage}
       </Snackbar>
 
 
