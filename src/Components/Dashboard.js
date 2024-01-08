@@ -146,7 +146,7 @@ const Dashboard = ({userId}) => {
   {/* CHECKS IF the user is admin before providing delete button */}
   {JSON.parse(event.participants)[0][userId]["permissions"]=="admin"  ? (
   <Button
-    onClick={() => {e
+    onClick={() => {
      handleDelete(event.id);
          
 
