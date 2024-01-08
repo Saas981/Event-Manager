@@ -67,13 +67,11 @@ function App({ signOut}) {
     <Router >
            <Navbar user={user}style={{zIndex:100}}/>
  <div style={{
-          minHeight: '90vh',
-          height: "auto",
+          width:"100%",
           background: theme === "dark"
             ? 'linear-gradient(to right, #1d1629, #1e1e24 )'
             : 'linear-gradient(to right, rgba(80, 63, 159,0.18), rgba(255, 81, 181,0.18))',
           paddingBottom: "10%",
-          paddingTop: "6%"
         }}>   
         <br></br>
           <Grid
@@ -81,7 +79,7 @@ function App({ signOut}) {
             direction="column"
             justifyContent="center"
             alignItems="center"
-            style={{ paddingTop: '20px', }}
+            style={{ paddingTop: '10%', }}
             
           >
             <Routes>
@@ -94,12 +92,22 @@ function App({ signOut}) {
               <Route path="/create" element={<CreateEvent userId={user}/>} />
               <Route path="/join/:eventId" element={<JoinEventPage user={user}/>} />
               <Route path="/profile" element={<Profile theme={theme}/>}/>
-              <Route path="/settings" element={<Settings theme={theme}/>}/>
-
             </Routes>
           </Grid>
+                    
       
       </div>
+           <div style={{
+          height:"100%",
+          marginTop:"-20%",
+        
+        }}>
+        <Routes>
+       
+              <Route  path="/settings" element={<Settings theme={theme}/>}/>
+          
+            </Routes>
+             </div>
     </Router>
   );
 }

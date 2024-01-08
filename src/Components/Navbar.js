@@ -19,7 +19,7 @@ import {
   Avatar,
   ThemeProvider,
 } from '@mui/material';
-import { Home, Info, ContactMail, Person, Login, Logout, PersonAdd, Menu as MenuIcon, Dashboard } from '@mui/icons-material';
+import { Home, Info, ContactMail, Person, Login, Logout, PersonAdd,Settings, Menu as MenuIcon, Dashboard } from '@mui/icons-material';
 import useScrollTrigger from '@mui/material/useScrollTrigger';
 import { styled, createTheme } from '@mui/material/styles';
 import { Link } from 'react-router-dom';
@@ -38,27 +38,27 @@ const StyledBadge = styled(Badge)(({ theme }) => ({
     height:"7px",
     boxShadow: `0 0 0 2px ${theme.palette.background.paper}`,
     '&::after': {
-      position: 'absolute',
-      top: 0,
-      left: 0,
-      width: '100%',
-      height: '100%',
-      borderRadius: '50%',
-      animation: 'ripple 1.2s infinite ease-in-out',
-      border: '1px solid currentColor',
-      content: '""',
+      // position: 'absolute',
+      // top: 0,
+      // left: 0,
+      // width: '100%',
+      // height: '100%',
+      // borderRadius: '50%',
+      // // animation: 'ripple 1.2s infinite ease-in-out',
+      // border: '1px solid currentColor',
+      // content: '""',
     },
   },
-  '@keyframes ripple': {
-    '0%': {
-      transform: 'scale(.8)',
-      opacity: 1,
-    },
-    '100%': {
-      transform: 'scale(2.4)',
-      opacity: 0,
-    },
-  },
+  // '@keyframes ripple': {
+  //   '0%': {
+  //     transform: 'scale(.8)',
+  //     opacity: 1,
+  //   },
+  //   '100%': {
+  //     transform: 'scale(2.4)',
+  //     opacity: 0,
+  //   },
+  // },
 }));
 
 
@@ -185,6 +185,10 @@ const Navbar = ({ user,setTheme }) => {
                         <MenuItem component={Link} to="/dashboard" onClick={handleCloseMenu}>
             <Dashboard style={{ marginRight: '8px', fontSize: '22px' }} />
             <span style={{ fontSize: '15px' }}>Dashboard</span>
+          </MenuItem>
+          <MenuItem component={Link} to="/settings" onClick={handleCloseMenu}>
+            <Settings style={{ marginRight: '8px', fontSize: '22px' }} />
+            <span style={{ fontSize: '15px' }}>Settings</span>
           </MenuItem>
                      <MenuItem onClick={handleSignOut}>
             <Logout style={{ marginRight: '8px',fontSize:'22px' }} />
