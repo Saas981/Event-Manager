@@ -147,8 +147,8 @@ const Dashboard = ({userId}) => {
   {JSON.parse(event.participants)[0][userId]["permissions"]=="admin"  ? (
   <Button
     onClick={() => {
-      // handleDelete(event.id);
-            console.log("USERID ", userId )
+     handleDelete(event.id);
+         
 
       console.log("EVENT ",JSON.parse(event.participants)[0] )
        console.log("EVENT ",JSON.parse(event.participants)[0][userId]["permissions"]=="admin" )
