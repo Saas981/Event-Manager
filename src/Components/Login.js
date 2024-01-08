@@ -3,7 +3,7 @@ import { TextField, Button, Alert, CircularProgress } from '@mui/material';
 import '../Styles/Login.css';
 import {Auth } from 'aws-amplify'; // Import Auth from aws-amplify
 
-function Login() {
+function Login({theme}) {
   const [loading, setLoading] = useState(false);
 
   const [formData, setFormData] = useState({

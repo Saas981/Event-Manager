@@ -1,13 +1,34 @@
 
 import React, { useState } from 'react';
-import { AppBar, Toolbar, Button, IconButton, Typography, Container, useMediaQuery, useTheme, Menu, MenuItem,Stack, Slide,LinearProgress,Badge, CircularProgress, Avatar } from '@mui/material';
-import { Home, Info, ContactMail,Person, Login, Logout, PersonAdd, Menu as MenuIcon, Dashboard } from '@mui/icons-material';
+import {
+  AppBar,
+  Toolbar,
+  Button,
+  IconButton,
+  Typography,
+  Container,
+  useMediaQuery,
+  useTheme,
+  Menu,
+  MenuItem,
+  Stack,
+  Slide,
+  LinearProgress,
+  Badge,
+  CircularProgress,
+  Avatar,
+  ThemeProvider,
+} from '@mui/material';
+import { Home, Info, ContactMail, Person, Login, Logout, PersonAdd, Menu as MenuIcon, Dashboard } from '@mui/icons-material';
 import useScrollTrigger from '@mui/material/useScrollTrigger';
-import { styled } from '@mui/material/styles';
+import { styled, createTheme } from '@mui/material/styles';
 import { Link } from 'react-router-dom';
 import { Auth } from 'aws-amplify';
-
 import '../Styles/Navbar.css';
+import darkTheme from '../Themes/darkTheme';
+
+
+
 
 const StyledBadge = styled(Badge)(({ theme }) => ({
   '& .MuiBadge-badge': {
@@ -41,7 +62,7 @@ const StyledBadge = styled(Badge)(({ theme }) => ({
 }));
 
 
-const Navbar = ({ user }) => {
+const Navbar = ({ user,setTheme }) => {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('md'));
   const [anchorEl, setAnchorEl] = React.useState(null);
@@ -82,10 +103,19 @@ const Navbar = ({ user }) => {
   const pages = ['About', 'Contact', 'Login', 'Signup'];
 
   return (
+        <ThemeProvider theme={darkTheme}>
+
     <>
     <Slide appear={false} direction="down" in={!trigger}>
-      <AppBar className="navbar" position="fixed" style={{ opacity: 0.6, background: 'linear-gradient(to right, #ae9dfa, #f7abd7)', borderRadius: 0 }}>
-        <Container>
+<AppBar
+  className="navbar"
+  position="fixed"
+  style={{
+    opacity: 1,
+    background: `linear-gradient(to right, ${darkTheme.palette.primary.main}, ${darkTheme.palette.secondary.main})`,
+    borderRadius: 0,
+  }}
+>       <Container>
           <Toolbar >
             <IconButton className="nav-button" edge="start" color="inherit" component={Link} to="/">
               <Home />
@@ -207,6 +237,8 @@ const Navbar = ({ user }) => {
     </Slide>
    
       </>
+          </ThemeProvider>
+
   );
 };
 

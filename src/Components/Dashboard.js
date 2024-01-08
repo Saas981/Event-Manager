@@ -10,7 +10,7 @@ import { deleteEvent } from '../graphql/mutations';
      import  Button from '@mui/joy/Button'
      import DeleteRoundedIcon from '@mui/icons-material/DeleteRounded';
 
-const Dashboard = ({userId}) => {
+const Dashboard = ({userId,theme}) => {
   const [events, setEvents] = useState([]);
 
 

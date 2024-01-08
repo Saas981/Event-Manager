@@ -19,7 +19,7 @@ import { Storage } from 'aws-amplify';
 import { updateEvent } from '../graphql/mutations';
 import PersonIcon from '@mui/icons-material/Person';
 
-const JoinEventPage = ({user}) => {
+const JoinEventPage = ({user,theme}) => {
   const { eventId } = useParams();
   const[load,setLoad]= React.useState(false);
   const [eventDetails, setEventDetails] = useState(null);

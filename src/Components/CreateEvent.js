@@ -24,7 +24,7 @@ import Box from '@mui/joy/Box';
 import { Storage } from 'aws-amplify';
 
 
-const CreateEvent = ({userId}) => {
+const CreateEvent = ({userId,theme}) => {
   const [activeStep, setActiveStep] = useState(0);
   const [progress, setProgress] = useState(0);
   const [open, setOpen] = React.useState(false);

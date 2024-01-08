@@ -3,7 +3,7 @@ import { Auth } from 'aws-amplify';
 import { TextField, Button, Alert, CircularProgress } from '@mui/material';
 import '../Styles/SignUp.css';
 import PersonAddAltSharpIcon from '@mui/icons-material/PersonAddAltSharp';
-function SignUp() {
+function SignUp({theme}) {
   const [formData, setFormData] = useState({
     email: '',
     password: '',
