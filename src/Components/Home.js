@@ -1,4 +1,5 @@
 import React from 'react';
+import { Link } from 'react-router-dom';
 import { Container, Typography, Button, Grid, Skeleton, Paper } from '@mui/material';
 import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
 import { styled } from '@mui/system';
@@ -126,6 +127,7 @@ const Home = () => {
         color="primary"
         size="large"
         endIcon={<ArrowForwardIcon />}
+        component={Link} to="/Dashboard" 
       >
         Get Started Now
       </GradientButton>
