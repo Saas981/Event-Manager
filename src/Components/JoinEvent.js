@@ -15,13 +15,14 @@ import { API, graphqlOperation } from 'aws-amplify';
 import { getEvent } from '../graphql/queries';
 import EventIcon from '@mui/icons-material/Event';
 import { Storage } from 'aws-amplify';
-import { updateEvent } from '../graphql/mutations';
-import PersonIcon from '@mui/icons-material/Person';
+import * as mutations from '../graphql/mutations';
+import { PersonIcon } from '@mui/icons-material/Person';
 
 const JoinEventPage = ({ user, theme }) => {
   const { eventId } = useParams();
   const [load, setLoad] = React.useState(false);
   const [eventDetails, setEventDetails] = useState(null);
+  const [isCapacityFull, setIsCapacityFull] = useState(false);
 
   useEffect(() => {
     const fetchEventDetails = async () => {
@@ -53,8 +54,21 @@ const JoinEventPage = ({ user, theme }) => {
     fetchEventDetails();
   }, [eventId, user]);
 
+  useEffect(() => {
+    if (eventDetails && eventDetails.capacity) {
+      const currentParticipantsCount = Object.keys(JSON.parse(eventDetails.participants)[0]).length;
+      setIsCapacityFull(currentParticipantsCount >= eventDetails.capacity);
+    }
+  }, [eventDetails]);
+
   const handleJoin = async () => {
     try {
+      if (isCapacityFull) {
+        // Show an error message to the user
+        console.log('Event capacity is full. Cannot join.');
+        return;
+      }
+
       const updatedEventDetails = { ...eventDetails };
       setLoad(true);
 
@@ -64,9 +78,8 @@ const JoinEventPage = ({ user, theme }) => {
       const eventCapacity = updatedEventDetails.capacity;
 
       if (currentParticipantsCount >= eventCapacity) {
-        
         setLoad(false);
-        
+        console.log("Event capacity is full. Cannot join.");
         return;
       }
 
@@ -74,7 +87,7 @@ const JoinEventPage = ({ user, theme }) => {
       updatedEventDetails.participants = participants;
 
       const updateEventResponse = await API.graphql({
-        query: updateEvent,
+        query: mutations.updateEvent,
         variables: {
           input: {
             id: eventId,
@@ -99,6 +112,11 @@ const JoinEventPage = ({ user, theme }) => {
   const handleReject = () => {
     console.log('Reject Event clicked');
     window.location.href = '/dashboard';
+  };
+
+  const handleWaitlist = () => {
+    console.log('Joining waitlist...');
+    
   };
 
   return (
@@ -132,54 +150,36 @@ const JoinEventPage = ({ user, theme }) => {
                 </Typography>
               </Box>
 
-              <Box sx={{ paddingBottom: "12px", borderRadius: "10px", margin: "0px 0px", borderTopLeftRadius: "10px", borderTopRightRadius: "10px" }}>
-
-                <Box sx={{ margin: "4px", marginTop: "2px", border: '2px dashed #ccc' }}>
-                  <Grid container sx={{ border: '2px dashed #ccc', opacity: 0.8, paddingBottom: "5px", margin: "0px 00px", backgroundColor: "#dfdfdf" }}>
-                    <Grid xs={1}>
-                      <img src={eventDetails.imgUrl} alt="Event Cover" style={{ marginTop: '25%', height: "35px", margin: "10px", marginBottom: "-20px", borderRadius: '8px' }} />
-                    </Grid>
-                    <Grid xs={11} >
-                      <Typography variant="h4" gutterBottom sx={{ opacity: 0.8, paddingLeft: '20px', fontSize: "28px", marginBottom: '5px', paddingTop: "15px", fontFamily: 'Inter', fontWeight: '400', background: 'linear-gradient(to bottom,rgba(88, 94, 96,1.2),rgba(93, 80, 82,1.2))', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>
-                        {eventDetails.title}
-                      </Typography>
-                    </Grid>
-                  </Grid>
-
-                  <Stack direction="row" spacing={2} alignItems="center" marginBottom={2} sx={{ padding: '30px', paddingLeft: "10px", paddingBottom: "20px", margin: "0px 0px", backgroundColor: "#f1f1f1" }}>
-                    <Avatar src={eventDetails.organizerAvatar} alt="Organizer Avatar" />
-                    <Typography sx={{ fontFamily: 'Inter, sans-serif' }} variant="subtitle1">{eventDetails.organizer}</Typography>
-                    <Divider orientation="vertical" flexItem />
-                    <EventIcon />
-                    <Typography variant="subtitle1" sx={{ fontFamily: 'Inter, sans-serif' }}>
-                      {new Date(eventDetails.startTime).toLocaleString('en-US', {
-                        weekday: 'long',
-                        year: 'numeric',
-                        month: 'long',
-                        day: 'numeric',
-                        hour: 'numeric',
-                        minute: 'numeric',
-                        hour12: true
-                      })}
-                    </Typography>
-                  </Stack>
-                </Box>
-
+              {isCapacityFull ? (
+                // Show Reject and Waitlist buttons
                 <Stack direction="row" spacing={2} sx={{ padding: '10px', justifyContent: 'flex-center', paddingRight: "40px", backgroundColor: "#f8f8f8" }}>
                   <Button variant="soft" color="danger" sx={{ width: "100%" }} onClick={handleReject}>
                     Reject
                   </Button>
-                  {load ? (
-                    <Button loading variant="solid" color="success" sx={{ width: "100%" }} onClick={handleJoin}>
-                      Join
-                    </Button>
-                  ) : (
-                    <Button variant="soft" color="success" sx={{ width: "100%" }} onClick={handleJoin}>
-                      Join
-                    </Button>
-                  )}
+                  <Button variant="soft" color="primary" sx={{ width: "100%" }} onClick={handleWaitlist}>
+                    Waitlist
+                  </Button>
                 </Stack>
-              </Box>
+              ) : (
+                // Show Join and Reject buttons
+                <Box sx={{ paddingBottom: "12px", borderRadius: "10px", margin: "0px 0px", borderTopLeftRadius: "10px", borderTopRightRadius: "10px" }}>
+                  <Stack direction="row" spacing={2} sx={{ padding: '10px', justifyContent: 'flex-center', paddingRight: "40px", backgroundColor: "#f8f8f8" }}>
+                    <Button variant="soft" color="danger" sx={{ width: "100%" }} onClick={handleReject}>
+                      Reject
+                    </Button>
+                    {load ? (
+                      <Button loading variant="solid" color="success" sx={{ width: "100%" }} onClick={handleJoin}>
+                        Join
+                      </Button>
+                    ) : (
+                      <Button variant="soft" color="success" sx={{ width: "100%" }} onClick={handleJoin}>
+                        Join
+                      </Button>
+                    )}
+                  </Stack>
+                </Box>
+              )}
+
             </>
           )}
         </Paper>
