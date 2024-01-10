@@ -1,11 +1,9 @@
 import React, { useState, useEffect } from 'react';
-import { Typography, Box, Collapse, Paper, Avatar, Grid, Skeleton } from '@mui/material';
+import { Typography, Box, Collapse, Paper, Grid, Skeleton } from '@mui/material';
 import { styled } from '@mui/system';
 import PeopleIcon from '@mui/icons-material/People';
 import { API, graphqlOperation } from 'aws-amplify';
-import { Link } from 'react-router-dom';
-import { listEvents } from '../graphql/queries';
-import { getEvent, updateEvent } from '../graphql/queries'; // Assuming getEvent is defined in queries
+import { listEvents, getEvent, updateEvent } from '../graphql/queries';
 import * as mutations from '../graphql/mutations';
 import { deleteEvent } from '../graphql/mutations';
 
@@ -16,12 +14,12 @@ import AccessTimeSharpIcon from '@mui/icons-material/AccessTimeSharp';
 
 const Dashboard = ({ userId, theme }) => {
   const [events, setEvents] = useState([]);
+  const [isAdmin, setIsAdmin] = useState(false);
 
   const fetchEvents = async () => {
     try {
       const { data } = await API.graphql(graphqlOperation(listEvents));
 
-      //ONLY SHOW TO People that can view it which are participants
       let moddedData = data.listEvents.items.filter((event) => {
         const participants = JSON.parse(event.participants);
         return participants[0].hasOwnProperty(userId);
@@ -32,10 +30,10 @@ const Dashboard = ({ userId, theme }) => {
           if (event.coverImage) {
             try {
               const imgUrl = await Storage.get(event.coverImage);
-              const isAdmin = JSON.parse(event.participants)[0].userId === "admin";
+              const userIsAdmin = JSON.parse(event.participants)[0].userId === "admin";
               const isWaitlisted = JSON.parse(event.participants)[0].userId === "admin";
 
-              return { ...event, imgUrl, isAdmin, isWaitlisted };
+              return { ...event, imgUrl, userIsAdmin, isWaitlisted };
             } catch (error) {
               console.error('Error fetching image URL:', error);
             }
@@ -51,8 +49,21 @@ const Dashboard = ({ userId, theme }) => {
     }
   };
 
+  const checkAdminStatus = async () => {
+    try {
+      const response = await API.graphql(graphqlOperation(getEvent, { id: "admin" }));
+      const adminDetails = response.data.getEvent;
+      const adminParticipants = JSON.parse(adminDetails.participants);
+
+      setIsAdmin(adminParticipants[0].hasOwnProperty(userId) && adminParticipants[0][userId]["permissions"] === "admin");
+    } catch (error) {
+      console.error('Error checking admin status:', error);
+    }
+  };
+
   useEffect(() => {
     fetchEvents();
+    checkAdminStatus();
   }, [userId]);
 
   const handleDelete = async (eventId) => {
@@ -67,42 +78,39 @@ const Dashboard = ({ userId, theme }) => {
 
   const handleLeave = async (eventId) => {
     try {
-      // Fetch the current event details
       const response = await API.graphql(graphqlOperation(getEvent, { id: eventId }));
       const eventDetails = response.data.getEvent;
-  
-      // Parse the participants
+
       let participants = JSON.parse(eventDetails.participants);
-  
-      // Check if the user is a participant in the event
+
       if (participants[0].hasOwnProperty(userId)) {
-        // Remove the user from the participants list
-        delete participants[0][userId];
-  
-        // Update the event with the modified participants
-        const updateEventResponse = await API.graphql({
-          query: mutations.updateEvent,
-          variables: {
-            input: {
-              id: eventId,
-              participants: JSON.stringify(participants),
+        const userIsAdmin = participants[0][userId]["permissions"] === "admin";
+
+        if (userIsAdmin) {
+          console.log('As the admin, you cannot leave your own event.');
+        } else {
+          delete participants[0][userId];
+
+          const updateEventResponse = await API.graphql({
+            query: mutations.updateEvent,
+            variables: {
+              input: {
+                id: eventId,
+                participants: JSON.stringify(participants),
+              },
             },
-          },
-        });
-  
-        console.log('Left the event:', updateEventResponse);
-  
-        // Fetch the updated list of events after leaving
-        fetchEvents();
+          });
+
+          console.log('Left the event:', updateEventResponse);
+          fetchEvents();
+        }
       } else {
-        // User is not a participant, handle accordingly (maybe show a message)
         console.log('You are not a participant in this event.');
       }
     } catch (error) {
       console.error('Error leaving event:', error);
     }
   };
-  
 
   const handleEventClick = (eventId) => {
     setExpandedEvent(expandedEvent === eventId ? null : eventId);
@@ -179,23 +187,25 @@ const Dashboard = ({ userId, theme }) => {
               </Button>
             ) : null}
 
-            {/* Leave Event Button */}
-            <Button
-              onClick={() => handleLeave(event.id)}
-              color="primary"
-              variant='soft'
-              
-              sx={{
-                width: "100%",
-                
-                
-              }}
-            >
-              Leave
-            </Button>
+           {/* Leave Event Button */}
+{!isAdmin && JSON.parse(event.participants)[0][userId] && JSON.parse(event.participants)[0][userId]["permissions"] !== "admin" && (
+  <Button
+    onClick={() => handleLeave(event.id)}
+    color="primary"
+    variant="soft"
+    sx={{
+      width: "100%",
+    }}
+  >
+    Leave
+  </Button>
+)}
+
+
+
 
             {/* CHECKS IF the user is admin before providing delete button */}
-            {JSON.parse(event.participants)[0][userId]["permissions"] === "admin" ? (
+            {JSON.parse(event.participants)[0][userId]["permissions"] === "admin" && !isAdmin ? (
               <Button
                 onClick={() => handleDelete(event.id)}
                 startDecorator={<DeleteRoundedIcon />}
@@ -203,8 +213,6 @@ const Dashboard = ({ userId, theme }) => {
                 variant="soft"
                 sx={{
                   width: "100%",
-                  borderRadius: "0px",
-                  
                 }}
               >
                 Delete this Event
