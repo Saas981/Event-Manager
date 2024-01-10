@@ -45,7 +45,7 @@ const SaveButton = {
   cursor: 'pointer',
 };
 
-const Profile = () => {
+const Profile = ({theme, userData}) => {
   const [isEditing, setIsEditing] = useState(false);
   const [photo, setPhoto] = useState(null);
   const [username, setUsername] = useState('Mike Oxlong');
@@ -56,13 +56,14 @@ const Profile = () => {
     const fetchData = async () => {
       try {
         // Check if user data exists in localStorage
-        const storedData = localStorage.getItem('userData');
+        const storedData = userData
+        console.log("STORED DATA ",storedData)
         if (storedData) {
-          const parsedData = JSON.parse(storedData);
-          setPhoto(parsedData.photo);
-          setUsername(parsedData.username);
-          setName(parsedData.name);
-          setEmail(parsedData.email);
+
+          setPhoto(storedData.photo);
+          setUsername(storedData.username);
+          setName(storedData.id);
+          setEmail(storedData.email);
         } else {
           // If not, fetch from API
           const response = await fetch('https://api.example.com/user/123');
@@ -90,7 +91,7 @@ const Profile = () => {
     };
 
     fetchData();
-  }, []); // Empty dependency array ensures the effect runs only once, similar to componentDidMount
+  }, [userData]); // Empty dependency array ensures the effect runs only once, similar to componentDidMount
 
   const handleEditProfile = () => {
     setIsEditing(true);
@@ -134,7 +135,7 @@ const Profile = () => {
       ) : (
         <p style={ProfileContent}>{username}</p>
       )}
-      <div style={ProfileSubheader}>Name:</div>
+      <div style={ProfileSubheader}>Id:</div>
       {isEditing ? (
         <input
           type="text"
