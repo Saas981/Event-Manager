@@ -66,9 +66,10 @@ const Dashboard = ({ userId, theme }) => {
     checkAdminStatus();
   }, [userId]);
 
-  const handleDelete = async (eventId) => {
+  const handleDelete = async (eventId,imageName) => {
     try {
       const response = await API.graphql(graphqlOperation(deleteEvent, { input: { id: eventId } }));
+      const fileResponse = await Storage.remove(imageName);
       console.log('Event deleted successfully:', response);
       fetchEvents();
     } catch (error) {
@@ -207,7 +208,7 @@ const Dashboard = ({ userId, theme }) => {
             {/* CHECKS IF the user is admin before providing delete button */}
             {JSON.parse(event.participants)[0][userId]["permissions"] === "admin" && !isAdmin ? (
               <Button
-                onClick={() => handleDelete(event.id)}
+                onClick={() => handleDelete(event.id,event.coverImage)}
                 startDecorator={<DeleteRoundedIcon />}
                 color="danger"
                 variant="soft"
