@@ -28,13 +28,21 @@ const JoinEventPage = ({ user, theme }) => {
     const fetchEventDetails = async () => {
       try {
         const { data } = await API.graphql(graphqlOperation(getEvent, { id: eventId }));
+        if (!data.getEvent) { 
+          window.location.href="/Error404"
+          
+          
+        }
         const participants = JSON.parse(data.getEvent.participants);
-
+        
         if (participants[0].hasOwnProperty(user)) {
           window.location.href = "/dashboard";
         }
+        
 
         let moddedData = data.getEvent;
+        console.log("Join Event Data", moddedData);
+
         if (moddedData.coverImage) {
           try {
             const imgUrl = await Storage.get(moddedData.coverImage);
@@ -45,6 +53,7 @@ const JoinEventPage = ({ user, theme }) => {
         }
 
         setEventDetails(moddedData);
+        
 
       } catch (error) {
         console.error('Error fetching event details:', error);
