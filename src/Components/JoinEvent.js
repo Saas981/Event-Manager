@@ -187,7 +187,7 @@ const JoinEventPage = ({ user, theme }) => {
                     <Typography level="h2" style={{ color: "#fafafa", fontSize: "25px", fontWeight: "550", marginLeft: '5px', fontFamily: 'Inter, sans-serif' }}>
                   This Event is Full! 
                 </Typography>
-                <Typography level="h4" style={{ color: "#fafafa",fontSiae:"10px",  fontWeight: "400", marginLeft: '10px', fontFamily: 'Inter, sans-serif' }}>
+                <Typography level="h4" style={{ color: "#fafafa",fontSize:"10px",  fontWeight: "400", marginLeft: '10px', fontFamily: 'Inter, sans-serif' }}>
                   Please Join the Waitlist.
                 </Typography>
                 
@@ -250,7 +250,7 @@ const JoinEventPage = ({ user, theme }) => {
                   <Button variant="soft" color="danger" sx={{ width: "100%" }} onClick={handleReject}>
                     Reject
                   </Button>
-                  <Button variant="soft" color="primary" sx={{ width: "100%" }} color="warning" startDecorator={<AccessTimeSharpIcon/>} onClick={handleWaitlist}>
+                  <Button variant="soft" color="warning" sx={{ width: "100%" }}  startDecorator={<AccessTimeSharpIcon/>} onClick={handleWaitlist}>
                   
                     Waitlist
                   </Button>
