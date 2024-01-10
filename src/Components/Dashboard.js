@@ -5,7 +5,10 @@ import PeopleIcon from '@mui/icons-material/People';
 import { API, graphqlOperation } from 'aws-amplify';
 import { Link } from 'react-router-dom';
 import { listEvents } from '../graphql/queries';
+import { getEvent, updateEvent } from '../graphql/queries'; // Assuming getEvent is defined in queries
+import * as mutations from '../graphql/mutations';
 import { deleteEvent } from '../graphql/mutations';
+
 import { Storage } from 'aws-amplify';
 import Button from '@mui/joy/Button';
 import DeleteRoundedIcon from '@mui/icons-material/DeleteRounded';
@@ -62,10 +65,44 @@ const Dashboard = ({ userId, theme }) => {
     }
   };
 
-  const handleLeave = (eventId) => {
-    
-    console.log("Leaving the Event");
+  const handleLeave = async (eventId) => {
+    try {
+      // Fetch the current event details
+      const response = await API.graphql(graphqlOperation(getEvent, { id: eventId }));
+      const eventDetails = response.data.getEvent;
+  
+      // Parse the participants
+      let participants = JSON.parse(eventDetails.participants);
+  
+      // Check if the user is a participant in the event
+      if (participants[0].hasOwnProperty(userId)) {
+        // Remove the user from the participants list
+        delete participants[0][userId];
+  
+        // Update the event with the modified participants
+        const updateEventResponse = await API.graphql({
+          query: mutations.updateEvent,
+          variables: {
+            input: {
+              id: eventId,
+              participants: JSON.stringify(participants),
+            },
+          },
+        });
+  
+        console.log('Left the event:', updateEventResponse);
+  
+        // Fetch the updated list of events after leaving
+        fetchEvents();
+      } else {
+        // User is not a participant, handle accordingly (maybe show a message)
+        console.log('You are not a participant in this event.');
+      }
+    } catch (error) {
+      console.error('Error leaving event:', error);
+    }
   };
+  
 
   const handleEventClick = (eventId) => {
     setExpandedEvent(expandedEvent === eventId ? null : eventId);
