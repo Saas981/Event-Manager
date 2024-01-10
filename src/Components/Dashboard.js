@@ -9,6 +9,8 @@ import { deleteEvent } from '../graphql/mutations';
      import { Storage } from 'aws-amplify';
      import  Button from '@mui/joy/Button'
      import DeleteRoundedIcon from '@mui/icons-material/DeleteRounded';
+     import AccessTimeSharpIcon from '@mui/icons-material/AccessTimeSharp';
+
 
 const Dashboard = ({userId,theme}) => {
   const [events, setEvents] = useState([]);
@@ -36,9 +38,10 @@ const Dashboard = ({userId,theme}) => {
               const imgUrl = await Storage.get(event.coverImage);
               // Add the imgUrl attribute to the event object
               const isAdmin =(JSON.parse(event.participants)[0].userId=="admin")
-              
+              const isWaitlisted =(JSON.parse(event.participants)[0].userId=="admin")
+
              
-              return { ...event, imgUrl,isAdmin };
+              return { ...event, imgUrl,isAdmin,isWaitlisted };
             } catch (error) {
               console.error('Error fetching image URL:', error);
               // Handle error appropriately
@@ -143,6 +146,34 @@ const Dashboard = ({userId,theme}) => {
       </EventDetails>
     </Grid>
   </Grid>
+
+  {/* Waitlist button */}
+  {JSON.parse(event.participants)[0][userId]["permissions"]=="waitlist"  ? (
+  <Button
+    onClick={() => {
+    
+         
+
+      console.log("You're in a  waitlist")
+    }}
+    startDecorator={<AccessTimeSharpIcon/>}
+    color="warning"
+    variant="soft"
+    sx={{
+      width: "100%",
+      borderRadius: "0px",
+      marginTop: "3%",
+      "--Button-gap": "5px",
+      fontFamily:"Poppins"
+    }}
+  >
+    You're on the waitlist
+  </Button>
+) : null}
+
+
+
+
   {/* CHECKS IF the user is admin before providing delete button */}
   {JSON.parse(event.participants)[0][userId]["permissions"]=="admin"  ? (
   <Button
@@ -160,12 +191,14 @@ const Dashboard = ({userId,theme}) => {
       width: "100%",
       borderRadius: "0px",
       marginTop: "3%",
-      "--Button-gap": "15px",
+      "--Button-gap": "8px",
     }}
   >
     Delete this Event
   </Button>
 ) : null}
+
+
 
  
 </Collapse>
@@ -189,7 +222,7 @@ export default Dashboard;
 
 const DashboardContainer = styled(Box)({
   textAlign: 'center',
-  marginTop: '20px',
+  marginTop: '0px',
   width: '50%',
   background: 'linear-gradient(to right, rgba(80, 63, 159,0.1), rgba(255, 81, 181,0.1))',
   boxShadow: '4px 4px 8px rgba(0, 0, 0, 0.3)',

@@ -24,7 +24,7 @@ const SettingContainer = ({ children }) => (
 
 const Settings = ({ theme }) => {
   return (
-    <div style={{ padding: '20%', paddingTop: '8%', background: '#2f3136', minHeight: '100vh' }}>
+    <div style={{ padding: '20%', paddingTop: '8%', minHeight: '100vh' }}>
       {/* Title */}
       <Typography variant="h4" style={{ marginBottom: '20px', color: '#fff', fontFamily: 'Poppins' }}>
         User Settings
