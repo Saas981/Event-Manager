@@ -26,15 +26,23 @@ export default function UserUpdateForm(props) {
   const initialValues = {
     email: "",
     name: "",
-    username: "",
     phone: "",
+    username: "",
+    profilePicture: "",
     friends: "",
+    accountStatus: "",
   };
   const [email, setEmail] = React.useState(initialValues.email);
   const [name, setName] = React.useState(initialValues.name);
-  const [username, setUsername] = React.useState(initialValues.username);
   const [phone, setPhone] = React.useState(initialValues.phone);
+  const [username, setUsername] = React.useState(initialValues.username);
+  const [profilePicture, setProfilePicture] = React.useState(
+    initialValues.profilePicture
+  );
   const [friends, setFriends] = React.useState(initialValues.friends);
+  const [accountStatus, setAccountStatus] = React.useState(
+    initialValues.accountStatus
+  );
   const [errors, setErrors] = React.useState({});
   const resetStateValues = () => {
     const cleanValues = userRecord
@@ -42,9 +50,11 @@ export default function UserUpdateForm(props) {
       : initialValues;
     setEmail(cleanValues.email);
     setName(cleanValues.name);
-    setUsername(cleanValues.username);
     setPhone(cleanValues.phone);
+    setUsername(cleanValues.username);
+    setProfilePicture(cleanValues.profilePicture);
     setFriends(cleanValues.friends);
+    setAccountStatus(cleanValues.accountStatus);
     setErrors({});
   };
   const [userRecord, setUserRecord] = React.useState(userModelProp);
@@ -61,9 +71,11 @@ export default function UserUpdateForm(props) {
   const validations = {
     email: [{ type: "Email" }],
     name: [],
-    username: [],
     phone: [{ type: "Phone" }],
+    username: [],
+    profilePicture: [],
     friends: [],
+    accountStatus: [],
   };
   const runValidationTasks = async (
     fieldName,
@@ -93,9 +105,11 @@ export default function UserUpdateForm(props) {
         let modelFields = {
           email,
           name,
-          username,
           phone,
+          username,
+          profilePicture,
           friends,
+          accountStatus,
         };
         const validationResponses = await Promise.all(
           Object.keys(validations).reduce((promises, fieldName) => {
@@ -153,9 +167,11 @@ export default function UserUpdateForm(props) {
             const modelFields = {
               email: value,
               name,
-              username,
               phone,
+              username,
+              profilePicture,
               friends,
+              accountStatus,
             };
             const result = onChange(modelFields);
             value = result?.email ?? value;
@@ -181,9 +197,11 @@ export default function UserUpdateForm(props) {
             const modelFields = {
               email,
               name: value,
-              username,
               phone,
+              username,
+              profilePicture,
               friends,
+              accountStatus,
             };
             const result = onChange(modelFields);
             value = result?.name ?? value;
@@ -199,34 +217,6 @@ export default function UserUpdateForm(props) {
         {...getOverrideProps(overrides, "name")}
       ></TextField>
       <TextField
-        label="Username"
-        isRequired={false}
-        isReadOnly={false}
-        value={username}
-        onChange={(e) => {
-          let { value } = e.target;
-          if (onChange) {
-            const modelFields = {
-              email,
-              name,
-              username: value,
-              phone,
-              friends,
-            };
-            const result = onChange(modelFields);
-            value = result?.username ?? value;
-          }
-          if (errors.username?.hasError) {
-            runValidationTasks("username", value);
-          }
-          setUsername(value);
-        }}
-        onBlur={() => runValidationTasks("username", username)}
-        errorMessage={errors.username?.errorMessage}
-        hasError={errors.username?.hasError}
-        {...getOverrideProps(overrides, "username")}
-      ></TextField>
-      <TextField
         label="Phone"
         isRequired={false}
         isReadOnly={false}
@@ -238,9 +228,11 @@ export default function UserUpdateForm(props) {
             const modelFields = {
               email,
               name,
-              username,
               phone: value,
+              username,
+              profilePicture,
               friends,
+              accountStatus,
             };
             const result = onChange(modelFields);
             value = result?.phone ?? value;
@@ -256,6 +248,66 @@ export default function UserUpdateForm(props) {
         {...getOverrideProps(overrides, "phone")}
       ></TextField>
       <TextField
+        label="Username"
+        isRequired={false}
+        isReadOnly={false}
+        value={username}
+        onChange={(e) => {
+          let { value } = e.target;
+          if (onChange) {
+            const modelFields = {
+              email,
+              name,
+              phone,
+              username: value,
+              profilePicture,
+              friends,
+              accountStatus,
+            };
+            const result = onChange(modelFields);
+            value = result?.username ?? value;
+          }
+          if (errors.username?.hasError) {
+            runValidationTasks("username", value);
+          }
+          setUsername(value);
+        }}
+        onBlur={() => runValidationTasks("username", username)}
+        errorMessage={errors.username?.errorMessage}
+        hasError={errors.username?.hasError}
+        {...getOverrideProps(overrides, "username")}
+      ></TextField>
+      <TextField
+        label="Profile picture"
+        isRequired={false}
+        isReadOnly={false}
+        value={profilePicture}
+        onChange={(e) => {
+          let { value } = e.target;
+          if (onChange) {
+            const modelFields = {
+              email,
+              name,
+              phone,
+              username,
+              profilePicture: value,
+              friends,
+              accountStatus,
+            };
+            const result = onChange(modelFields);
+            value = result?.profilePicture ?? value;
+          }
+          if (errors.profilePicture?.hasError) {
+            runValidationTasks("profilePicture", value);
+          }
+          setProfilePicture(value);
+        }}
+        onBlur={() => runValidationTasks("profilePicture", profilePicture)}
+        errorMessage={errors.profilePicture?.errorMessage}
+        hasError={errors.profilePicture?.hasError}
+        {...getOverrideProps(overrides, "profilePicture")}
+      ></TextField>
+      <TextField
         label="Friends"
         isRequired={false}
         isReadOnly={false}
@@ -266,9 +318,11 @@ export default function UserUpdateForm(props) {
             const modelFields = {
               email,
               name,
-              username,
               phone,
+              username,
+              profilePicture,
               friends: value,
+              accountStatus,
             };
             const result = onChange(modelFields);
             value = result?.friends ?? value;
@@ -282,6 +336,36 @@ export default function UserUpdateForm(props) {
         errorMessage={errors.friends?.errorMessage}
         hasError={errors.friends?.hasError}
         {...getOverrideProps(overrides, "friends")}
+      ></TextField>
+      <TextField
+        label="Account status"
+        isRequired={false}
+        isReadOnly={false}
+        value={accountStatus}
+        onChange={(e) => {
+          let { value } = e.target;
+          if (onChange) {
+            const modelFields = {
+              email,
+              name,
+              phone,
+              username,
+              profilePicture,
+              friends,
+              accountStatus: value,
+            };
+            const result = onChange(modelFields);
+            value = result?.accountStatus ?? value;
+          }
+          if (errors.accountStatus?.hasError) {
+            runValidationTasks("accountStatus", value);
+          }
+          setAccountStatus(value);
+        }}
+        onBlur={() => runValidationTasks("accountStatus", accountStatus)}
+        errorMessage={errors.accountStatus?.errorMessage}
+        hasError={errors.accountStatus?.hasError}
+        {...getOverrideProps(overrides, "accountStatus")}
       ></TextField>
       <Flex
         justifyContent="space-between"

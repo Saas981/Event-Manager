@@ -21,6 +21,9 @@ import config from './aws-exports';
 import { Amplify } from 'aws-amplify';
 import { ThemeProvider } from '@mui/material/styles';
 import darkTheme from './Themes/darkTheme';
+import { API, graphqlOperation } from 'aws-amplify';
+import * as mutations from './graphql/mutations';
+import * as queries from './graphql/queries'
 
 
 Amplify.configure(config);
@@ -41,6 +44,8 @@ currentSession()
 function App({ signOut}) {
   const [theme,setTheme]= React.useState("dark")
   const [user, setUser] = React.useState(null);
+  const [userEmail, setUserEmail] = React.useState(null);
+ const [userData, setUserData]= React.useState(null)
 
     const toggleTheme = () => {
     setTheme((prevTheme) => (prevTheme === "light" ? "dark" : "light"));
@@ -50,11 +55,12 @@ function App({ signOut}) {
     const currentAuthenticatedUser = async () => {
       try {
         const userDetails = await Auth.currentAuthenticatedUser();
-        console.log(`The username: ${JSON.stringify(userDetails.username)}`);
+        console.dir( userDetails);
         //console.log(`The userId: ${userId}`);
         //console.log(`The signInDetails: ${JSON.stringify(signInDetails)}`);
        // console.log(name)
        setUser(userDetails.username)
+       setUserEmail(userDetails.attributes.email)
       } catch (err) {
         console.log(err);
       }
@@ -63,6 +69,40 @@ function App({ signOut}) {
     // Call the function when the component mounts
     currentAuthenticatedUser();
   }, [])
+
+
+  //This is to see if a userObject has been made for ht autehnticated user. If not we can make that object
+  useEffect(() => {
+    const fetchOrCreateUserObject = async () => {
+      try {
+        // Check if the user object exists
+        const getUserResponse = await API.graphql(graphqlOperation(queries.getUser, { id: user }));
+        const existingUserObject = getUserResponse.data.getUser;
+  
+        if (!existingUserObject) {
+          // If the user object doesn't exist, create it
+          const createUserResponse = await API.graphql(graphqlOperation(mutations.createUser, { input: { id: user,email:userEmail } }));
+          console.log("Newly created user object:", createUserResponse.data.createUser);
+          setUserData(createUserResponse)
+        } else {
+        setUserData(existingUserObject)
+          console.log("Existing user object:", existingUserObject);
+        }
+      } catch (error) {
+        console.error("Error fetching or creating user object:", error);
+      }
+    };
+  
+    if (user) {
+      fetchOrCreateUserObject();
+    }
+  }, [user]);
+  
+  
+
+
+
+
   return (
     
     <Router >
