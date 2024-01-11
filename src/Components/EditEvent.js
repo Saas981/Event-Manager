@@ -61,18 +61,26 @@ const [snackbarMessage, setSnackbarMessage] = useState('');
           
           
         }
-        if(!userId){
-                //  window.location.href="/unauthorized"
-        }
-        const participants = JSON.parse(data.getEvent.participants);
         
-        if (participants[0].hasOwnProperty(userId)) {
-          window.location.href = "/dashboard";
+        const participants = JSON.parse(data.getEvent.participants);
+        console.log("PARTICIAPNTS ",participants[0].hasOwnProperty(userId))
+        console.log("USERID ",userId)
+        
+        if(userId){
+            
+                 // window.location.href="/unauthorized"
+            if (participants[0][userId]["permissions"]!="admin") {
+               window.location.href = "/unauthorized";
+            }
+
         }
+
+
+
         
 
         let moddedData = data.getEvent;
-        console.log("Join Event Data", moddedData);
+       // console.log("Join Event Data", moddedData);
 
          if (moddedData.coverImage) {
         try {
@@ -87,7 +95,7 @@ const [snackbarMessage, setSnackbarMessage] = useState('');
 
 
         setEventDetails(moddedData);
-        console.log("FETCHED DATA",moddedData)
+      //  console.log("FETCHED DATA",moddedData)
 
       } catch (error) {
         console.error('Error fetching event details:', error);

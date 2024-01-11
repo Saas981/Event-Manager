@@ -141,7 +141,7 @@ function App({ signOut}) {
 
               <Route path='*' element={<ErrorPage theme={theme}/>}  />
 
-             <Route path="/edit/:eventId" element={<EditEvent user={user}/>} />
+             <Route path="/edit/:eventId" element={<EditEvent userId={user}/>} />
 
               
               
