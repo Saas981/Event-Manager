@@ -52,7 +52,7 @@ const JoinEventPage = ({ user, theme }) => {
     };
 
     fetchEventDetails();
-  }, [eventId, user]);
+  }, [eventId, user]);  
 
   useEffect(() => {
     if (eventDetails && eventDetails.capacity) {

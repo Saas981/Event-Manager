@@ -114,13 +114,13 @@ function App({ signOut}) {
           paddingBottom: "10%",
           minHeight:"100vh"
         }}>   
-        <br></br>
+
           <Grid
             container
             direction="column"
             justifyContent="center"
             alignItems="center"
-            style={{ paddingTop: '10%', }}
+            style={{ paddingTop: '9%', }}
             
           >
             <Routes>
@@ -133,22 +133,13 @@ function App({ signOut}) {
               <Route path="/create" element={<CreateEvent userId={user}/>} />
               <Route path="/join/:eventId" element={<JoinEventPage user={user}/>} />
               <Route path="/profile" element={<Profile theme={theme} userData={userData}/>}/>
+              <Route  path="/settings" element={<Settings theme={theme}/>}/>
             </Routes>
           </Grid>
                     
       
       </div>
-           <div style={{
-          height:"100%",
-          marginTop:"-55%",
-        
-        }}>
-        <Routes>
-       
-              <Route  path="/settings" element={<Settings theme={theme}/>}/>
-          
-            </Routes>
-             </div>
+   
     </Router>
   );
 }
