@@ -326,7 +326,7 @@ const handleBlur = (field) => {
               
               size="large"
               value={eventDetails.reoccuring}
-              onChange={(e) => handleChange('reoccuring', e.target.value)}
+              onChange={(e) => handleChange('reoccuring',  e.target.checked)}
               color="default"
             />
           }
