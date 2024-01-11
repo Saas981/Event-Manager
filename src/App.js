@@ -10,6 +10,7 @@ import CreateEvent from './Components/CreateEvent';
 import JoinEventPage from './Components/JoinEvent';
 import Profile from './Components/Profile'
 import Settings from './Components/Settings'
+import ErrorPage from './Components/ErrorPage';
 
 import Dashboard from './Components/Dashboard'
 import { Container, Grid } from '@mui/material';
@@ -124,6 +125,7 @@ function App({ signOut}) {
             
           >
             <Routes>
+            
               <Route path="/" element={<Home theme={theme}/>} />
               <Route path="/about" element={<About theme={theme}/>} />
               <Route path="/contact" element={<Contact theme={theme} />} />
@@ -132,7 +134,11 @@ function App({ signOut}) {
               <Route path="/dashboard" element={<Dashboard userId={user} />} />
               <Route path="/create" element={<CreateEvent userId={user}/>} />
               <Route path="/join/:eventId" element={<JoinEventPage user={user}/>} />
-              <Route path="/profile" element={<Profile theme={theme} userData={userData}/>}/>
+              <Route path="/profile" element={<Profile theme={theme}/>}/>
+              <Route path='*' element={<ErrorPage theme={theme}/>}  />
+              
+              
+
               <Route  path="/settings" element={<Settings theme={theme}/>}/>
             </Routes>
           </Grid>
