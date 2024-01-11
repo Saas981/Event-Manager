@@ -11,6 +11,8 @@ import JoinEventPage from './Components/JoinEvent';
 import Profile from './Components/Profile'
 import Settings from './Components/Settings'
 import ErrorPage from './Components/ErrorPage';
+import EditEvent from './Components/EditEvent'
+import UnauthorizedPage from './Components/UnauthorizedPage'
 
 import Dashboard from './Components/Dashboard'
 import { Container, Grid } from '@mui/material';
@@ -135,7 +137,12 @@ function App({ signOut}) {
               <Route path="/create" element={<CreateEvent userId={user}/>} />
               <Route path="/join/:eventId" element={<JoinEventPage user={user}/>} />
               <Route path="/profile" element={<Profile theme={theme}/>}/>
+                            <Route path="/unauthorized" element={<UnauthorizedPage theme={theme}/>}/>
+
               <Route path='*' element={<ErrorPage theme={theme}/>}  />
+
+             <Route path="/edit/:eventId" element={<EditEvent user={user}/>} />
+
               
               
 
