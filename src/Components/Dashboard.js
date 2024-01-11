@@ -11,6 +11,9 @@ import { Storage } from 'aws-amplify';
 import Button from '@mui/joy/Button';
 import DeleteRoundedIcon from '@mui/icons-material/DeleteRounded';
 import AccessTimeSharpIcon from '@mui/icons-material/AccessTimeSharp';
+import EditTwoToneIcon from '@mui/icons-material/EditTwoTone';
+
+import IconButton from '@mui/joy/IconButton';
 
 const Dashboard = ({ userId, theme }) => {
   const [events, setEvents] = useState([]);
@@ -117,6 +120,13 @@ const Dashboard = ({ userId, theme }) => {
     setExpandedEvent(expandedEvent === eventId ? null : eventId);
   };
 
+
+  const handleEdit = (eventId) => {
+    // Implement the logic for editing the event with the given eventId
+    console.log(`Edit event with ID: ${eventId}`);
+  };
+  
+
   const [expandedEvent, setExpandedEvent] = useState(null);
 
   return (
@@ -159,6 +169,20 @@ const Dashboard = ({ userId, theme }) => {
                   <ImageSkeleton width={"50%"} sx={{ margin: "10px", borderRadius: '8px' }} animation="wave" variant="rectangular" />
                 )}
                 <Typography sx={{ marginTop: '10px' }}>Organizer: {event.organizer}</Typography>
+                {JSON.parse(event.participants)[0][userId]["permissions"] === "admin" && (
+    <IconButton
+      aria-label="Edit Event"
+      component="a"
+      href={`/edit/${event.id}`}
+      color="neutral"
+      
+      sx={{
+        padding: 1, // Adjust padding as needed
+      }}
+    >
+      <EditTwoToneIcon />
+    </IconButton>
+  )}
               </Grid>
               <Grid item xs={8} sx={{ border: '2px dashed #ccc' }}>
                 <EventDetails sx={{ border: '2px dashed #ccc' }}>
