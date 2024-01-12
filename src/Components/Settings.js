@@ -34,6 +34,7 @@ const Settings = ({ themeType,setTheme,userData,setUserData,theme }) => {
     inputLabel: '',
     inputValue: '',
   });
+  
 
   const handleTabChange = (event, newValue) => {
     setSelectedTab(newValue);
@@ -58,6 +59,7 @@ const Settings = ({ themeType,setTheme,userData,setUserData,theme }) => {
     // Handle the confirm logic here
     console.log(`Confirming: ${modalContent.inputValue} for ${modalContent.type} input`);
     setOpen(false);
+    console.log("Userdata ",userData)
   };
 
     const handleThemeToggle = () => {

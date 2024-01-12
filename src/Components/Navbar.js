@@ -103,7 +103,7 @@ const Navbar = ({ user,setTheme,theme }) => {
             <Typography variant="h6" style={{ flexGrow: 1, marginLeft: '10px', fontFamily: 'Poppins, sans-serif' }}>
               Event Manager
             </Typography>
-            {1==1 ? (
+            {1!=1 ? (
               // Hamburger menu for smaller screens
               <>
                 <IconButton className="nav-button" edge="end" color="inherit" onClick={handleOpenMenu}>
