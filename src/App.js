@@ -22,10 +22,11 @@ import { Auth } from 'aws-amplify';
 import config from './aws-exports';
 import { Amplify } from 'aws-amplify';
 import { ThemeProvider } from '@mui/material/styles';
-import darkTheme from './Themes/darkTheme';
 import { API, graphqlOperation } from 'aws-amplify';
 import * as mutations from './graphql/mutations';
 import * as queries from './graphql/queries'
+import darkTheme from './Themes/darkTheme';
+import lightTheme from './Themes/lightTheme';
 
 
 Amplify.configure(config);
@@ -44,14 +45,21 @@ currentSession()
 
 
 function App({ signOut}) {
-  const [theme,setTheme]= React.useState(1)
+  const [theme,setTheme]= React.useState(darkTheme)
+  const [themeType,setThemeType] = React.useState(1)
   const [user, setUser] = React.useState(null);
   const [userEmail, setUserEmail] = React.useState(null);
  const [userData, setUserData]= React.useState(null)
 
-    const toggleTheme = () => {
-    setTheme((prevTheme) => (prevTheme === 0 ? 1 : 0));
-  };
+ useEffect(()=>{
+  if(themeType==0){
+    setTheme(lightTheme)
+  }
+  if(themeType==1){
+    setTheme(darkTheme)
+  }
+ },[themeType])
+   
  
   useEffect(() => {
     const currentAuthenticatedUser = async () => {
@@ -108,10 +116,10 @@ function App({ signOut}) {
   return (
     
     <Router >
-           <Navbar user={user} themeType={theme} style={{zIndex:100}}/>
+           <Navbar user={user} theme={theme} style={{zIndex:100}}/>
  <div style={{
           width:"100%",
-          background: theme === 1
+          background: themeType === 1
             ? 'linear-gradient(to right, #1d1629, #1e1e24 )'
             : 'linear-gradient(to right, rgba(80, 63, 159,0.18), rgba(255, 81, 181,0.18))',
           paddingBottom: "10%",
@@ -146,7 +154,7 @@ function App({ signOut}) {
               
               
 
-              <Route  path="/settings" element={<Settings userData={userData} setUserData={setUserData} themeType={theme} setTheme={setTheme}/>}/>
+              <Route  path="/settings" element={<Settings userData={userData} setUserData={setUserData} theme={theme }themeType={themeType} setTheme={setThemeType}/>}/>
             </Routes>
           </Grid>
                     

@@ -8,7 +8,7 @@ import {
   Typography,
   Container,
   useMediaQuery,
-  useTheme,
+
   Menu,
   MenuItem,
   Stack,
@@ -21,13 +21,11 @@ import {
 } from '@mui/material';
 import { Home, Info, ContactMail, Person, Login, Logout, PersonAdd,Settings, Menu as MenuIcon, Dashboard } from '@mui/icons-material';
 import useScrollTrigger from '@mui/material/useScrollTrigger';
-import { styled, createTheme } from '@mui/material/styles';
 import { Link } from 'react-router-dom';
 import { Auth } from 'aws-amplify';
 import '../Styles/Navbar.css';
-import darkTheme from '../Themes/darkTheme';
-import lightTheme from '../Themes/lightTheme';
-import { ThemeProvider } from '@mui/material';
+import { styled, createTheme } from '@mui/material/styles';
+
 
 
 
@@ -44,9 +42,8 @@ const StyledBadge = styled(Badge)(({ theme }) => ({
 }));
 
 
-const Navbar = ({ user,setTheme,themeType }) => {
-  const theme = useTheme();
-  const isMobile = useMediaQuery(theme.breakpoints.down('md'));
+const Navbar = ({ user,setTheme,theme }) => {
+
   const [anchorEl, setAnchorEl] = React.useState(null);
   const [loading, setLoading] = useState(false); // Added loading state
 
@@ -85,7 +82,6 @@ const Navbar = ({ user,setTheme,themeType }) => {
   const pages = ['About', 'Contact', 'Login', 'Signup'];
 
   return (
-<ThemeProvider theme={themeType === 1 ? darkTheme : lightTheme}>
 
     <>
     <Slide appear={false} direction="down" in={!trigger}>
@@ -94,9 +90,7 @@ const Navbar = ({ user,setTheme,themeType }) => {
   position="fixed"
   style={{
     opacity: 1,
-      background: themeType === 1
-            ? `linear-gradient(to right, ${darkTheme.palette.primary.main}, ${darkTheme.palette.secondary.main})`
-            : `linear-gradient(to right, ${lightTheme.palette.primary.main}, ${lightTheme.palette.secondary.main})`,
+      background: `linear-gradient(to right, ${theme.palette.primary.main}, ${theme.palette.secondary.main})`,
     
     borderRadius: 0,
   }}
@@ -109,7 +103,7 @@ const Navbar = ({ user,setTheme,themeType }) => {
             <Typography variant="h6" style={{ flexGrow: 1, marginLeft: '10px', fontFamily: 'Poppins, sans-serif' }}>
               Event Manager
             </Typography>
-            {isMobile ? (
+            {1==1 ? (
               // Hamburger menu for smaller screens
               <>
                 <IconButton className="nav-button" edge="end" color="inherit" onClick={handleOpenMenu}>
@@ -227,7 +221,6 @@ const Navbar = ({ user,setTheme,themeType }) => {
     </Slide>
    
       </>
-          </ThemeProvider>
 
   );
 };

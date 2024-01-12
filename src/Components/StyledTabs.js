@@ -7,7 +7,7 @@ import { buttonClasses } from '@mui/base/Button';
 import {  tabClasses } from '@mui/base/Tab';
 
 
-export default function StyledTabs({ selectedValue, onChange }) {
+export default function StyledTabs({ selectedValue, onChange,theme }) {
   return (
     <MuiTabs value={selectedValue} onChange={onChange}>
       <TabsList>

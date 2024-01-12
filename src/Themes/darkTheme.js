@@ -16,16 +16,16 @@ const darkTheme = createTheme({
     },
     background: {
       default: '#121212', // Default background color for dark mode
-      paper: '#1E1E1E', // Paper color for dark mode (e.g., card backgrounds)
+      paper: '#f1f1f1', // Paper color for dark mode (e.g., card backgrounds)
     },
     text: {
-      primary: '#ffffff', // Default text color for dark mode
-      secondary: '#A9A9A9', // Secondary text color for dark mode
+     primary: '#08041c',
     },
     action: {
       active: '#ffffff', // Active (selected) item color
       hover: '#333333', // Hover color for interactive elements
     },
+    textBackdrop:"#e8e8e8",
     divider: '#666666', // Divider color
   },
  

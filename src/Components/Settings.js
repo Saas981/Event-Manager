@@ -10,7 +10,6 @@ import Input from '@mui/joy/Input';
 
 
 
-
 const blue = {
   50: '#F0F7FF',
   100: '#C2E0FF',
@@ -24,7 +23,7 @@ const blue = {
   900: '#003A75',
 };
 
-const Settings = ({ theme,setTheme,userData,setUserData }) => {
+const Settings = ({ themeType,setTheme,userData,setUserData,theme }) => {
   const [selectedTab, setSelectedTab] = useState(0);
   const [open,setOpen] = useState(false)
   const [loadConfirmButton,setLoadConfirmButton] = useState(false)
@@ -74,9 +73,9 @@ const Settings = ({ theme,setTheme,userData,setUserData }) => {
       <Grid container justifyContent="center" spacing={3}>
         {/* Left Section */}
         <Grid item xs={12} md={4}>
-          <Paper elevation={3} sx={{ borderRadius: '20px', padding: '25px', height: '100%' }}>
+          <Paper elevation={3} sx={{ borderRadius: '20px', padding: '25px', height: '100%', backgroundColor: `${theme.palette.background.paper}`, }}>
             {/* Use the SettingsHeader component */}
-            <Typography variant="h4" mb={3} sx={{ fontFamily: 'Inter', fontWeight: '700', marginBottom: "25px", textAlign: 'center' }}>
+            <Typography variant="h4" mb={3} sx={{ fontFamily: 'Inter', fontWeight: '700', marginBottom: "25px", textAlign: 'center',color:`${theme.palette.text.primary}`}}>
             User Settings
   </Typography>
             {/* Pass selectedTab as a prop to StyledTabs */}
@@ -86,18 +85,18 @@ const Settings = ({ theme,setTheme,userData,setUserData }) => {
 
         {/* Right Section */}
         <Grid item xs={12} md={7}>
-          <Paper elevation={3} sx={{ borderRadius: '20px', padding: '25px', height: '100%', paddingLeft: '50px', paddingRight: "45px", backgroundColor: '#f1f1f1', overflowY: 'auto' }}>
+          <Paper elevation={3} sx={{ borderRadius: '20px', padding: '25px', height: '100%', paddingLeft: '50px', paddingRight: "45px", backgroundColor: `${theme.palette.background.paper}`, overflowY: 'auto' }}>
             {/* Content for the selected tab */}
             {selectedTab === 0 && (
               <div>
                 {/* Use the SettingsHeader component */}
                 <SettingsHeader title="Account Settings" />
                 {/* Sample settings under the "Account Settings" tab */}
-                <SettingItem title="Name" value="John Doe" onEdit={handleEdit("name")} />
-                <SettingItem title="Username" value="johndoe123" onEdit={handleEdit("username")} />
-                <SettingItem title="Phone Number" value="123-456-7890" onEdit={handleEdit("phone")} />
-                <SettingItem title="Email Address" value="johnexample21doe@example.com" onEdit={handleEdit("email")} />
-                <SettingItem title="Password" value="**********"  onEdit={handleEdit("password")} />
+                <SettingItem theme={theme }title="Name" value="John Doe" onEdit={handleEdit("name")} />
+                <SettingItem theme={theme }title="Username" value="johndoe123" onEdit={handleEdit("username")} />
+                <SettingItem theme={theme }title="Phone Number" value="123-456-7890" onEdit={handleEdit("phone")} />
+                <SettingItem theme={theme }title="Email Address" value="johnexample21doe@example.com" onEdit={handleEdit("email")} />
+                <SettingItem theme={theme }title="Password" value="**********"  onEdit={handleEdit("password")} />
                 
                  <Typography variant="h5" mb={3} sx={{  fontFamily: 'Inter', fontWeight: '600', marginTop: "30px",color:"#292929", textAlign: 'left'}}>
                 Account Deletion
@@ -118,7 +117,7 @@ const Settings = ({ theme,setTheme,userData,setUserData }) => {
                 <Box sx={{ display: 'flex', alignItems: 'center', marginTop: 3 }}>
             <Typography variant="h6" sx={{ marginRight: 2 }}>Dark Theme</Typography>
             <Switch
-              checked={theme === 1}
+              checked={themeType === 1}
               onChange={handleThemeToggle}
               inputProps={{ 'aria-label': 'Dark Theme Toggle' }}
             />
@@ -227,12 +226,12 @@ const SettingsHeader = ({ title }) => (
 );
 
 // Custom component for each setting item
-const SettingItem = ({ title, value, onEdit }) => (
+const SettingItem = ({ title, value, onEdit,theme }) => (
   <div style={{ display: 'flex', alignItems: 'center', marginBottom: '10px' }}>
     <Typography variant="h6" sx={{ fontFamily: 'Inter',color:"#393939", fontWeight: '700', marginRight: '8px', fontSize: '16px' }}>
       {title}:
     </Typography>
-    <Typography variant="body1" sx={{ marginRight: 'auto', fontFamily: 'Inter', backgroundColor: "#e8e8e8", padding: "6px", borderRadius: "6px", fontSize: '14px' }}>
+    <Typography variant="body1" sx={{ marginRight: 'auto', fontFamily: 'Inter', backgroundColor: `${theme.palette.textBackdrop}`, padding: "6px", borderRadius: "6px", fontSize: '14px' }}>
       {value}
     </Typography>
     <Button variant="soft" onClick={onEdit} size="sm" sx={{ fontSize: "12px", padding: "3px 15px", fontFamily: 'Inter', backgroundColor: "#94D8FF", color: "#004AAA", '&:hover': { backgroundColor: "#A9D7F1", color: "#6aa7f7" } }}>
