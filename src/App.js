@@ -13,7 +13,7 @@ import Settings from './Components/Settings'
 import ErrorPage from './Components/ErrorPage';
 import EditEvent from './Components/EditEvent'
 import UnauthorizedPage from './Components/UnauthorizedPage'
-
+import Search from './Components/Search';
 import Dashboard from './Components/Dashboard'
 import { Container, Grid } from '@mui/material';
 import './App.css'; 
@@ -151,7 +151,7 @@ function App({ signOut}) {
 
              <Route path="/edit/:eventId" element={<EditEvent userId={user}/>} />
 
-              
+               <Route path="/search" element={<Search theme={theme}/>}/>
               
 
               <Route  path="/settings" element={<Settings userData={userData} setUserData={setUserData} theme={theme }themeType={themeType} setTheme={setThemeType}/>}/>

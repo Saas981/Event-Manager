@@ -1,5 +1,6 @@
 
 import React, { useState } from 'react';
+
 import {
   AppBar,
   Toolbar,
@@ -24,10 +25,11 @@ import useScrollTrigger from '@mui/material/useScrollTrigger';
 import { Link } from 'react-router-dom';
 import { Auth } from 'aws-amplify';
 import '../Styles/Navbar.css';
-import { styled, createTheme } from '@mui/material/styles';
+import { styled, alpha } from '@mui/material/styles';
+import SearchIcon from '@mui/icons-material/Search';
 
-
-
+import Box from '@mui/material/Box';
+import InputBase from '@mui/material/InputBase';
 
 const StyledBadge = styled(Badge)(({ theme }) => ({
   '& .MuiBadge-badge': {
@@ -140,10 +142,24 @@ const Navbar = ({ user,setTheme,theme }) => {
                   About
                   <Info style={{ marginLeft: '5px' }} />
                 </Button>
-                <Button color="inherit" className="nav-button" component={Link} to="/contact" style={{ marginTop: "4px", marginRight: '50%', fontFamily: 'Poppins, sans-serif' }}>
+                <Button color="inherit" className="nav-button" component={Link} to="/contact" style={{ marginTop: "4px", marginRight: '51%', fontFamily: 'Poppins, sans-serif' }}>
                   Contact
                   <ContactMail style={{ marginLeft: '5px' }} />
+                    
                 </Button>
+                 
+                  {/* <Button color="inherit" className="nav-button" component={Link} to="/search" style={{ marginTop: "4px", marginRight: '40%', fontFamily: 'Poppins, sans-serif' }}>
+                  Search
+                  <SearchIcon style={{ marginLeft: '5px' }} />
+                </Button> */} <Search sx={{marginTop: "4px",position:"absolute", left: '45%'}}>
+            <SearchIconWrapper>
+              <SearchIcon />
+            </SearchIconWrapper>
+            <StyledInputBase
+              placeholder="Search…"
+              inputProps={{ 'aria-label': 'search' }}
+            />
+          </Search>
                   <Button color="inherit" className="nav-button" style={{ marginRight: '1px' }}>
                     <StyledBadge
                       overlap="circular"
@@ -152,6 +168,8 @@ const Navbar = ({ user,setTheme,theme }) => {
                     >
                       <Avatar onClick={handleOpenMenu} />
                     </StyledBadge>
+
+                   
                     <Menu
                       anchorEl={anchorEl}
                       style={{marginTop:'10px'}}
@@ -199,6 +217,7 @@ const Navbar = ({ user,setTheme,theme }) => {
                 )}
               </>
             )}
+           
           </Toolbar>
         </Container>
        
@@ -226,3 +245,47 @@ const Navbar = ({ user,setTheme,theme }) => {
 };
 
 export default Navbar;
+
+
+
+const Search = styled('div')(({ theme }) => ({
+  position: 'relative',
+  borderRadius: theme.shape.borderRadius,
+  backgroundColor: alpha(theme.palette.common.white, 0.15),
+  '&:hover': {
+    backgroundColor: alpha(theme.palette.common.white, 0.25),
+  },
+  marginLeft: 0,
+  width: '100%',
+  [theme.breakpoints.up('sm')]: {
+    marginLeft: theme.spacing(1),
+    width: 'auto',
+  },
+}));
+
+const SearchIconWrapper = styled('div')(({ theme }) => ({
+  padding: theme.spacing(0, 2),
+  height: '100%',
+  position: 'absolute',
+  pointerEvents: 'none',
+  display: 'flex',
+  alignItems: 'center',
+  justifyContent: 'center',
+}));
+
+const StyledInputBase = styled(InputBase)(({ theme }) => ({
+  color: 'inherit',
+  width: '100%',
+  '& .MuiInputBase-input': {
+    padding: theme.spacing(1, 10, 1, 0),
+    // vertical padding + font size from searchIcon
+    paddingLeft: `calc(1em + ${theme.spacing(4)})`,
+    transition: theme.transitions.create('width'),
+    [theme.breakpoints.up('sm')]: {
+      width: '12ch',
+      '&:focus': {
+        width: '20ch',
+      },
+    },
+  },
+}));
