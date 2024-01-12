@@ -77,7 +77,7 @@ const Settings = ({ themeType,setTheme,userData,setUserData,theme }) => {
         <Grid item xs={12} md={4}>
           <Paper elevation={3} sx={{ borderRadius: '20px', padding: '25px', height: '100%', backgroundColor: `${theme.palette.background.paper}`, }}>
             {/* Use the SettingsHeader component */}
-            <Typography variant="h4" mb={3} sx={{ fontFamily: 'Inter', fontWeight: '700', marginBottom: "25px", textAlign: 'center',color:`${theme.palette.text.primary}`}}>
+            <Typography variant="h4" mb={3} sx={{ fontFamily: 'Poppins', fontWeight: '700', marginBottom: "25px", textAlign: 'center',color:`${theme.palette.text.primary}`}}>
             User Settings
   </Typography>
             {/* Pass selectedTab as a prop to StyledTabs */}
@@ -100,13 +100,13 @@ const Settings = ({ themeType,setTheme,userData,setUserData,theme }) => {
                 <SettingItem theme={theme }title="Email Address" value="johnexample21doe@example.com" onEdit={handleEdit("email")} />
                 <SettingItem theme={theme }title="Password" value="**********"  onEdit={handleEdit("password")} />
                 
-                 <Typography variant="h5" mb={3} sx={{  fontFamily: 'Inter', fontWeight: '600', marginTop: "30px",color:"#292929", textAlign: 'left'}}>
+                 <Typography variant="h5" mb={3} sx={{  fontFamily: 'Poppins', fontWeight: '600', marginTop: "30px",color:"#292929", textAlign: 'left'}}>
                 Account Deletion
                 </Typography>
-                 <Typography variant="body1" mb={3} sx={{ fontFamily: 'Inter', textAlign: 'left', fontSize: '16px', lineHeight: '1.5' }}>
+                 <Typography variant="body1" mb={3} sx={{ fontFamily: 'Poppins', textAlign: 'left', fontSize: '16px', lineHeight: '1.5' }}>
                   Are you sure that you want to delete your account? This will immediately log you out of your account and you will not be able to log in again.
                 </Typography>
-                <Button variant="soft" color="danger" size="lg" sx={{ width:"100%",borderRadius:"15px", fontFamily: 'Inter', fontSize: '16px', padding: '10px 30px',backgroundColor: "#ffa3a4", '&:hover': { backgroundColor: "#FF6668" } }}>
+                <Button variant="soft" color="danger" size="lg" sx={{ width:"100%",borderRadius:"15px", fontFamily: 'Poppins', fontSize: '16px', padding: '10px 30px',backgroundColor: "#ffa3a4", '&:hover': { backgroundColor: "#FF6668" } }}>
                   Delete Account
                 </Button>
               </div>
@@ -136,7 +136,7 @@ const Settings = ({ themeType,setTheme,userData,setUserData,theme }) => {
             {selectedTab === 3 && (
               <div>
                 {/* Account Deletion Section */}
-                <Typography variant="h4" mb={3} sx={{ fontFamily: 'Inter', fontWeight: '600', marginBottom: "30px", textAlign: 'left' }}>
+                <Typography variant="h4" mb={3} sx={{ fontFamily: 'Poppins', fontWeight: '600', marginBottom: "30px", textAlign: 'left' }}>
                   Pronouns
                 </Typography>
  
@@ -222,7 +222,7 @@ backgroundColor: "rgb(32, 29, 41,0.3)"}}>
 };
 
 const SettingsHeader = ({ title }) => (
-  <Typography variant="h4" mb={3} sx={{ fontFamily: 'Inter', fontWeight: '700', marginBottom: "40px", textAlign: 'left' }}>
+  <Typography variant="h4" mb={3} sx={{ fontFamily: 'Poppins', fontWeight: '700', marginBottom: "40px", textAlign: 'left' }}>
     {title}
   </Typography>
 );
@@ -230,13 +230,13 @@ const SettingsHeader = ({ title }) => (
 // Custom component for each setting item
 const SettingItem = ({ title, value, onEdit,theme }) => (
   <div style={{ display: 'flex', alignItems: 'center', marginBottom: '10px' }}>
-    <Typography variant="h6" sx={{ fontFamily: 'Inter',color:"#393939", fontWeight: '700', marginRight: '8px', fontSize: '16px' }}>
+    <Typography variant="h6" sx={{ fontFamily: 'Poppins',color:"#393939", fontWeight: '700', marginRight: '8px', fontSize: '16px' }}>
       {title}:
     </Typography>
-    <Typography variant="body1" sx={{ marginRight: 'auto', fontFamily: 'Inter', backgroundColor: `${theme.palette.textBackdrop}`, padding: "6px", borderRadius: "6px", fontSize: '14px' }}>
+    <Typography variant="body1" sx={{ marginRight: 'auto', fontFamily: 'Poppins', backgroundColor: `${theme.palette.textBackdrop}`, padding: "6px", borderRadius: "6px", fontSize: '14px' }}>
       {value}
     </Typography>
-    <Button variant="soft" onClick={onEdit} size="sm" sx={{ fontSize: "12px", padding: "3px 15px", fontFamily: 'Inter', backgroundColor: "#94D8FF", color: "#004AAA", '&:hover': { backgroundColor: "#A9D7F1", color: "#6aa7f7" } }}>
+    <Button variant="soft" onClick={onEdit} size="sm" sx={{ fontSize: "12px", padding: "3px 15px", fontFamily: 'Poppins', backgroundColor: "#94D8FF", color: "#004AAA", '&:hover': { backgroundColor: "#A9D7F1", color: "#6aa7f7" } }}>
       Edit
     </Button>
   </div>
