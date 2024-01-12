@@ -56,11 +56,22 @@ const Settings = ({ themeType,setTheme,userData,setUserData,theme }) => {
   };
 
   const handleConfirm = () => {
-    // Handle the confirm logic here
-    console.log(`Confirming: ${modalContent.inputValue} for ${modalContent.type} input`);
+    // Extract necessary information from modalContent
+    const { type, inputValue } = modalContent;
+  
+    // Update the corresponding field in userData
+    setUserData((prevUserData) => ({
+      ...prevUserData,
+      [type]: inputValue,
+    }));
+  
+    // Close the modal
     setOpen(false);
-    console.log("Userdata ",userData)
+  
+    // Log the updated userData
+    console.log("Updated UserData: ", userData);
   };
+  
 
     const handleThemeToggle = () => {
     // Toggle between dark and light theme
@@ -94,10 +105,10 @@ const Settings = ({ themeType,setTheme,userData,setUserData,theme }) => {
                 {/* Use the SettingsHeader component */}
                 <SettingsHeader title="Account Settings" />
                 {/* Sample settings under the "Account Settings" tab */}
-                <SettingItem theme={theme }title="Name" value="John Doe" onEdit={handleEdit("name")} />
+                <SettingItem theme={theme }title="Name" value={`${userData?.name}`} onEdit={handleEdit("name")} />
                 <SettingItem theme={theme }title="Username" value="johndoe123" onEdit={handleEdit("username")} />
                 <SettingItem theme={theme }title="Phone Number" value="123-456-7890" onEdit={handleEdit("phone")} />
-                <SettingItem theme={theme }title="Email Address" value="johnexample21doe@example.com" onEdit={handleEdit("email")} />
+                <SettingItem theme={theme }title="Email Address" value={`${userData?.email}`} onEdit={handleEdit("email")} />
                 <SettingItem theme={theme }title="Password" value="**********"  onEdit={handleEdit("password")} />
                 
                  <Typography variant="h5" mb={3} sx={{  fontFamily: 'Inter', fontWeight: '600', marginTop: "30px",color:"#292929", textAlign: 'left'}}>
