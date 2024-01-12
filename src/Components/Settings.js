@@ -147,10 +147,8 @@ const Settings = ({ themeType,setTheme,userData,setUserData,theme }) => {
             {selectedTab === 3 && (
               <div>
                 {/* Account Deletion Section */}
-                <Typography variant="h4" mb={3} sx={{ fontFamily: 'Poppins', fontWeight: '600', marginBottom: "30px", textAlign: 'left' }}>
-                  Pronouns
-                </Typography>
- 
+                <SettingsHeader title="Customizations" />
+                {/* Add your customizations content here */}
               </div>
             )}
             {/* Add more sections for other tabs as needed */}
