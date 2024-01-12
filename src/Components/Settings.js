@@ -106,10 +106,10 @@ const Settings = ({ themeType,setTheme,userData,setUserData,theme }) => {
                 <SettingsHeader title="Account Settings" />
                 {/* Sample settings under the "Account Settings" tab */}
                 <SettingItem theme={theme }title="Name" value={`${userData?.name}`} onEdit={handleEdit("name")} />
-                <SettingItem theme={theme }title="Username" value="johndoe123" onEdit={handleEdit("username")} />
-                <SettingItem theme={theme }title="Phone Number" value="123-456-7890" onEdit={handleEdit("phone")} />
+                <SettingItem theme={theme }title="Username" value={`${userData?.username}`} onEdit={handleEdit("username")} />
+                <SettingItem theme={theme }title="Phone Number" value={`${userData?.phone}`} onEdit={handleEdit("phone")} />
                 <SettingItem theme={theme }title="Email Address" value={`${userData?.email}`} onEdit={handleEdit("email")} />
-                <SettingItem theme={theme }title="Password" value="**********"  onEdit={handleEdit("password")} />
+                <SettingItem theme={theme }title="Password" value={`${userData?.password}`}  onEdit={handleEdit("password")} />
                 
                  <Typography variant="h5" mb={3} sx={{  fontFamily: 'Poppins', fontWeight: '600', marginTop: "30px",color:"#292929", textAlign: 'left'}}>
                 Account Deletion
@@ -147,10 +147,8 @@ const Settings = ({ themeType,setTheme,userData,setUserData,theme }) => {
             {selectedTab === 3 && (
               <div>
                 {/* Account Deletion Section */}
-                <Typography variant="h4" mb={3} sx={{ fontFamily: 'Poppins', fontWeight: '600', marginBottom: "30px", textAlign: 'left' }}>
-                  Pronouns
-                </Typography>
- 
+                <SettingsHeader title="Customizations" />
+                {/* Add your customizations content here */}
               </div>
             )}
             {/* Add more sections for other tabs as needed */}
