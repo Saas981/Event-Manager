@@ -44,13 +44,13 @@ currentSession()
 
 
 function App({ signOut}) {
-  const [theme,setTheme]= React.useState("dark")
+  const [theme,setTheme]= React.useState(1)
   const [user, setUser] = React.useState(null);
   const [userEmail, setUserEmail] = React.useState(null);
  const [userData, setUserData]= React.useState(null)
 
     const toggleTheme = () => {
-    setTheme((prevTheme) => (prevTheme === "light" ? "dark" : "light"));
+    setTheme((prevTheme) => (prevTheme === 0 ? 1 : 0));
   };
  
   useEffect(() => {
@@ -108,10 +108,10 @@ function App({ signOut}) {
   return (
     
     <Router >
-           <Navbar user={user}style={{zIndex:100}}/>
+           <Navbar user={user} themeType={theme} style={{zIndex:100}}/>
  <div style={{
           width:"100%",
-          background: theme === "dark"
+          background: theme === 1
             ? 'linear-gradient(to right, #1d1629, #1e1e24 )'
             : 'linear-gradient(to right, rgba(80, 63, 159,0.18), rgba(255, 81, 181,0.18))',
           paddingBottom: "10%",
@@ -146,7 +146,7 @@ function App({ signOut}) {
               
               
 
-              <Route  path="/settings" element={<Settings theme={theme}/>}/>
+              <Route  path="/settings" element={<Settings userData={userData} setUserData={setUserData} themeType={theme} setTheme={setTheme}/>}/>
             </Routes>
           </Grid>
                     

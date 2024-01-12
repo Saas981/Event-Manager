@@ -4,6 +4,7 @@ import StyledTabs from './StyledTabs'; // Import the StyledTabs component
 import Modal from '@mui/joy/Modal';
 import ModalClose from '@mui/joy/ModalClose';
 import  Button from "@mui/joy/Button"
+import Switch from '@mui/material/Switch';
 import ModalDialog from '@mui/joy/ModalDialog';
 import Input from '@mui/joy/Input';
 
@@ -23,7 +24,7 @@ const blue = {
   900: '#003A75',
 };
 
-const Settings = ({ theme }) => {
+const Settings = ({ theme,setTheme,userData,setUserData }) => {
   const [selectedTab, setSelectedTab] = useState(0);
   const [open,setOpen] = useState(false)
   const [loadConfirmButton,setLoadConfirmButton] = useState(false)
@@ -58,6 +59,11 @@ const Settings = ({ theme }) => {
     // Handle the confirm logic here
     console.log(`Confirming: ${modalContent.inputValue} for ${modalContent.type} input`);
     setOpen(false);
+  };
+
+    const handleThemeToggle = () => {
+    // Toggle between dark and light theme
+    setTheme((prevTheme) => (prevTheme === 1 ? 0 : 1));
   };
 
 
@@ -109,6 +115,14 @@ const Settings = ({ theme }) => {
                 {/* Use the SettingsHeader component */}
                 <SettingsHeader title="Privacy and Safety" />
                 {/* Sample settings under the "Privacy and Safety" tab */}
+                <Box sx={{ display: 'flex', alignItems: 'center', marginTop: 3 }}>
+            <Typography variant="h6" sx={{ marginRight: 2 }}>Dark Theme</Typography>
+            <Switch
+              checked={theme === 1}
+              onChange={handleThemeToggle}
+              inputProps={{ 'aria-label': 'Dark Theme Toggle' }}
+            />
+          </Box>
               </div>
             )}
             {selectedTab === 2 && (

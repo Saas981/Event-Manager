@@ -17,7 +17,7 @@ import {
   Badge,
   CircularProgress,
   Avatar,
-  ThemeProvider,
+  
 } from '@mui/material';
 import { Home, Info, ContactMail, Person, Login, Logout, PersonAdd,Settings, Menu as MenuIcon, Dashboard } from '@mui/icons-material';
 import useScrollTrigger from '@mui/material/useScrollTrigger';
@@ -26,7 +26,8 @@ import { Link } from 'react-router-dom';
 import { Auth } from 'aws-amplify';
 import '../Styles/Navbar.css';
 import darkTheme from '../Themes/darkTheme';
-
+import lightTheme from '../Themes/lightTheme';
+import { ThemeProvider } from '@mui/material';
 
 
 
@@ -37,32 +38,13 @@ const StyledBadge = styled(Badge)(({ theme }) => ({
     width:"1px",
     height:"7px",
     boxShadow: `0 0 0 2px ${theme.palette.background.paper}`,
-    '&::after': {
-      // position: 'absolute',
-      // top: 0,
-      // left: 0,
-      // width: '100%',
-      // height: '100%',
-      // borderRadius: '50%',
-      // // animation: 'ripple 1.2s infinite ease-in-out',
-      // border: '1px solid currentColor',
-      // content: '""',
-    },
+  
   },
-  // '@keyframes ripple': {
-  //   '0%': {
-  //     transform: 'scale(.8)',
-  //     opacity: 1,
-  //   },
-  //   '100%': {
-  //     transform: 'scale(2.4)',
-  //     opacity: 0,
-  //   },
-  // },
+
 }));
 
 
-const Navbar = ({ user,setTheme }) => {
+const Navbar = ({ user,setTheme,themeType }) => {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('md'));
   const [anchorEl, setAnchorEl] = React.useState(null);
@@ -103,7 +85,7 @@ const Navbar = ({ user,setTheme }) => {
   const pages = ['About', 'Contact', 'Login', 'Signup'];
 
   return (
-        <ThemeProvider theme={darkTheme}>
+<ThemeProvider theme={themeType === 1 ? darkTheme : lightTheme}>
 
     <>
     <Slide appear={false} direction="down" in={!trigger}>
@@ -112,7 +94,10 @@ const Navbar = ({ user,setTheme }) => {
   position="fixed"
   style={{
     opacity: 1,
-    background: `linear-gradient(to right, ${darkTheme.palette.primary.main}, ${darkTheme.palette.secondary.main})`,
+      background: themeType === 1
+            ? `linear-gradient(to right, ${darkTheme.palette.primary.main}, ${darkTheme.palette.secondary.main})`
+            : `linear-gradient(to right, ${lightTheme.palette.primary.main}, ${lightTheme.palette.secondary.main})`,
+    
     borderRadius: 0,
   }}
 >       <Container>
@@ -120,6 +105,7 @@ const Navbar = ({ user,setTheme }) => {
             <IconButton className="nav-button" edge="start" color="inherit" component={Link} to="/">
               <Home />
             </IconButton>
+         
             <Typography variant="h6" style={{ flexGrow: 1, marginLeft: '10px', fontFamily: 'Poppins, sans-serif' }}>
               Event Manager
             </Typography>

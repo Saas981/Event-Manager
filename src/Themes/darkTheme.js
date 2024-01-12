@@ -2,14 +2,17 @@ import { createTheme } from '@mui/material/styles';
 
 const darkTheme = createTheme({
   palette: {
-    type: 'dark', // Use dark mode
+    mode: 'dark',
+
     primary: {
-      main: '#1b1133', // Dark purple primary color
-      contrastText: '#ffffff', // Text color against primary color
+      main: '#1b1133',
+      light: '#ddd0ff',
+      dark: '#291f48',
     },
     secondary: {
-      main: '#111433', // Super dark purple secondary color
-      contrastText: '#ffffff', // Text color against secondary color
+      main: '#111433',
+      light: '#deeef5',
+      dark: '#152c33',
     },
     background: {
       default: '#121212', // Default background color for dark mode
