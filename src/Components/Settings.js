@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Typography, Container, Grid, Paper,Box  } from '@mui/material';
+import { Typography, Container, Grid, Paper,Box, } from '@mui/material';
 import StyledTabs from './StyledTabs'; // Import the StyledTabs component
 import Modal from '@mui/joy/Modal';
 import ModalClose from '@mui/joy/ModalClose';
@@ -7,6 +7,8 @@ import  Button from "@mui/joy/Button"
 import Switch from '@mui/material/Switch';
 import ModalDialog from '@mui/joy/ModalDialog';
 import Input from '@mui/joy/Input';
+import ProfileUploader from './UploaderProfile';
+import Textarea from '@mui/joy/Textarea';
 
 
 
@@ -25,6 +27,9 @@ const blue = {
 
 const Settings = ({ themeType,setTheme,userData,setUserData,theme }) => {
   const [selectedTab, setSelectedTab] = useState(0);
+  const [profilePicture,setProfilePicture]= useState()
+    const [bio, setBio  ] = useState('');
+
   const [open,setOpen] = useState(false)
   const [loadConfirmButton,setLoadConfirmButton] = useState(false)
   const [modalContent, setModalContent] = useState({
@@ -127,14 +132,7 @@ const Settings = ({ themeType,setTheme,userData,setUserData,theme }) => {
                 {/* Use the SettingsHeader component */}
                 <SettingsHeader title="Privacy and Safety" />
                 {/* Sample settings under the "Privacy and Safety" tab */}
-                <Box sx={{ display: 'flex', alignItems: 'center', marginTop: 3 }}>
-            <Typography variant="h6" sx={{ marginRight: 2 }}>Dark Theme</Typography>
-            <Switch
-              checked={themeType === 1}
-              onChange={handleThemeToggle}
-              inputProps={{ 'aria-label': 'Dark Theme Toggle' }}
-            />
-          </Box>
+               
               </div>
             )}
             {selectedTab === 2 && (
@@ -147,8 +145,50 @@ const Settings = ({ themeType,setTheme,userData,setUserData,theme }) => {
             {selectedTab === 3 && (
               <div>
                 {/* Account Deletion Section */}
-                <SettingsHeader title="Customizations" />
-                {/* Add your customizations content here */}
+                <SettingsHeader title="Customizations" sx={{ marginBottom: 0 }} />
+                
+             <Grid container>
+      {/* This should be in 1 row with 1 grid item */}
+      <Grid item  xs={3} sx={{marginTop:"0"}}>
+           <SettingItemStatic theme={theme} title="Profile Picture" />
+        <ProfileUploader savedFile={profilePicture} setSavedFile={setProfilePicture} sx={{marginTop:"1%"}}/>
+     
+      </Grid>
+
+      {/* Description and text area box */}
+      <Grid item xs={9}>
+        <Box sx={{ marginLeft: 2 }}>
+     <SettingItemStatic theme={theme} title="Bio" />
+
+    
+          <Textarea
+          color="neutral"
+  disabled={false}
+  minRows={4}
+  size="md"
+  variant="outlined"
+            value={bio}
+            onChange={(e) => setBio(e.target.value)}
+            aria-label="description"
+            placeholder="Write your description here..."
+            style={{ width: '100%', minHeight: '80px', padding: '8px', borderRadius: '4px' }}
+          />
+        </Box>
+      </Grid>
+    </Grid>
+
+
+
+                 <Box sx={{ display: 'flex', alignItems: 'center', marginTop: 3 }}>
+     <SettingItemStatic theme={theme} title="Dark Mode" />
+            <Switch
+              checked={themeType === 1}
+              onChange={handleThemeToggle}
+              inputProps={{ 'aria-label': 'Dark Theme Toggle' }}
+            />
+          </Box>
+
+          
               </div>
             )}
             {/* Add more sections for other tabs as needed */}
@@ -231,7 +271,7 @@ backgroundColor: "rgb(32, 29, 41,0.3)"}}>
 };
 
 const SettingsHeader = ({ title }) => (
-  <Typography variant="h4" mb={3} sx={{ fontFamily: 'Poppins', fontWeight: '700', marginBottom: "40px", textAlign: 'left' }}>
+  <Typography variant="h4" mb={3} sx={{ fontFamily: 'Poppins', fontWeight: '700', marginBottom: "30px", textAlign: 'left' }}>
     {title}
   </Typography>
 );
@@ -248,6 +288,15 @@ const SettingItem = ({ title, value, onEdit,theme }) => (
     <Button variant="soft" onClick={onEdit} size="sm" sx={{ fontSize: "12px", padding: "3px 15px", fontFamily: 'Poppins', backgroundColor: "#94D8FF", color: "#004AAA", '&:hover': { backgroundColor: "#A9D7F1", color: "#6aa7f7" } }}>
       Edit
     </Button>
+  </div>
+);
+
+const SettingItemStatic = ({ title,theme }) => (
+  <div style={{ display: 'flex', alignItems: 'center', marginBottom: '5px',marginTop:"5px" }}>
+    <Typography variant="h6" sx={{ fontFamily: 'Poppins',color:"#393939", fontWeight: '700', marginRight: '8px', fontSize: '16px' }}>
+      {title}
+    </Typography>
+   
   </div>
 );
 
