@@ -1,5 +1,6 @@
 
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 
 import {
   AppBar,
@@ -48,6 +49,23 @@ const Navbar = ({ user,setTheme,theme }) => {
 
   const [anchorEl, setAnchorEl] = React.useState(null);
   const [loading, setLoading] = useState(false); // Added loading state
+  const [searchQuery, setSearchQuery] = useState('');
+  const navigate = useNavigate();
+
+
+    const handleSearch = () => {
+    // Navigate to the search page with the current searchQuery
+    navigate(`/search/${searchQuery}`);
+  };
+
+  const handleClearSearch = () => {
+    // Clear the search query and navigate to the search page
+    setSearchQuery('');
+    navigate(`/search`);
+  };
+
+
+
 
 
   console.log("CURRENT USER ",user)
@@ -156,8 +174,15 @@ const Navbar = ({ user,setTheme,theme }) => {
               <SearchIcon />
             </SearchIconWrapper>
             <StyledInputBase
-              placeholder="Search…"
-              inputProps={{ 'aria-label': 'search' }}
+               placeholder="Search…"
+        inputProps={{ 'aria-label': 'search' }}
+        value={searchQuery}
+        onChange={(e) => setSearchQuery(e.target.value)}
+        onKeyDown={(e) => {
+          if (e.key === 'Enter') {
+            handleSearch();
+          }
+        }}
             />
           </Search>
                   <Button color="inherit" className="nav-button" style={{ marginRight: '1px' }}>
