@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Typography, Container, Grid, Paper,Box, } from '@mui/material';
 import StyledTabs from './StyledTabs'; // Import the StyledTabs component
 import Modal from '@mui/joy/Modal';
@@ -39,6 +39,16 @@ const Settings = ({ themeType,setTheme,userData,setUserData,theme }) => {
     inputLabel: '',
     inputValue: '',
   });
+
+  useEffect(() => {
+    console.log("USER DATA UPDATED ",userData)
+    // Assuming that userData is an object and you want to update its profilePictureImage property
+    setUserData((prevUserData) => ({
+      ...prevUserData,
+      profilePictureImage: profilePicture,
+    }));
+  }, [profilePicture]);
+  
   
 
   const handleTabChange = (event, newValue) => {

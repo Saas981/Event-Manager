@@ -45,7 +45,7 @@ const StyledBadge = styled(Badge)(({ theme }) => ({
 }));
 
 
-const Navbar = ({ user,setTheme,theme }) => {
+const Navbar = ({ user,setTheme,theme,userData }) => {
 
   const [anchorEl, setAnchorEl] = React.useState(null);
   const [loading, setLoading] = useState(false); // Added loading state
@@ -191,7 +191,12 @@ const Navbar = ({ user,setTheme,theme }) => {
                       anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
                       variant="dot"
                     >
-                      <Avatar onClick={handleOpenMenu} />
+                         {userData?.profilePictureImage ?(
+                          <Avatar onClick={handleOpenMenu} src={URL.createObjectURL(userData?.profilePictureImage)} sx={{ width: 48, height: 48}}/>
+                               
+                               
+                                  ) :(  <Avatar onClick={handleOpenMenu} sx={{  width: 48, height: 48}} />)}
+                    
                     </StyledBadge>
 
                    
@@ -202,7 +207,9 @@ const Navbar = ({ user,setTheme,theme }) => {
                       onClose={handleCloseMenu}
                     >
                                 <MenuItem component={Link} to="/profile" onClick={handleCloseMenu}>
+                               
             <Person style={{ marginRight: '8px', fontSize: '22px' }} />
+
             <span style={{ fontSize: '15px' }}>Profile</span>
           </MenuItem>
                         <MenuItem component={Link} to="/dashboard" onClick={handleCloseMenu}>

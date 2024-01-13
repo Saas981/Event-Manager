@@ -116,7 +116,7 @@ function App({ signOut}) {
   return (
     
     <Router >
-           <Navbar user={user} theme={theme} style={{zIndex:100}}/>
+           <Navbar user={user} userData={userData} theme={theme} style={{zIndex:100}}/>
  <div style={{
           width:"100%",
           background: themeType === 1
