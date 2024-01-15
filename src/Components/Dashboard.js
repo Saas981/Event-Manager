@@ -32,7 +32,7 @@ const Dashboard = ({ userId, theme }) => {
         moddedData.map(async (event) => {
           if (event.coverImage) {
             try {
-              const imgUrl = await Storage.get(event.coverImage);
+              const imgUrl = await Storage.get("eventCovers/"+event.coverImage);
               const userIsAdmin = JSON.parse(event.participants)[0].userId === "admin";
               const isWaitlisted = JSON.parse(event.participants)[0].userId === "admin";
 

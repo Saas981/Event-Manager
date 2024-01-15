@@ -84,7 +84,7 @@ const [snackbarMessage, setSnackbarMessage] = useState('');
 
          if (moddedData.coverImage) {
         try {
-          const imgUrl = await Storage.get(moddedData.coverImage);
+          const imgUrl = await Storage.get("eventCovers/"+moddedData.coverImage);
           const file = await fetch(imgUrl).then(res => res.blob());
           setSavedFile(file);
           moddedData = { ...moddedData, imgUrl: URL.createObjectURL(file) };

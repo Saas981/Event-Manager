@@ -9,6 +9,7 @@ import ModalDialog from '@mui/joy/ModalDialog';
 import Input from '@mui/joy/Input';
 import ProfileUploader from './UploaderProfile';
 import Textarea from '@mui/joy/Textarea';
+import { Storage } from 'aws-amplify';
 
 
 
@@ -41,12 +42,66 @@ const Settings = ({ themeType,setTheme,userData,setUserData,theme }) => {
   });
 
   useEffect(() => {
+    const fetchProfilePicture = async () => {
+      console.log("WAHT WE HAVE NOW ",userData)
+      if (userData?.profilePicture) {
+        console.log("PROFILEPICTUREIMAGE ",userData.profilePicture)
+        try {
+          // Fetch the profile picture from Storage
+          const imgUrl = await Storage.get(userData.profilePicture)
+          const file = await fetch(imgUrl).then(res => res.blob());
+          console.log("IMGA URARL ",imgUrl)
+          // Set the profile picture state
+          setProfilePicture(file);
+        } catch (error) {
+          console.log("Error fetching profile picture: ", error);
+        }
+      }
+    };
+  
+    // Call the function when userData.profilePicture changes
+    fetchProfilePicture();
+  }, [userData?.profilePicture]);
+  
+
+  useEffect(() => {
     console.log("USER DATA UPDATED ",userData)
     // Assuming that userData is an object and you want to update its profilePictureImage property
     setUserData((prevUserData) => ({
       ...prevUserData,
       profilePictureImage: profilePicture,
     }));
+  }, [profilePicture]);
+
+
+  useEffect(() => {
+    const uploadProfilePicture = async () => {
+      if (profilePicture) {
+        try {
+          // Upload profile picture to S3
+          const imgUrl = await Storage.put(
+            `profilePictures/${userData.id}/image.png`,
+            profilePicture,
+            {
+              contentType: "image/png", // Replace with the actual content type of your image
+            }
+          );
+  
+          // Update the userData with the imgUrl
+          console.log("IMAGE GURLL ",imgUrl.key)
+          setUserData((prevUserData) => ({
+            ...prevUserData,
+            profilePicture:imgUrl.key,
+          }));
+          console.log("USER DATA RIGHT NOW ",userData)
+        } catch (error) {
+          console.log("Error uploading file: ", error);
+        }
+      }
+    };
+  
+    // Call the function when profilePicture changes
+    uploadProfilePicture();
   }, [profilePicture]);
   
   

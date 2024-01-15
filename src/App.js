@@ -27,6 +27,7 @@ import * as mutations from './graphql/mutations';
 import * as queries from './graphql/queries'
 import darkTheme from './Themes/darkTheme';
 import lightTheme from './Themes/lightTheme';
+import { Storage } from 'aws-amplify';
 
 
 Amplify.configure(config);
@@ -50,6 +51,42 @@ function App({ signOut}) {
   const [user, setUser] = React.useState(null);
   const [userEmail, setUserEmail] = React.useState(null);
  const [userData, setUserData]= React.useState(null)
+
+
+
+  useEffect(() => {
+    const fetchProfilePicture = async () => {
+      console.log("WAHT WE HAVE NOW ",userData)
+      if (userData?.profilePicture) {
+        console.log("PROFILEPICTUREIMAGE ",userData.profilePicture)
+        try {
+          // Fetch the profile picture from Storage
+          const imgUrl = await Storage.get(userData.profilePicture)
+          const file = await fetch(imgUrl).then(res => res.blob());
+          console.log("IMGA URARL ",imgUrl)
+              setUserData((prevUserData) => ({
+      ...prevUserData,
+      profilePictureImage: file,
+    }));
+          // Set the profile picture state
+  
+        } catch (error) {
+          console.log("Error fetching profile picture: ", error);
+        }
+      }
+    };
+  
+    // Call the function when userData.profilePicture changes
+    fetchProfilePicture();
+  }, [userData?.profilePicture]);
+
+
+
+
+
+
+
+
 
  useEffect(()=>{
   if(themeType==0){
@@ -107,6 +144,40 @@ function App({ signOut}) {
       fetchOrCreateUserObject();
     }
   }, [user]);
+
+
+
+  useEffect(() => {
+    const updateUserProfile = async () => {
+      try {
+        if (userData) {
+          const { id, name,username,phone,profilePicture /* other properties from userData */ } = userData;
+          const updatedUser = await API.graphql(
+            {
+            query: mutations.updateUser,
+            variables: {
+              input: {
+               id: id,
+               name:name,
+               username:username,
+               phone:phone,
+               profilePicture:profilePicture
+              },
+            },
+          }
+          
+          );
+          console.log("User updated:", updatedUser.data.updateUser);
+        }
+      } catch (error) {
+        console.error("Error updating user:", error);
+      }
+    };
+  
+    // Call the function when userData changes
+    updateUserProfile();
+  }, [userData]);
+  
   
   
 
