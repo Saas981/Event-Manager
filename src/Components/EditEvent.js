@@ -129,7 +129,7 @@ const [snackbarMessage, setSnackbarMessage] = useState('');
       // Upload the file if there is a new cover image
       if (savedFile) {
         try {
-          await Storage.put(eventDetails.title + eventDetails.organizer + savedFile.name, savedFile, {
+          await Storage.put("eventCovers/"+eventDetails.title + eventDetails.organizer + savedFile.name, savedFile, {
             contentType: "image/png", // contentType is optional
           });
         } catch (error) {
