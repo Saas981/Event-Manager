@@ -7,6 +7,7 @@ import MoreVertIcon from '@mui/icons-material/MoreVert';
 import { listUsers } from '../graphql/queries';
 import { API, graphqlOperation } from 'aws-amplify';
 import { useParams } from 'react-router-dom';
+import { Storage } from 'aws-amplify';
 
 
 
@@ -26,6 +27,7 @@ const Search = () => {
             filter: {
               or: [
                 { email: { contains: searchQuery } },
+                 { username: { contains: searchQuery } },
                 { name: { contains: searchQuery } }
               ]
             },
@@ -33,7 +35,22 @@ const Search = () => {
           }));
           //set results to data
           const users = data.listUsers.items;
-          setSearchResults(users);
+      const usersWithImgUrl = await Promise.all(users.map(async (user) => {
+        if (user.profilePicture) {
+          try {
+            const imgUrl = await Storage.get(user.profilePicture);
+            return { ...user, imgUrl };
+          } catch (error) {
+            console.error('Error fetching data:', error);
+            return user; // Return the user without imgUrl in case of an error
+          }
+        } else {
+          return user; // Return the user without imgUrl if profilePicture is not present
+        }
+      }));
+
+      setSearchResults(usersWithImgUrl);
+          console.log("USERS RETREIVED ",searchResults)
         } catch (error) {
           console.error('Error fetching data:', error);
         }
@@ -66,7 +83,7 @@ const Search = () => {
   };
 
   return (
-    <Container sx={{ paddingTop: '5%', paddingBottom: '5%' }}>
+    <Container sx={{ paddingTop: '1%', paddingBottom: '5%' }}>
       {/* Search Bar */}
      
 
@@ -116,10 +133,16 @@ const Search = () => {
       {/* Search Results */}
       <Grid container spacing={3} sx={{ marginTop: '3%', border: '2px dashed #ddd', padding: '5%', backgroundColor: '#fff' }}>
   {searchResults.map((user) => (
-    <Card key={user.id} sx={{ maxWidth: 345, margin: '0 auto' }}>
+    <Card key={user.id} sx={{ width: "30%", margin: '20px 10px' }}>
       <CardContent>
         <div style={{ position:"relative" }}>
-        <Avatar sx={{ width: 56, height: 56 }} />
+        <Avatar sx={{ width: 56, height: 56 }} src={user.imgUrl}/>
+            <Typography variant="h6" component="div" sx={{ marginTop:2,fontFamily:"Poppins" }}>
+          {user.name}
+        </Typography>
+        <Typography variant="h6" component="div" sx={{ marginTop:0,fontSize:14,color:"#a8a8a8" }}>
+          {user.username}
+        </Typography>
         <Typography variant="h6" component="div" sx={{ mt: 2 }}>
           {user.email}
         </Typography>

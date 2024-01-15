@@ -37,7 +37,7 @@ Amplify.configure(config);
 async function currentSession() {
   try {
     const { accessToken, idToken } = (await Auth.currentSession()).tokens ?? {};
-    console.log("SESSION", accessToken)
+    //console.log("SESSION", accessToken)
   } catch (err) {
     console.log(err);
   }
@@ -56,14 +56,14 @@ function App({ signOut}) {
 
   useEffect(() => {
     const fetchProfilePicture = async () => {
-      console.log("WAHT WE HAVE NOW ",userData)
+    //  console.log("WAHT WE HAVE NOW ",userData)
       if (userData?.profilePicture) {
-        console.log("PROFILEPICTUREIMAGE ",userData.profilePicture)
+       // console.log("PROFILEPICTUREIMAGE ",userData.profilePicture)
         try {
           // Fetch the profile picture from Storage
           const imgUrl = await Storage.get(userData.profilePicture)
           const file = await fetch(imgUrl).then(res => res.blob());
-          console.log("IMGA URARL ",imgUrl)
+          //console.log("IMGA URARL ",imgUrl)
               setUserData((prevUserData) => ({
       ...prevUserData,
       profilePictureImage: file,
@@ -128,12 +128,21 @@ function App({ signOut}) {
   
         if (!existingUserObject) {
           // If the user object doesn't exist, create it
-          const createUserResponse = await API.graphql(graphqlOperation(mutations.createUser, { input: { id: user,email:userEmail } }));
-          console.log("Newly created user object:", createUserResponse.data.createUser);
+          const createUserResponse = await API.graphql(graphqlOperation(mutations.createUser, { input: { id: user,email:userEmail,username:"user"+Math.floor(Math.random() * (1000000 - 0 + 1)) + 1
+         } }));
+          //console.log("Newly created user object:", createUserResponse.data.createUser);
           setUserData(createUserResponse)
         } else {
-        setUserData(existingUserObject)
-          console.log("Existing user object:", existingUserObject);
+          if (!existingUserObject?.username) {
+            existingUserObject.username = "user" + Math.floor(Math.random() * (1000000 - 0 + 1)) + 1;
+            setUserData(existingUserObject);
+          } else {
+            setUserData(existingUserObject);
+          }
+          
+    
+      
+        //  console.log("Existing user object:", existingUserObject);
         }
       } catch (error) {
         console.error("Error fetching or creating user object:", error);
