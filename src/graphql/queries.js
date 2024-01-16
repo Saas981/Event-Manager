@@ -7,6 +7,11 @@ export const getUser = /* GraphQL */ `
       id
       email
       name
+      phone
+      username
+      profilePicture
+      friends
+      accountStatus
       createdAt
       updatedAt
     }
@@ -23,6 +28,11 @@ export const listUsers = /* GraphQL */ `
         id
         email
         name
+        phone
+        username
+        profilePicture
+        friends
+        accountStatus
         createdAt
         updatedAt
       }

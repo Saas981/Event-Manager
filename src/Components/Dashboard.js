@@ -6,7 +6,7 @@ import { API, graphqlOperation } from 'aws-amplify';
 import { listEvents, getEvent, updateEvent } from '../graphql/queries';
 import * as mutations from '../graphql/mutations';
 import { deleteEvent } from '../graphql/mutations';
-
+import AddIcon from '@mui/icons-material/Add';
 import { Storage } from 'aws-amplify';
 import Button from '@mui/joy/Button';
 import DeleteRoundedIcon from '@mui/icons-material/DeleteRounded';
@@ -32,7 +32,7 @@ const Dashboard = ({ userId, theme }) => {
         moddedData.map(async (event) => {
           if (event.coverImage) {
             try {
-              const imgUrl = await Storage.get(event.coverImage);
+              const imgUrl = await Storage.get("eventCovers/"+event.coverImage);
               const userIsAdmin = JSON.parse(event.participants)[0].userId === "admin";
               const isWaitlisted = JSON.parse(event.participants)[0].userId === "admin";
 
@@ -131,45 +131,95 @@ const Dashboard = ({ userId, theme }) => {
 
   return (
     <DashboardContainer>
-      <DashboardHeader elevation={3}>
-        Welcome to Your Dashboard<Box></Box>
+      <DashboardHeader elevation={3} sx={{}}>
+        Welcome to Your Dashboard
+        <Box sx={{ width: "100%", marginTop:"-10px" }}>
+  <Button
+    component="a"
+    href="/create"
+    variant="soft"
+    color="primary"
+    sx={{
+      width: "80%",
+      padding: "8px",
+      borderRadius: "20px",
+      backgroundColor: "#B5BBFD",
+      color: "#40137D",
+      fontFamily: "Poppins",
+      fontSize: "24px",
+            transition: "background-color 0.3s ease", // Fade transition on background color
+
+      '&:hover': {
+        backgroundColor: '#a7aefc', // Shade of purple on hover
+
+      },
+    }}
+  >
+    <AddIcon sx={{ fontSize: "32px" }} />
+    Create Event
+  </Button>
+</Box>
+
+         
       </DashboardHeader>
 
-      <Box sx={{ width: "100%" }}>
-        <Button component="a" href="/create" variant="soft" color="primary" sx={{ width: "100%", borderRadius: "0px" }}>
-          Create Event
-        </Button>
-      </Box>
+     
 
       {events.map((event) => (
-        <EventContainer key={event.id} elevation={3}>
-          <EventBox onClick={() => handleEventClick(event.id)}>
-            <Grid container>
-              <Grid xs={4}>
-                <Typography sx={{ fontSize: "14px", textAlign: "left" }}>{new Date(event.startTime).toLocaleString()}</Typography>
-              </Grid>
-              <Grid xs={5}>
-                <Typography sx={{ textAlign: "center" }}>{event.title}</Typography>
-              </Grid>
-              <Grid xs={3}>
-                <ParticipantCount>
-                  {`${Object.keys(JSON.parse(event.participants)[0]).length}/${event.capacity}`}
-                  <PeopleIcon style={{ fontSize: '28px' }} />
-                </ParticipantCount>
-              </Grid>
-            </Grid>
-          </EventBox>
+        
 
-          <Collapse style={{ background: 'linear-gradient(to bottom right, rgba(74, 158, 226,0.1),rgba(90, 63, 192,0.1 ))' }} in={expandedEvent === event.id}>
-            <Grid container>
-              <Grid item xs={4} sx={{ border: '2px dashed #ccc' }}>
-                {event.imgUrl ? (
-                  <img src={event.imgUrl} alt="Event Cover" style={{ width: '50%', margin: "10px", borderRadius: '8px' }} />
-                ) : (
-                  <ImageSkeleton width={"50%"} sx={{ margin: "10px", borderRadius: '8px' }} animation="wave" variant="rectangular" />
-                )}
-                <Typography sx={{ marginTop: '10px' }}>Organizer: {event.organizer}</Typography>
-                {JSON.parse(event.participants)[0][userId]["permissions"] === "admin" && (
+<EventContainer key={event.id} elevation={3} sx={{ position: "relative" }}>
+  {JSON.parse(event.participants)[0][userId]["permissions"] === "waitlist" ? (
+   <IconButton
+   onClick={() => {
+     console.log("You're in a waitlist");
+   }}
+   variant="soft"
+   sx={{
+     position: "absolute",
+     top: "-25px",
+     right: "-15px", // Align to the right corner
+     width: "50px",
+     height: "50px",
+     borderRadius: "50px",
+     margin: "10px", // Adjust margin as needed
+     backgroundColor: "#f4c692", // Yellow background color
+     color: "#422c11", // Yellow text color
+     "--Button-gap": "5px",
+     fontFamily: "Poppins",
+     zIndex: 1, // Make sure it's above other content
+     transition: "background-color 0.3s ease, color 0.3s ease", // Fade transition on background and text color
+     '&:hover': {
+       backgroundColor: '#f2c48f', // Slightly darker yellow on hover
+       color: '#7a5426', // Slightly darker yellow text on hover
+     },
+   }}
+ >
+   <AccessTimeSharpIcon sx={{ fontSize: "32px" }} />
+ </IconButton>
+ 
+  ) : null}
+          <EventBox onClick={() => handleEventClick(event.id)}>
+            {/* Details half */}
+            <Grid container  direction="row"
+  justifyContent="space-evenly"
+>
+              {/* <Grid xs={4}>
+                <Typography sx={{ fontSize: "14px", textAlign: "left" }}>{new Date(event.startTime).toLocaleString()}</Typography>
+              </Grid> */}
+              <Grid xs={10} sx={{alignItems:"right"}}>
+                <Typography sx={{ textAlign: "left",fontFamily:"Poppins",fontWeight:"600",fontSize:"28px",marginLeft:"0.2%" }}>{event.title}</Typography>
+              </Grid>
+              <Grid xs={1}     
+
+>
+                
+                <ParticipantCount>
+                  
+                  {`${Object.keys(JSON.parse(event.participants)[0]).length}/${event.capacity}`}
+                  <PeopleIcon style={{ fontSize: '28px',marginRight:"5%" }} />
+
+                   {JSON.parse(event.participants)[0][userId]["permissions"] === "admin" && (
     <IconButton
       aria-label="Edit Event"
       component="a"
@@ -178,21 +228,86 @@ const Dashboard = ({ userId, theme }) => {
       
       sx={{
         padding: 1, // Adjust padding as needed
+        marginTop:"-6%",
+  
       }}
     >
-      <EditTwoToneIcon />
+      <EditTwoToneIcon  sx={{
+
+        fontSize:"18px"
+      }}/>
     </IconButton>
   )}
-              </Grid>
-              <Grid item xs={8} sx={{ border: '2px dashed #ccc' }}>
-                <EventDetails sx={{ border: '2px dashed #ccc' }}>
-                  <Typography>{event.description}</Typography>
-                </EventDetails>
+                </ParticipantCount>
               </Grid>
             </Grid>
+          </EventBox>
 
-            {/* Waitlist button */}
-            {JSON.parse(event.participants)[0][userId]["permissions"] === "waitlist" ? (
+      
+            <Grid container direction="row"
+  justifyContent="flex-end" sx={{marginBottom:"0px"}}>
+               {/* half description */}
+               <Grid item xs={7.5} sx={{ textAlign: "left", display: "flex", flexDirection: "column",marginTop:"1%", justifyContent: "space-between" }}>
+  <div>
+    <Typography sx={{ marginTop: '10px', fontFamily: "Poppins", fontWeight: "500", textAlign: "left", marginLeft: "7%" }}>Organizer: {event.organizer}</Typography>
+    <Typography sx={{ marginTop: '10px', fontFamily: "Poppins", fontWeight: "400", textAlign: "left", marginLeft: "7%" }}> {new Date(event.startTime).toLocaleString()}</Typography>
+
+    <EventDetails>
+      <Typography sx={{ backgroundColor: "#f9f9f9", fontFamily: 'Poppins, sans-serif', fontSize: "15px", padding: "8px", borderRadius: "10px", color: "#3f3f3f" }}>{event.description}</Typography>
+    </EventDetails>
+  </div>
+
+
+
+  {/* <Typography sx={{ fontSize: "14px", marginTop: '10px', marginBottom: '10px', fontFamily: "Poppins", fontWeight: "400", textAlign: "left", marginLeft: "7%", color: "#3f3f3f" }}>
+    {new Date(event.startTime).toLocaleString()}
+  </Typography> */}
+
+    <Button variant="soft" onClick={() => { console.log("nothing happened") }} size="sm" sx={{
+    fontSize: "14px",
+    padding: "3px 10px",
+    backgroundColor: "#B5BBFD",
+    color: "#40137D",
+    fontWeight: "600",
+    marginBottom:"20px",
+    borderRadius:"15px",
+    fontFamily: "Poppins",
+    width: "85%",
+    transition: "background-color 0.3s ease", // Fade transition on background color
+    '&:hover': {
+      backgroundColor: '#a7aefc', // Shade of purple on hover
+    },
+    mx: "auto", // Center the button horizontally
+  }}>
+    See more
+  </Button>
+</Grid>
+
+
+
+
+
+              {/* Image half */}
+              <Grid item xs={4.5} sx={{padding:"0px",backgroundColor:"#fafafa" }}>
+                {event.imgUrl ? (
+                  <img src={event.imgUrl} alt="Event Cover" style={{ objectFit:"cover", alignSelf:"flex-end" ,  width: '90%',height:"200px", margin: "10px", borderRadius: '8px' }} />
+                ) : (
+                  <ImageSkeleton width={"50%"} sx={{ margin: "10px", borderRadius: '8px' }} animation="wave" variant="rectangular" />
+                )}
+               
+               
+              </Grid>
+
+             
+            </Grid>
+
+
+
+{ 1==1 &&(
+   <>
+
+   {/* Waitlist button */}
+        {JSON.parse(event.participants)[0][userId]["permissions"] === "waitlist" ? (
               <Button
                 onClick={() => {
                   console.log("You're in a waitlist");
@@ -201,9 +316,11 @@ const Dashboard = ({ userId, theme }) => {
                 color="warning"
                 variant="soft"
                 sx={{
+                
+                fontSize:"14px",
                   width: "100%",
                   borderRadius: "0px",
-                  marginTop: "3%",
+                  marginTop: "1%",
                   "--Button-gap": "5px",
                   fontFamily: "Poppins",
                 }}
@@ -211,6 +328,8 @@ const Dashboard = ({ userId, theme }) => {
                 You're on the waitlist
               </Button>
             ) : null}
+
+  
 
            {/* Leave Event Button */}
 {!isAdmin && JSON.parse(event.participants)[0][userId] && JSON.parse(event.participants)[0][userId]["permissions"] !== "admin" && (
@@ -229,6 +348,9 @@ const Dashboard = ({ userId, theme }) => {
 
 
 
+
+
+
             {/* CHECKS IF the user is admin before providing delete button */}
             {JSON.parse(event.participants)[0][userId]["permissions"] === "admin" && !isAdmin ? (
               <Button
@@ -243,7 +365,16 @@ const Dashboard = ({ userId, theme }) => {
                 Delete this Event
               </Button>
             ) : null}
-          </Collapse>
+
+
+</>
+
+)
+      }
+
+          
+
+          
         </EventContainer>
       ))}
     </DashboardContainer>
@@ -254,75 +385,77 @@ export default Dashboard;
 
 const DashboardContainer = styled(Box)({
   textAlign: 'center',
-  marginTop: '0px',
-  width: '50%',
-  background: 'linear-gradient(to right, rgba(80, 63, 159,0.1), rgba(255, 81, 181,0.1))',
-  boxShadow: '4px 4px 8px rgba(0, 0, 0, 0.3)',
+  marginBottom: '20px',
+  width: '65%',
+padding:"0px",
+background:"none",
+  // background: 'linear-gradient(to right, rgba(80, 63, 159,0.1), rgba(255, 81, 181,0.1))',
+  // boxShadow: '4px 4px 8px rgba(0, 0, 0, 0.3)',
 });
 
 const DashboardHeader = styled(Paper)({
-  width: '90%',
+  width: '100%',
   margin: '0 auto',
-  borderRadius: '0px',
-  borderBottomLeftRadius: '5px',
-  borderBottomRightRadius: '10px',
-  background: 'linear-gradient(to bottom right, rgba(74, 158, 226,0.6),rgba(90, 63, 192,0.6))',
-  color: "#f8f8f8",
-  fontSize: '24px',
-  fontWeight: 'bold',
+  borderRadius: '20px',
+  background: '#f8f8f8',
+  color: "#0f0f0f",
+  fontSize: '54px',
+  fontWeight: '900',
   fontFamily: 'Poppins, sans-serif',
-  '& > *': {
-    fontFamily: 'inherit',
-    fontSize: '18px',
-  },
-  padding: '5%',
+  padding: '25px 0px',
+  marginBottom: '20px',
 });
+
 
 const EventContainer = styled(Paper)({
   width: '100%',
-  margin: '0 auto',
-  borderRadius: '0px',
-  borderBottomLeftRadius: '5px',
-  borderBottomRightRadius: '10px',
+  margin: '0 auto 20px auto',
+  borderRadius: '20px',
   fontFamily: 'Poppins, sans-serif',
   color: '#000',
   cursor: 'pointer',
   boxShadow: '0px 4px 10px rgba(0, 0, 0, 0.1)',
+
 });
 
 const EventBox = styled(Box)({
   margin: '0px 0',
-  width: '90%',
-  borderBottom: '1px solid #BDBDBD',
-  padding: '10px 0',
-  padding: '5%',
+  padding: '12px 0px',
   display: 'flex',
   fontFamily: 'Poppins, sans-serif',
   alignItems: 'center',
-  background: 'linear-gradient(to bottom right, rgba(74, 158, 226,0.3),rgba(90, 63, 192,0.3))',
+  justifyContent: 'space-between',
+  background: '#EFEFEF',
+  borderTopRightRadius: '20px',
+    borderTopLeftRadius: '20px',
   '& > *': {
     fontFamily: 'inherit',
     fontSize: '18px',
   },
-  justifyContent: 'space-between',
   cursor: 'pointer',
 });
 
 const EventDetails = styled(Box)({
-  padding: '10px',
+  
   fontFamily: 'Poppins, sans-serif',
-  borderTop: '1px solid #BDBDBD',
+  marginLeft:"6%",
+  marginTop:"1%",
+  height:"100%",
+  marginRight:"10px",
 });
 
 const ParticipantCount = styled(Box)({
   display: 'flex',
   fontFamily: 'Poppins, sans-serif',
   alignItems: 'right',
-  justifyContent: 'space-between',
+  fontWeight:"500",
+  marginTop:"10px",
+
 });
 
 const ImageSkeleton = styled(Skeleton)({
   width: '100%',
   height: '100px',
-  marginBottom: '10px',
+  marginBottom: '20px',
 });
+

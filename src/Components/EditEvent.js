@@ -84,7 +84,7 @@ const [snackbarMessage, setSnackbarMessage] = useState('');
 
          if (moddedData.coverImage) {
         try {
-          const imgUrl = await Storage.get(moddedData.coverImage);
+          const imgUrl = await Storage.get("eventCovers/"+moddedData.coverImage);
           const file = await fetch(imgUrl).then(res => res.blob());
           setSavedFile(file);
           moddedData = { ...moddedData, imgUrl: URL.createObjectURL(file) };
@@ -129,7 +129,7 @@ const [snackbarMessage, setSnackbarMessage] = useState('');
       // Upload the file if there is a new cover image
       if (savedFile) {
         try {
-          await Storage.put(eventDetails.title + eventDetails.organizer + savedFile.name, savedFile, {
+          await Storage.put("eventCovers/"+eventDetails.title + eventDetails.organizer + savedFile.name, savedFile, {
             contentType: "image/png", // contentType is optional
           });
         } catch (error) {

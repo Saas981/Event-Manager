@@ -27,6 +27,7 @@ import * as mutations from './graphql/mutations';
 import * as queries from './graphql/queries'
 import darkTheme from './Themes/darkTheme';
 import lightTheme from './Themes/lightTheme';
+import { Storage } from 'aws-amplify';
 
 
 Amplify.configure(config);
@@ -36,7 +37,7 @@ Amplify.configure(config);
 async function currentSession() {
   try {
     const { accessToken, idToken } = (await Auth.currentSession()).tokens ?? {};
-    console.log("SESSION", accessToken)
+    //console.log("SESSION", accessToken)
   } catch (err) {
     console.log(err);
   }
@@ -50,6 +51,42 @@ function App({ signOut}) {
   const [user, setUser] = React.useState(null);
   const [userEmail, setUserEmail] = React.useState(null);
  const [userData, setUserData]= React.useState(null)
+
+
+
+  useEffect(() => {
+    const fetchProfilePicture = async () => {
+    //  console.log("WAHT WE HAVE NOW ",userData)
+      if (userData?.profilePicture) {
+       // console.log("PROFILEPICTUREIMAGE ",userData.profilePicture)
+        try {
+          // Fetch the profile picture from Storage
+          const imgUrl = await Storage.get(userData.profilePicture)
+          const file = await fetch(imgUrl).then(res => res.blob());
+          //console.log("IMGA URARL ",imgUrl)
+              setUserData((prevUserData) => ({
+      ...prevUserData,
+      profilePictureImage: file,
+    }));
+          // Set the profile picture state
+  
+        } catch (error) {
+          console.log("Error fetching profile picture: ", error);
+        }
+      }
+    };
+  
+    // Call the function when userData.profilePicture changes
+    fetchProfilePicture();
+  }, [userData?.profilePicture]);
+
+
+
+
+
+
+
+
 
  useEffect(()=>{
   if(themeType==0){
@@ -91,12 +128,21 @@ function App({ signOut}) {
   
         if (!existingUserObject) {
           // If the user object doesn't exist, create it
-          const createUserResponse = await API.graphql(graphqlOperation(mutations.createUser, { input: { id: user,email:userEmail } }));
-          console.log("Newly created user object:", createUserResponse.data.createUser);
+          const createUserResponse = await API.graphql(graphqlOperation(mutations.createUser, { input: { id: user,email:userEmail,username:"user"+Math.floor(Math.random() * (1000000 - 0 + 1)) + 1
+         } }));
+          //console.log("Newly created user object:", createUserResponse.data.createUser);
           setUserData(createUserResponse)
         } else {
-        setUserData(existingUserObject)
-          console.log("Existing user object:", existingUserObject);
+          if (!existingUserObject?.username) {
+            existingUserObject.username = "user" + Math.floor(Math.random() * (1000000 - 0 + 1)) + 1;
+            setUserData(existingUserObject);
+          } else {
+            setUserData(existingUserObject);
+          }
+          
+    
+      
+        //  console.log("Existing user object:", existingUserObject);
         }
       } catch (error) {
         console.error("Error fetching or creating user object:", error);
@@ -107,6 +153,40 @@ function App({ signOut}) {
       fetchOrCreateUserObject();
     }
   }, [user]);
+
+
+
+  useEffect(() => {
+    const updateUserProfile = async () => {
+      try {
+        if (userData) {
+          const { id, name,username,phone,profilePicture /* other properties from userData */ } = userData;
+          const updatedUser = await API.graphql(
+            {
+            query: mutations.updateUser,
+            variables: {
+              input: {
+               id: id,
+               name:name,
+               username:username,
+               phone:phone,
+               profilePicture:profilePicture
+              },
+            },
+          }
+          
+          );
+          console.log("User updated:", updatedUser.data.updateUser);
+        }
+      } catch (error) {
+        console.error("Error updating user:", error);
+      }
+    };
+  
+    // Call the function when userData changes
+    updateUserProfile();
+  }, [userData]);
+  
   
   
 
@@ -144,12 +224,13 @@ function App({ signOut}) {
               <Route path="/dashboard" element={<Dashboard userId={user} />} />
               <Route path="/create" element={<CreateEvent userId={user}/>} />
               <Route path="/join/:eventId" element={<JoinEventPage user={user}/>} />
-              <Route path="/profile" element={<Profile theme={theme}/>}/>
+              <Route path="/profile" element={<Profile userData={userData} theme={theme}/>}/>
                             <Route path="/unauthorized" element={<UnauthorizedPage theme={theme}/>}/>
 
               <Route path='*' element={<ErrorPage theme={theme}/>}  />
 
              <Route path="/edit/:eventId" element={<EditEvent userId={user}/>} />
+              {/* <Route path="/profile/:username" element={<Profile theme={theme}/>}/> */}
 
                <Route path="/search" element={<Search theme={theme} userId={user}/>}/>
                              <Route path="/search/:query" element={<Search theme={theme} userId={user}/>}/>

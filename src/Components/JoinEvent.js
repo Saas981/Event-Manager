@@ -45,7 +45,7 @@ const JoinEventPage = ({ user, theme }) => {
 
         if (moddedData.coverImage) {
           try {
-            const imgUrl = await Storage.get(moddedData.coverImage);
+            const imgUrl = await Storage.get("eventCovers/"+moddedData.coverImage);
             moddedData = { ...moddedData, imgUrl };
           } catch (error) {
             console.error('Error fetching image URL:', error);
