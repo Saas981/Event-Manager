@@ -225,6 +225,7 @@ function App({ signOut}) {
               <Route path="/create" element={<CreateEvent userId={user}/>} />
               <Route path="/join/:eventId" element={<JoinEventPage user={user}/>} />
               <Route path="/profile" element={<Profile userData={userData} theme={theme}/>}/>
+
                             <Route path="/unauthorized" element={<UnauthorizedPage theme={theme}/>}/>
 
               <Route path='*' element={<ErrorPage theme={theme}/>}  />
