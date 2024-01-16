@@ -31,6 +31,8 @@ export default function UserUpdateForm(props) {
     profilePicture: "",
     friends: "",
     accountStatus: "",
+    bio: "",
+    settings: "",
   };
   const [email, setEmail] = React.useState(initialValues.email);
   const [name, setName] = React.useState(initialValues.name);
@@ -43,6 +45,8 @@ export default function UserUpdateForm(props) {
   const [accountStatus, setAccountStatus] = React.useState(
     initialValues.accountStatus
   );
+  const [bio, setBio] = React.useState(initialValues.bio);
+  const [settings, setSettings] = React.useState(initialValues.settings);
   const [errors, setErrors] = React.useState({});
   const resetStateValues = () => {
     const cleanValues = userRecord
@@ -55,6 +59,8 @@ export default function UserUpdateForm(props) {
     setProfilePicture(cleanValues.profilePicture);
     setFriends(cleanValues.friends);
     setAccountStatus(cleanValues.accountStatus);
+    setBio(cleanValues.bio);
+    setSettings(cleanValues.settings);
     setErrors({});
   };
   const [userRecord, setUserRecord] = React.useState(userModelProp);
@@ -76,6 +82,8 @@ export default function UserUpdateForm(props) {
     profilePicture: [],
     friends: [],
     accountStatus: [],
+    bio: [],
+    settings: [],
   };
   const runValidationTasks = async (
     fieldName,
@@ -110,6 +118,8 @@ export default function UserUpdateForm(props) {
           profilePicture,
           friends,
           accountStatus,
+          bio,
+          settings,
         };
         const validationResponses = await Promise.all(
           Object.keys(validations).reduce((promises, fieldName) => {
@@ -172,6 +182,8 @@ export default function UserUpdateForm(props) {
               profilePicture,
               friends,
               accountStatus,
+              bio,
+              settings,
             };
             const result = onChange(modelFields);
             value = result?.email ?? value;
@@ -202,6 +214,8 @@ export default function UserUpdateForm(props) {
               profilePicture,
               friends,
               accountStatus,
+              bio,
+              settings,
             };
             const result = onChange(modelFields);
             value = result?.name ?? value;
@@ -233,6 +247,8 @@ export default function UserUpdateForm(props) {
               profilePicture,
               friends,
               accountStatus,
+              bio,
+              settings,
             };
             const result = onChange(modelFields);
             value = result?.phone ?? value;
@@ -263,6 +279,8 @@ export default function UserUpdateForm(props) {
               profilePicture,
               friends,
               accountStatus,
+              bio,
+              settings,
             };
             const result = onChange(modelFields);
             value = result?.username ?? value;
@@ -293,6 +311,8 @@ export default function UserUpdateForm(props) {
               profilePicture: value,
               friends,
               accountStatus,
+              bio,
+              settings,
             };
             const result = onChange(modelFields);
             value = result?.profilePicture ?? value;
@@ -323,6 +343,8 @@ export default function UserUpdateForm(props) {
               profilePicture,
               friends: value,
               accountStatus,
+              bio,
+              settings,
             };
             const result = onChange(modelFields);
             value = result?.friends ?? value;
@@ -353,6 +375,8 @@ export default function UserUpdateForm(props) {
               profilePicture,
               friends,
               accountStatus: value,
+              bio,
+              settings,
             };
             const result = onChange(modelFields);
             value = result?.accountStatus ?? value;
@@ -366,6 +390,70 @@ export default function UserUpdateForm(props) {
         errorMessage={errors.accountStatus?.errorMessage}
         hasError={errors.accountStatus?.hasError}
         {...getOverrideProps(overrides, "accountStatus")}
+      ></TextField>
+      <TextField
+        label="Bio"
+        isRequired={false}
+        isReadOnly={false}
+        value={bio}
+        onChange={(e) => {
+          let { value } = e.target;
+          if (onChange) {
+            const modelFields = {
+              email,
+              name,
+              phone,
+              username,
+              profilePicture,
+              friends,
+              accountStatus,
+              bio: value,
+              settings,
+            };
+            const result = onChange(modelFields);
+            value = result?.bio ?? value;
+          }
+          if (errors.bio?.hasError) {
+            runValidationTasks("bio", value);
+          }
+          setBio(value);
+        }}
+        onBlur={() => runValidationTasks("bio", bio)}
+        errorMessage={errors.bio?.errorMessage}
+        hasError={errors.bio?.hasError}
+        {...getOverrideProps(overrides, "bio")}
+      ></TextField>
+      <TextField
+        label="Settings"
+        isRequired={false}
+        isReadOnly={false}
+        value={settings}
+        onChange={(e) => {
+          let { value } = e.target;
+          if (onChange) {
+            const modelFields = {
+              email,
+              name,
+              phone,
+              username,
+              profilePicture,
+              friends,
+              accountStatus,
+              bio,
+              settings: value,
+            };
+            const result = onChange(modelFields);
+            value = result?.settings ?? value;
+          }
+          if (errors.settings?.hasError) {
+            runValidationTasks("settings", value);
+          }
+          setSettings(value);
+        }}
+        onBlur={() => runValidationTasks("settings", settings)}
+        errorMessage={errors.settings?.errorMessage}
+        hasError={errors.settings?.hasError}
+        {...getOverrideProps(overrides, "settings")}
       ></TextField>
       <Flex
         justifyContent="space-between"

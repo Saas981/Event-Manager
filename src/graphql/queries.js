@@ -12,6 +12,8 @@ export const getUser = /* GraphQL */ `
       profilePicture
       friends
       accountStatus
+      bio
+      settings
       createdAt
       updatedAt
     }
@@ -33,6 +35,8 @@ export const listUsers = /* GraphQL */ `
         profilePicture
         friends
         accountStatus
+        bio
+        settings
         createdAt
         updatedAt
       }

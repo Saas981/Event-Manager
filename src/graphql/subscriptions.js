@@ -12,6 +12,8 @@ export const onCreateUser = /* GraphQL */ `
       profilePicture
       friends
       accountStatus
+      bio
+      settings
       createdAt
       updatedAt
     }
@@ -28,6 +30,8 @@ export const onUpdateUser = /* GraphQL */ `
       profilePicture
       friends
       accountStatus
+      bio
+      settings
       createdAt
       updatedAt
     }
@@ -44,6 +48,8 @@ export const onDeleteUser = /* GraphQL */ `
       profilePicture
       friends
       accountStatus
+      bio
+      settings
       createdAt
       updatedAt
     }
