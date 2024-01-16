@@ -222,7 +222,7 @@ function App({ signOut}) {
               <Route path="/login" element={<Login theme={theme}/>} />
               <Route path="/signup" element={<SignUp theme={theme}/>} />
               <Route path="/dashboard" element={<Dashboard userId={user} />} />
-              <Route path="/create" element={<CreateEvent userId={user}/>} />
+              <Route path="/create" element={<CreateEvent userId={user} userData={userData}/>} />
               <Route path="/join/:eventId" element={<JoinEventPage user={user}/>} />
               <Route path="/profile" element={<Profile userData={userData} theme={theme}/>}/>
 
@@ -230,7 +230,7 @@ function App({ signOut}) {
 
               <Route path='*' element={<ErrorPage theme={theme}/>}  />
 
-             <Route path="/edit/:eventId" element={<EditEvent userId={user}/>} />
+             <Route path="/edit/:eventId" element={<EditEvent userId={user} userData={userData}/>} />
               {/* <Route path="/profile/:username" element={<Profile theme={theme}/>}/> */}
 
                <Route path="/search" element={<Search theme={theme} userId={user}/>}/>

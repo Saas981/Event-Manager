@@ -1,4 +1,4 @@
-type User @model @auth(rules: [{allow: public, operations: [read]}, {allow: private}]) {
+type User @model @auth(rules: [{allow: public}]) {
   id: ID!
   email: AWSEmail
   name: String
@@ -11,7 +11,7 @@ type User @model @auth(rules: [{allow: public, operations: [read]}, {allow: priv
   settings: String
 }
 
-type Event @model @auth(rules: [{allow: private}]) {
+type Event @model @auth(rules: [{allow: public}]) {
   id: ID!
   title: String
   startTime: AWSDateTime

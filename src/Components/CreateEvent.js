@@ -24,7 +24,7 @@ import Box from '@mui/joy/Box';
 import { Storage } from 'aws-amplify';
 
 
-const CreateEvent = ({userId,theme}) => {
+const CreateEvent = ({userId,theme,userData}) => {
   const [activeStep, setActiveStep] = useState(0);
   const [progress, setProgress] = useState(0);
   const [open, setOpen] = React.useState(false);
@@ -40,7 +40,7 @@ const CreateEvent = ({userId,theme}) => {
     capacity: 1,
     participants:`[ { "${userId}": { "permissions": "admin" } } ]`,
     description: '',
-    organizer: '',
+    organizer: userData.username,
     coverImage:'',
   });
   const [snackbarOpen, setSnackbarOpen] = useState(false);
@@ -210,14 +210,16 @@ const handleBlur = (field) => {
     />
   </Grid>
   <Grid item xs={12} sx={{marginTop:"10px"}}>
-    <TextField
-      label="Organizer Name"
-      fullWidth
-      variant="outlined"
-      value={eventDetails.organizer}
-      onChange={(e) => handleChange('organizer', e.target.value)}
-      sx={{ fontFamily: 'Inter', mb: 2 }}
-    />
+  <TextField
+  label="Organizer Name"
+  fullWidth
+  variant="outlined"
+  value={userData.username} // Set the value to userData.username
+  onChange={(e) => handleChange('organizer', e.target.value)}
+  disabled // Set the disabled prop to make it disabled
+  sx={{ fontFamily: 'Inter', mb: 2 }}
+/>
+
   </Grid>
   <Grid item xs={12} sx={{marginTop:"10px"}}>
     <TextField
