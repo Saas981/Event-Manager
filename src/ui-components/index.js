@@ -9,3 +9,7 @@ export { default as UserCreateForm } from "./UserCreateForm";
 export { default as UserUpdateForm } from "./UserUpdateForm";
 export { default as EventCreateForm } from "./EventCreateForm";
 export { default as EventUpdateForm } from "./EventUpdateForm";
+export { default as MessageCreateForm } from "./MessageCreateForm";
+export { default as MessageUpdateForm } from "./MessageUpdateForm";
+export { default as ChatRoomCreateForm } from "./ChatRoomCreateForm";
+export { default as ChatRoomUpdateForm } from "./ChatRoomUpdateForm";

@@ -18,6 +18,9 @@
       },
       "storage": {
         "s3eventmanagerstoragedf0e68b2": {}
+      },
+      "api": {
+        "EventManager": {}
       }
     }
   },
