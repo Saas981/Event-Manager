@@ -4,13 +4,18 @@ import StyledTabs from './StyledTabs'; // Import the StyledTabs component
 import Modal from '@mui/joy/Modal';
 import ModalClose from '@mui/joy/ModalClose';
 import  Button from "@mui/joy/Button"
+import Snackbar from '@mui/joy/Snackbar';
+import ErrorOutlineSharpIcon from '@mui/icons-material/ErrorOutlineSharp';
+
 import Switch from '@mui/material/Switch';
 import ModalDialog from '@mui/joy/ModalDialog';
 import Input from '@mui/joy/Input';
 import ProfileUploader from './UploaderProfile';
 import Textarea from '@mui/joy/Textarea';
 import { Storage } from 'aws-amplify';
-
+import { API, graphqlOperation } from 'aws-amplify';
+import * as mutations from '../graphql/mutations';
+import * as queries from '../graphql/queries'
 
 
 const blue = {
@@ -28,6 +33,9 @@ const blue = {
 
 const Settings = ({ themeType,setTheme,userData,setUserData,theme }) => {
   const [selectedTab, setSelectedTab] = useState(0);
+    const [snackbarOpen, setSnackbarOpen] = useState(false);
+    const [snackbarMessage,setSnackbarMessage] = useState("An error occured")
+
   const [profilePicture,setProfilePicture]= useState()
     const [bio, setBio  ] = useState('');
 
@@ -110,30 +118,59 @@ const Settings = ({ themeType,setTheme,userData,setUserData,theme }) => {
     setSelectedTab(newValue);
   };
 
-   const handleEdit = (settingType) => {
-    return () => {
+  const handleEdit = (settingType) => {
+    return async () => { // Make the outer function async
       console.log(`Edit ${settingType}`);
-    let lowercase = false;
-      if(settingType=="username"){
-        
+      let lowercase = false;
+      
+      if (settingType === "username") {
         lowercase = true;
+       
       }
+  
       setModalContent({
-        type:settingType,
+        type: settingType,
         title: `Edit ${settingType}`,
         description: `Please update your ${settingType}:`,
         inputLabel: settingType,
-        inputValue: '', 
-        lowercase:lowercase
+        inputValue: '',
+        lowercase: lowercase
       });
-        setOpen(true);
+      setOpen(true);
     };
   };
+  
 
-  const handleConfirm = () => {
+  const handleConfirm = async () => {
     // Extract necessary information from modalContent
     const { type, inputValue } = modalContent;
   
+
+    if(type=="username"){
+       try {
+          const { data } = await API.graphql(graphqlOperation(queries.listUsers, {
+            filter: {
+              username: {
+                eq: inputValue
+              }
+            }
+          }));
+          console.log("USERNAME CHECKING DATA ", data.listUsers.items.length);
+
+          if(data.listUsers.items.length>0){
+             setOpen(true);
+            setSnackbarMessage("This username has already been taken")
+            setSnackbarOpen(true)
+            return 0; 
+          }
+        } catch (error) {
+          console.error("Error fetching data:", error);
+        }
+    }
+
+
+
+
     // Update the corresponding field in userData
     setUserData((prevUserData) => ({
       ...prevUserData,
@@ -372,7 +409,26 @@ backgroundColor: "rgb(32, 29, 41,0.3)"}}>
           </Box>
         </ModalDialog>
       </Modal>
-
+<Snackbar
+        variant="soft"
+        color="danger"
+        autoHideDuration={3000}
+        open={snackbarOpen}
+        anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
+        startDecorator={<ErrorOutlineSharpIcon />}
+        endDecorator={
+          <Button
+            onClick={() => setSnackbarOpen(false)}
+            size="sm"
+            variant="soft"
+            color="danger"
+          >
+            Dismiss
+          </Button>
+        }
+      >
+        {snackbarMessage}
+      </Snackbar>
 
     </>
   );
