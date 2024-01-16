@@ -230,6 +230,7 @@ function App({ signOut}) {
               <Route path='*' element={<ErrorPage theme={theme}/>}  />
 
              <Route path="/edit/:eventId" element={<EditEvent userId={user}/>} />
+              {/* <Route path="/profile/:username" element={<Profile theme={theme}/>}/> */}
 
                <Route path="/search" element={<Search theme={theme} userId={user}/>}/>
                              <Route path="/search/:query" element={<Search theme={theme} userId={user}/>}/>
