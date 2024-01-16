@@ -113,13 +113,17 @@ const Settings = ({ themeType,setTheme,userData,setUserData,theme }) => {
    const handleEdit = (settingType) => {
     return () => {
       console.log(`Edit ${settingType}`);
-    
+    let lowercase = false;
+      if(settingType=="username"){
+        lowercase = true;
+      }
       setModalContent({
         type:settingType,
         title: `Edit ${settingType}`,
         description: `Please update your ${settingType}:`,
         inputLabel: settingType,
         inputValue: '', 
+        lowercase:lowercase
       });
         setOpen(true);
     };
@@ -206,7 +210,7 @@ const Settings = ({ themeType,setTheme,userData,setUserData,theme }) => {
                 <SettingsHeader title="Account Settings" />
                 {/* Sample settings under the "Account Settings" tab */}
                 <SettingItem theme={theme }title="Name" value={`${userData?.name}`} onEdit={handleEdit("name")} />
-                <SettingItem theme={theme }title="Username" value={`${userData?.username}`} onEdit={handleEdit("username")} />
+                <SettingItem theme={theme }title="Username" value={`${userData?.username}`} onEdit={handleEdit("username")} lowercase={true} />
                 <SettingItem theme={theme }title="Phone Number" value={`${userData?.phone}`} onEdit={handleEdit("phone")} />
                 <SettingItem theme={theme }title="Email Address" value={`${userData?.email}`} onEdit={handleEdit("email")} />
                 <SettingItem theme={theme }title="Password" value={`${userData?.password}`}  onEdit={handleEdit("password")} />
@@ -322,7 +326,15 @@ backgroundColor: "rgb(32, 29, 41,0.3)"}}>
         
             fullWidth
             value={modalContent.inputValue}
-            onChange={(e) => setModalContent({ ...modalContent, inputValue: e.target.value })}
+            onChange={(e) => {
+              if(modalContent.lowercase){
+ setModalContent({ ...modalContent, inputValue: e.target.value.toLowerCase() })
+              }
+              else{
+ setModalContent({ ...modalContent, inputValue: e.target.value })
+              }
+             
+          }}
             sx={{ mt: 0 , }}
           
           />
@@ -372,19 +384,26 @@ const SettingsHeader = ({ title }) => (
 );
 
 // Custom component for each setting item
-const SettingItem = ({ title, value, onEdit,theme }) => (
-  <div style={{ display: 'flex', alignItems: 'center', marginBottom: '10px' }}>
-    <Typography variant="h6" sx={{ fontFamily: 'Poppins',color:"#393939", fontWeight: '700', marginRight: '8px', fontSize: '16px' }}>
-      {title}:
-    </Typography>
-    <Typography variant="body1" sx={{ marginRight: 'auto', fontFamily: 'Poppins', backgroundColor: `${theme.palette.textBackdrop}`, padding: "6px", borderRadius: "6px", fontSize: '14px' }}>
-      {value}
-    </Typography>
-    <Button variant="soft" onClick={onEdit} size="sm" sx={{ fontSize: "12px", padding: "3px 15px", fontFamily: 'Poppins', backgroundColor: "#94D8FF", color: "#004AAA", '&:hover': { backgroundColor: "#A9D7F1", color: "#6aa7f7" } }}>
-      Edit
-    </Button>
-  </div>
-);
+const SettingItem = ({ title, value, onEdit, theme, }) => {
+  let newValue = value;
+ 
+  // Convert value to lowercase
+
+  return (
+    <div style={{ display: 'flex', alignItems: 'center', marginBottom: '10px' }}>
+      <Typography variant="h6" sx={{ fontFamily: 'Poppins', color: "#393939", fontWeight: '700', marginRight: '8px', fontSize: '16px' }}>
+        {title}:
+      </Typography>
+      <Typography variant="body1" sx={{ marginRight: 'auto', fontFamily: 'Poppins', backgroundColor: `${theme.palette.textBackdrop}`, padding: "6px", borderRadius: "6px", fontSize: '14px' }}>
+        {newValue}
+      </Typography>
+      <Button variant="soft" onClick={onEdit} size="sm" sx={{ fontSize: "12px", padding: "3px 15px", fontFamily: 'Poppins', backgroundColor: "#94D8FF", color: "#004AAA", '&:hover': { backgroundColor: "#A9D7F1", color: "#6aa7f7" } }}>
+        Edit
+      </Button>
+    </div>
+  );
+};
+
 
 const SettingItemStatic = ({ title,theme }) => (
   <div style={{ display: 'flex', alignItems: 'center', marginBottom: '5px',marginTop:"5px" }}>
