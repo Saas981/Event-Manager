@@ -1,13 +1,9 @@
-type User
-  @model
-  @auth(rules: [{ allow: public }])
-  @primaryKey(fields: ["username"])
-{
+type User @model @auth(rules: [{allow: public}]) {
   id: ID!
   email: AWSEmail
   name: String
   phone: AWSPhone
-  username: String!
+  username: String
   profilePicture: String
   friends: String
   accountStatus: String
@@ -15,11 +11,7 @@ type User
   settings: String
 }
 
-
-type Event
-  @model
-  @auth(rules: [{ allow: public }])
-{
+type Event @model @auth(rules: [{allow: public}]) {
   id: ID!
   title: String
   startTime: AWSDateTime
