@@ -1,9 +1,13 @@
-type User @model @auth(rules: [{allow: public}]) {
+type User
+  @model
+  @auth(rules: [{ allow: public }])
+  @key(fields: ["username"])
+{
   id: ID!
   email: AWSEmail
   name: String
   phone: AWSPhone
-  username: String
+  username: String!
   profilePicture: String
   friends: String
   accountStatus: String
@@ -11,7 +15,10 @@ type User @model @auth(rules: [{allow: public}]) {
   settings: String
 }
 
-type Event @model @auth(rules: [{allow: public}]) {
+type Event
+  @model
+  @auth(rules: [{ allow: public }])
+{
   id: ID!
   title: String
   startTime: AWSDateTime
@@ -25,4 +32,3 @@ type Event @model @auth(rules: [{allow: public}]) {
   rating: Float
   coverImage: String
 }
- 

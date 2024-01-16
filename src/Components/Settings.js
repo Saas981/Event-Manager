@@ -115,6 +115,7 @@ const Settings = ({ themeType,setTheme,userData,setUserData,theme }) => {
       console.log(`Edit ${settingType}`);
     let lowercase = false;
       if(settingType=="username"){
+        
         lowercase = true;
       }
       setModalContent({
