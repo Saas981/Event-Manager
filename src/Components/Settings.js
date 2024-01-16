@@ -92,6 +92,35 @@ const Settings = ({ themeType,setTheme,userData,setUserData,theme }) => {
     // Toggle between dark and light theme
     setTheme((prevTheme) => (prevTheme === 1 ? 0 : 1));
   };
+  const [showPassword, setShowPassword] = useState(false);
+  // hide password feature
+  const SettingItem = ({ title, value, onEdit, theme }) => (
+    <div style={{ display: 'flex', alignItems: 'center', marginBottom: '10px' }}>
+      <Typography variant="h6" sx={{ fontFamily: 'Poppins', color: "#393939", fontWeight: '700', marginRight: '8px', fontSize: '16px' }}>
+        {title}:
+      </Typography>
+      {title === "Password" ? (
+        <>
+          <Typography variant="body1" sx={{ marginRight: 'auto', fontFamily: 'Poppins', backgroundColor: `${theme.palette.textBackdrop}`, padding: "6px", borderRadius: "6px", fontSize: '14px' }}>
+            {showPassword ? value : '*'.repeat(value.length)}
+          </Typography>
+          <Button variant="soft" onClick={() => setShowPassword(!showPassword)} size="sm" sx={{ fontSize: "12px", padding: "3px 15px", fontFamily: 'Poppins', backgroundColor: "#94D8FF", color: "#004AAA", '&:hover': { backgroundColor: "#A9D7F1", color: "#6aa7f7" } }}>
+            {showPassword ? "Hide" : "Show"}
+          </Button>
+        </>
+      ) : (
+        <>
+          <Typography variant="body1" sx={{ marginRight: 'auto', fontFamily: 'Poppins', backgroundColor: `${theme.palette.textBackdrop}`, padding: "6px", borderRadius: "6px", fontSize: '14px' }}>
+            {value}
+          </Typography>
+          <Button variant="soft" onClick={onEdit} size="sm" sx={{ fontSize: "12px", padding: "3px 15px", fontFamily: 'Poppins', backgroundColor: "#94D8FF", color: "#004AAA", '&:hover': { backgroundColor: "#A9D7F1", color: "#6aa7f7" } }}>
+            Edit
+          </Button>
+        </>
+      )}
+    </div>
+  );
+  
 
 
 
