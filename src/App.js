@@ -135,8 +135,13 @@ function App({ signOut}) {
         } else {
           if (!existingUserObject?.username) {
             existingUserObject.username = "user" + Math.floor(Math.random() * (1000000 - 0 + 1)) + 1;
+          
             setUserData(existingUserObject);
           } else {
+            if(!existingUserObject?.friends){
+                existingUserObject.friends = "[{}]";
+                 setUserData(existingUserObject);
+            }
             setUserData(existingUserObject);
           }
           
@@ -160,7 +165,7 @@ function App({ signOut}) {
     const updateUserProfile = async () => {
       try {
         if (userData) {
-          const { id, name,username,phone,profilePicture /* other properties from userData */ } = userData;
+          const { id, name,username,phone,profilePicture,friends /* other properties from userData */ } = userData;
           const updatedUser = await API.graphql(
             {
             query: mutations.updateUser,
@@ -170,7 +175,8 @@ function App({ signOut}) {
                name:name,
                username:username,
                phone:phone,
-               profilePicture:profilePicture
+               profilePicture:profilePicture,
+               friends:friends,
               },
             },
           }
@@ -233,8 +239,8 @@ function App({ signOut}) {
              <Route path="/edit/:eventId" element={<EditEvent userId={user} userData={userData}/>} />
               {/* <Route path="/profile/:username" element={<Profile theme={theme}/>}/> */}
 
-               <Route path="/search" element={<Search theme={theme} userId={user}/>}/>
-                             <Route path="/search/:query" element={<Search theme={theme} userId={user}/>}/>
+               <Route path="/search" element={<Search theme={theme} userData={userData}  setUserData={setUserData} userId={user} />}/>
+                             <Route path="/search/:query" element={<Search theme={theme}  setUserData={setUserData} userData={userData} userId={user}/>}/>
 
 
               <Route  path="/settings" element={<Settings userData={userData} setUserData={setUserData} theme={theme }themeType={themeType} setTheme={setThemeType}/>}/>
