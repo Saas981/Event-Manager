@@ -45,27 +45,26 @@ const SaveButton = {
   cursor: 'pointer',
 };
 
-const Profile = ({theme, userData}) => {
+const Profile = ({ theme, userData }) => {
   const [isEditing, setIsEditing] = useState(false);
   const [photo, setPhoto] = useState(null);
   const [username, setUsername] = useState('Mike Oxlong');
   const [name, setName] = useState('John Doe');
   const [email, setEmail] = useState('example@gmail.com');
+  const [bio, setBio] = useState('');
 
   useEffect(() => {
     const fetchData = async () => {
       try {
-        // Check if user data exists in localStorage
-        const storedData = userData
-        console.log("STORED DATA ",storedData)
-        if (storedData) {
+        const storedData = userData;
 
+        if (storedData) {
           setPhoto(storedData.photo);
           setUsername(storedData.username);
-          setName(storedData.id);
+          setName(storedData.name);
           setEmail(storedData.email);
+          setBio(storedData.bio || '');
         } else {
-          // If not, fetch from API
           const response = await fetch('https://api.example.com/user/123');
           const data = await response.json();
 
@@ -73,8 +72,8 @@ const Profile = ({theme, userData}) => {
           setUsername(data.username);
           setName(data.name);
           setEmail(data.email);
+          setBio(data.bio || '');
 
-          // Save fetched data to localStorage
           localStorage.setItem(
             'userData',
             JSON.stringify({
@@ -82,6 +81,7 @@ const Profile = ({theme, userData}) => {
               username: data.username,
               name: data.name,
               email: data.email,
+              bio: data.bio || '',
             })
           );
         }
@@ -91,18 +91,16 @@ const Profile = ({theme, userData}) => {
     };
 
     fetchData();
-  }, [userData]); // Empty dependency array ensures the effect runs only once, similar to componentDidMount
+  }, [userData]);
 
   const handleEditProfile = () => {
     setIsEditing(true);
   };
 
   const handleSaveProfile = () => {
-    // Add logic to save the updated profile information
     setIsEditing(false);
     console.log('Profile Saved!');
 
-    // Update localStorage with the new data
     localStorage.setItem(
       'userData',
       JSON.stringify({
@@ -110,6 +108,7 @@ const Profile = ({theme, userData}) => {
         username,
         name,
         email,
+        bio,
       })
     );
   };
@@ -156,6 +155,17 @@ const Profile = ({theme, userData}) => {
         />
       ) : (
         <p style={ProfileContent}>{email}</p>
+      )}
+      <div style={ProfileSubheader}>Bio:</div>
+      {isEditing ? (
+        <textarea
+          value={bio}
+          onChange={(e) => setBio(e.target.value)}
+          style={{ width: '100%', marginBottom: '15px', minHeight: '80px' }}
+          maxLength={45} // Set maximum character limit for the bio
+        />
+      ) : (
+        <p style={ProfileContent}>{bio}</p>
       )}
       {isEditing ? (
         <button style={SaveButton} onClick={handleSaveProfile}>

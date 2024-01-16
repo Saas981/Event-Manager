@@ -92,6 +92,7 @@ const Settings = ({ themeType,setTheme,userData,setUserData,theme }) => {
     // Toggle between dark and light theme
     setTheme((prevTheme) => (prevTheme === 1 ? 0 : 1));
   };
+  
   const [showPassword, setShowPassword] = useState(false);
   // hide password feature
   const SettingItem = ({ title, value, onEdit, theme }) => (
