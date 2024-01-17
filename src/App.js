@@ -238,7 +238,7 @@ function App({ signOut}) {
               <Route path='*' element={<ErrorPage theme={theme}/>}  />
                          <Route path="/event/:eventId" element={<EventDashboard theme={theme} userId={user} userData={userData}/>} />
 
-             <Route path="/edit/:eventId" element={<EditEvent userId={user} userData={userData}/>} />
+             <Route path="/edit/:eventId" element={<EditEvent  userData={userData}/>} />
               {/* <Route path="/profile/:username" element={<Profile theme={theme}/>}/> */}
 
                <Route path="/search" element={<Search theme={theme} userData={userData}  setUserData={setUserData} userId={user} />}/>

@@ -17,13 +17,13 @@ export declare type MessageUpdateFormInputValues = {
     textContent?: string;
     imageContent?: string;
     sender?: string;
-    chatRoomID?: string;
+    chatRoomId?: string;
 };
 export declare type MessageUpdateFormValidationValues = {
     textContent?: ValidationFunction<string>;
     imageContent?: ValidationFunction<string>;
     sender?: ValidationFunction<string>;
-    chatRoomID?: ValidationFunction<string>;
+    chatRoomId?: ValidationFunction<string>;
 };
 export declare type PrimitiveOverrideProps<T> = Partial<T> & React.DOMAttributes<HTMLDivElement>;
 export declare type MessageUpdateFormOverridesProps = {
@@ -31,7 +31,7 @@ export declare type MessageUpdateFormOverridesProps = {
     textContent?: PrimitiveOverrideProps<TextFieldProps>;
     imageContent?: PrimitiveOverrideProps<TextFieldProps>;
     sender?: PrimitiveOverrideProps<TextFieldProps>;
-    chatRoomID?: PrimitiveOverrideProps<TextFieldProps>;
+    chatRoomId?: PrimitiveOverrideProps<TextFieldProps>;
 } & EscapeHatchProps;
 export declare type MessageUpdateFormProps = React.PropsWithChildren<{
     overrides?: MessageUpdateFormOverridesProps | undefined | null;

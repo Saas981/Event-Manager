@@ -26,7 +26,7 @@ export default function MessageCreateForm(props) {
     textContent: "",
     imageContent: "",
     sender: "",
-    chatRoomID: "",
+    chatRoomId: "",
   };
   const [textContent, setTextContent] = React.useState(
     initialValues.textContent
@@ -35,20 +35,20 @@ export default function MessageCreateForm(props) {
     initialValues.imageContent
   );
   const [sender, setSender] = React.useState(initialValues.sender);
-  const [chatRoomID, setChatRoomID] = React.useState(initialValues.chatRoomID);
+  const [chatRoomId, setChatRoomId] = React.useState(initialValues.chatRoomId);
   const [errors, setErrors] = React.useState({});
   const resetStateValues = () => {
     setTextContent(initialValues.textContent);
     setImageContent(initialValues.imageContent);
     setSender(initialValues.sender);
-    setChatRoomID(initialValues.chatRoomID);
+    setChatRoomId(initialValues.chatRoomId);
     setErrors({});
   };
   const validations = {
     textContent: [],
     imageContent: [],
     sender: [],
-    chatRoomID: [{ type: "Required" }],
+    chatRoomId: [{ type: "Required" }],
   };
   const runValidationTasks = async (
     fieldName,
@@ -79,7 +79,7 @@ export default function MessageCreateForm(props) {
           textContent,
           imageContent,
           sender,
-          chatRoomID,
+          chatRoomId,
         };
         const validationResponses = await Promise.all(
           Object.keys(validations).reduce((promises, fieldName) => {
@@ -137,7 +137,7 @@ export default function MessageCreateForm(props) {
               textContent: value,
               imageContent,
               sender,
-              chatRoomID,
+              chatRoomId,
             };
             const result = onChange(modelFields);
             value = result?.textContent ?? value;
@@ -164,7 +164,7 @@ export default function MessageCreateForm(props) {
               textContent,
               imageContent: value,
               sender,
-              chatRoomID,
+              chatRoomId,
             };
             const result = onChange(modelFields);
             value = result?.imageContent ?? value;
@@ -191,7 +191,7 @@ export default function MessageCreateForm(props) {
               textContent,
               imageContent,
               sender: value,
-              chatRoomID,
+              chatRoomId,
             };
             const result = onChange(modelFields);
             value = result?.sender ?? value;
@@ -210,7 +210,7 @@ export default function MessageCreateForm(props) {
         label="Chat room id"
         isRequired={true}
         isReadOnly={false}
-        value={chatRoomID}
+        value={chatRoomId}
         onChange={(e) => {
           let { value } = e.target;
           if (onChange) {
@@ -218,20 +218,20 @@ export default function MessageCreateForm(props) {
               textContent,
               imageContent,
               sender,
-              chatRoomID: value,
+              chatRoomId: value,
             };
             const result = onChange(modelFields);
-            value = result?.chatRoomID ?? value;
+            value = result?.chatRoomId ?? value;
           }
-          if (errors.chatRoomID?.hasError) {
-            runValidationTasks("chatRoomID", value);
+          if (errors.chatRoomId?.hasError) {
+            runValidationTasks("chatRoomId", value);
           }
-          setChatRoomID(value);
+          setChatRoomId(value);
         }}
-        onBlur={() => runValidationTasks("chatRoomID", chatRoomID)}
-        errorMessage={errors.chatRoomID?.errorMessage}
-        hasError={errors.chatRoomID?.hasError}
-        {...getOverrideProps(overrides, "chatRoomID")}
+        onBlur={() => runValidationTasks("chatRoomId", chatRoomId)}
+        errorMessage={errors.chatRoomId?.errorMessage}
+        hasError={errors.chatRoomId?.hasError}
+        {...getOverrideProps(overrides, "chatRoomId")}
       ></TextField>
       <Flex
         justifyContent="space-between"

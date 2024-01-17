@@ -18,14 +18,14 @@ export declare type ChatRoomUpdateFormInputValues = {
     type?: string;
     admins?: string;
     participants?: string;
-    messages?: string;
+    eventId?: string;
 };
 export declare type ChatRoomUpdateFormValidationValues = {
     name?: ValidationFunction<string>;
     type?: ValidationFunction<string>;
     admins?: ValidationFunction<string>;
     participants?: ValidationFunction<string>;
-    messages?: ValidationFunction<string>;
+    eventId?: ValidationFunction<string>;
 };
 export declare type PrimitiveOverrideProps<T> = Partial<T> & React.DOMAttributes<HTMLDivElement>;
 export declare type ChatRoomUpdateFormOverridesProps = {
@@ -34,7 +34,7 @@ export declare type ChatRoomUpdateFormOverridesProps = {
     type?: PrimitiveOverrideProps<TextFieldProps>;
     admins?: PrimitiveOverrideProps<TextFieldProps>;
     participants?: PrimitiveOverrideProps<TextFieldProps>;
-    messages?: PrimitiveOverrideProps<TextFieldProps>;
+    eventId?: PrimitiveOverrideProps<TextFieldProps>;
 } & EscapeHatchProps;
 export declare type ChatRoomUpdateFormProps = React.PropsWithChildren<{
     overrides?: ChatRoomUpdateFormOverridesProps | undefined | null;

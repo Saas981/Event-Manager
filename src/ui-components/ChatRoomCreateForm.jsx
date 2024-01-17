@@ -27,7 +27,7 @@ export default function ChatRoomCreateForm(props) {
     type: "",
     admins: "",
     participants: "",
-    messages: "",
+    eventId: "",
   };
   const [name, setName] = React.useState(initialValues.name);
   const [type, setType] = React.useState(initialValues.type);
@@ -35,14 +35,14 @@ export default function ChatRoomCreateForm(props) {
   const [participants, setParticipants] = React.useState(
     initialValues.participants
   );
-  const [messages, setMessages] = React.useState(initialValues.messages);
+  const [eventId, setEventId] = React.useState(initialValues.eventId);
   const [errors, setErrors] = React.useState({});
   const resetStateValues = () => {
     setName(initialValues.name);
     setType(initialValues.type);
     setAdmins(initialValues.admins);
     setParticipants(initialValues.participants);
-    setMessages(initialValues.messages);
+    setEventId(initialValues.eventId);
     setErrors({});
   };
   const validations = {
@@ -50,7 +50,7 @@ export default function ChatRoomCreateForm(props) {
     type: [],
     admins: [],
     participants: [],
-    messages: [],
+    eventId: [],
   };
   const runValidationTasks = async (
     fieldName,
@@ -82,7 +82,7 @@ export default function ChatRoomCreateForm(props) {
           type,
           admins,
           participants,
-          messages,
+          eventId,
         };
         const validationResponses = await Promise.all(
           Object.keys(validations).reduce((promises, fieldName) => {
@@ -141,7 +141,7 @@ export default function ChatRoomCreateForm(props) {
               type,
               admins,
               participants,
-              messages,
+              eventId,
             };
             const result = onChange(modelFields);
             value = result?.name ?? value;
@@ -169,7 +169,7 @@ export default function ChatRoomCreateForm(props) {
               type: value,
               admins,
               participants,
-              messages,
+              eventId,
             };
             const result = onChange(modelFields);
             value = result?.type ?? value;
@@ -197,7 +197,7 @@ export default function ChatRoomCreateForm(props) {
               type,
               admins: value,
               participants,
-              messages,
+              eventId,
             };
             const result = onChange(modelFields);
             value = result?.admins ?? value;
@@ -225,7 +225,7 @@ export default function ChatRoomCreateForm(props) {
               type,
               admins,
               participants: value,
-              messages,
+              eventId,
             };
             const result = onChange(modelFields);
             value = result?.participants ?? value;
@@ -241,10 +241,10 @@ export default function ChatRoomCreateForm(props) {
         {...getOverrideProps(overrides, "participants")}
       ></TextField>
       <TextField
-        label="Messages"
+        label="Event id"
         isRequired={false}
         isReadOnly={false}
-        value={messages}
+        value={eventId}
         onChange={(e) => {
           let { value } = e.target;
           if (onChange) {
@@ -253,20 +253,20 @@ export default function ChatRoomCreateForm(props) {
               type,
               admins,
               participants,
-              messages: value,
+              eventId: value,
             };
             const result = onChange(modelFields);
-            value = result?.messages ?? value;
+            value = result?.eventId ?? value;
           }
-          if (errors.messages?.hasError) {
-            runValidationTasks("messages", value);
+          if (errors.eventId?.hasError) {
+            runValidationTasks("eventId", value);
           }
-          setMessages(value);
+          setEventId(value);
         }}
-        onBlur={() => runValidationTasks("messages", messages)}
-        errorMessage={errors.messages?.errorMessage}
-        hasError={errors.messages?.hasError}
-        {...getOverrideProps(overrides, "messages")}
+        onBlur={() => runValidationTasks("eventId", eventId)}
+        errorMessage={errors.eventId?.errorMessage}
+        hasError={errors.eventId?.hasError}
+        {...getOverrideProps(overrides, "eventId")}
       ></TextField>
       <Flex
         justifyContent="space-between"

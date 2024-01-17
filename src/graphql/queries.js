@@ -98,7 +98,7 @@ export const getMessage = /* GraphQL */ `
       textContent
       imageContent
       sender
-      chatRoomID
+      chatRoomId
       createdAt
       updatedAt
     }
@@ -116,7 +116,7 @@ export const listMessages = /* GraphQL */ `
         textContent
         imageContent
         sender
-        chatRoomID
+        chatRoomId
         createdAt
         updatedAt
       }
@@ -132,7 +132,7 @@ export const getChatRoom = /* GraphQL */ `
       type
       admins
       participants
-      messages
+      eventId
       createdAt
       updatedAt
     }
@@ -151,7 +151,7 @@ export const listChatRooms = /* GraphQL */ `
         type
         admins
         participants
-        messages
+        eventId
         createdAt
         updatedAt
       }

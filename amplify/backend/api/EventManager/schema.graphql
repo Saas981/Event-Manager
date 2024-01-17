@@ -1,4 +1,4 @@
-type User @model @auth(rules: [{ allow: public }]) {
+type User @model @auth(rules: [{allow: public}]) {
   id: ID!
   email: AWSEmail
   name: String
@@ -11,7 +11,7 @@ type User @model @auth(rules: [{ allow: public }]) {
   settings: String
 }
 
-type Event @model @auth(rules: [{ allow: public }]) {
+type Event @model @auth(rules: [{allow: public}]) {
   id: ID!
   title: String
   startTime: AWSDateTime
@@ -26,19 +26,20 @@ type Event @model @auth(rules: [{ allow: public }]) {
   coverImage: String
 }
 
-type Message @model @auth(rules: [{ allow: public }]) {
+type Message @model @auth(rules: [{allow: public}]) {
   id: ID!
   textContent: String
   imageContent: String
   sender: String
-  chatRoomID: ID!
+  chatRoomId: ID!
 }
 
-type ChatRoom @model @auth(rules: [{ allow: public }]) {
+type ChatRoom @model @auth(rules: [{allow: public}]) {
   id: ID!
   name: String
   type: String
   admins: String
-  participants:String
-  messages: String
+  participants: String
+  eventId: String
 }
+ 

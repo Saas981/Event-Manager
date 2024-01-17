@@ -143,7 +143,7 @@ export const createMessage = /* GraphQL */ `
       textContent
       imageContent
       sender
-      chatRoomID
+      chatRoomId
       createdAt
       updatedAt
     }
@@ -159,7 +159,7 @@ export const updateMessage = /* GraphQL */ `
       textContent
       imageContent
       sender
-      chatRoomID
+      chatRoomId
       createdAt
       updatedAt
     }
@@ -175,7 +175,7 @@ export const deleteMessage = /* GraphQL */ `
       textContent
       imageContent
       sender
-      chatRoomID
+      chatRoomId
       createdAt
       updatedAt
     }
@@ -192,7 +192,7 @@ export const createChatRoom = /* GraphQL */ `
       type
       admins
       participants
-      messages
+      eventId
       createdAt
       updatedAt
     }
@@ -209,7 +209,7 @@ export const updateChatRoom = /* GraphQL */ `
       type
       admins
       participants
-      messages
+      eventId
       createdAt
       updatedAt
     }
@@ -226,7 +226,7 @@ export const deleteChatRoom = /* GraphQL */ `
       type
       admins
       participants
-      messages
+      eventId
       createdAt
       updatedAt
     }
