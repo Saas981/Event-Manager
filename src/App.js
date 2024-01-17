@@ -15,6 +15,7 @@ import EditEvent from './Components/EditEvent'
 import UnauthorizedPage from './Components/UnauthorizedPage'
 import Search from './Components/Search';
 import Dashboard from './Components/Dashboard'
+import EventDashboard from './Components/EventDashboard';
 import { Container, Grid } from '@mui/material';
 import './App.css'; 
 
@@ -235,6 +236,7 @@ function App({ signOut}) {
                             <Route path="/unauthorized" element={<UnauthorizedPage theme={theme}/>}/>
 
               <Route path='*' element={<ErrorPage theme={theme}/>}  />
+                         <Route path="/event/:eventId" element={<EventDashboard theme={theme} userId={user} userData={userData}/>} />
 
              <Route path="/edit/:eventId" element={<EditEvent userId={user} userData={userData}/>} />
               {/* <Route path="/profile/:username" element={<Profile theme={theme}/>}/> */}

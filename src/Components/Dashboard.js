@@ -10,6 +10,7 @@ import AddIcon from '@mui/icons-material/Add';
 import { Storage } from 'aws-amplify';
 import Button from '@mui/joy/Button';
 import DeleteRoundedIcon from '@mui/icons-material/DeleteRounded';
+import { Link } from 'react-router-dom';
 import AccessTimeSharpIcon from '@mui/icons-material/AccessTimeSharp';
 import EditTwoToneIcon from '@mui/icons-material/EditTwoTone';
 
@@ -263,12 +264,14 @@ const Dashboard = ({ userId, theme }) => {
     {new Date(event.startTime).toLocaleString()}
   </Typography> */}
 
-    <Button variant="soft" onClick={() => { console.log("nothing happened") }} size="sm" sx={{
+    <Button variant="soft"  component={Link}// Use Link component from react-router-dom
+   to={`/event/${event.id}`}  onClick={() => { console.log("nothing happened") }} size="sm" sx={{
     fontSize: "14px",
     padding: "3px 10px",
     backgroundColor: "#B5BBFD",
     color: "#40137D",
     fontWeight: "600",
+   
     marginBottom:"20px",
     borderRadius:"15px",
     fontFamily: "Poppins",
