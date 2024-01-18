@@ -1,9 +1,11 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState,useRef  } from 'react';
 import { Container, Typography, Grid, List, ListItem, ListItemAvatar, Avatar, ListItemText } from '@mui/material';
-import { Input, Button, styled } from '@mui/joy';
+import { Input, Button, styled,Skeleton } from '@mui/joy';
 
 
-const ChatRoom = ({userData,theme}) => {
+const ChatRoom = ({userData,theme,chatRoom}) => {
+      const containerRef = useRef(null);
+
         const [chatMessages, setChatMessages] = useState([]);
         const messages = [
     {
@@ -91,6 +93,16 @@ const ChatRoom = ({userData,theme}) => {
     setChatMessages(updatedMessages);
   }, [userData?.id]); 
       
+    const scrollToBottom = () => {
+        console.log("CONTAINER REF ",containerRef)
+    containerRef.current.scrollTop = containerRef.current.scrollHeight;
+
+
+  }
+
+     useEffect(() => {
+    scrollToBottom()
+  }, [chatMessages,containerRef]);
 
 
    return (
@@ -122,16 +134,23 @@ const ChatRoom = ({userData,theme}) => {
         {/* Right half with the chatroom */}
         <Grid item xs={8}>
           {/* Chat messages go here (static) */}
+          
           <StyledTypography variant="h6" align="center">
-            ChatRoom Title
-          </StyledTypography>
+  {chatRoom ? (
+    chatRoom.name
+  ) : (
+    <Skeleton variant="rectangular" width={200} height="1.5em" sx={{ margin: 'auto' }} />
+  )}
+</StyledTypography>
+
+
           {/* Display static messages */}
 
           {/* Text input bar */}
           <div style={{ display: 'flex', alignItems: 'flex-end', borderRadius: '10px', backgroundColor: "#f8f8f8", minHeight: "500px" }}>
            
            <Grid container>
-            <Grid item xs={12} sx={{    backgroundColor: 'none',
+            <Grid ref={containerRef} item xs={12} sx={{    backgroundColor: 'none',
     maxHeight: '450px',
     overflowY: 'auto',
      '&::-webkit-scrollbar': {
@@ -144,7 +163,15 @@ const ChatRoom = ({userData,theme}) => {
     },
     '&::-webkit-scrollbar-track': {
       backgroundColor: '#e8e8e8', // Color of the track
-    },}}>
+    },
+        'scroll-behavior': 'smooth',
+    'scroll-margin': '0px',
+    'scroll-snap-coordinate': '0% 100%',
+    'scroll-snap-destination': '0% 100%',
+    'scroll-snap-type': 'y mandatory',
+    'scroll-padding-bottom': '150px',
+    
+    }}>
           {/* MESSAGES GO HERE */}
             {chatMessages.map((message) => (
     <>

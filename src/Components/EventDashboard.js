@@ -5,17 +5,49 @@ import { useParams } from 'react-router-dom';
 import { API, graphqlOperation } from 'aws-amplify';
 import * as mutations from '../graphql/mutations';
 import * as queries from '../graphql/queries';
+import { Storage } from 'aws-amplify';
 
 const EventDashboard = ({ theme, userData }) => {
   const { eventId } = useParams();
   const [chatRoom, setChatRoom] = useState(null);
+  const [eventDetails, setEventDetails]= useState(null)
 
 
   useEffect(() => {
    
     const fetchOrCreateChatRoomObject = async () => {
       try {
-       
+        //Check if event exists
+         const { data } = await API.graphql(graphqlOperation(queries.getEvent, { id: eventId }));
+        if (!data.getEvent) { 
+                      console.log("NO EVENT EXISTS")
+
+        window.location.href="/Error404"
+        }
+
+           const participants = JSON.parse(data.getEvent.participants);
+        //Check if the user is a participant
+    if (userData && !participants[0].hasOwnProperty(userData?.id)) {
+                  console.log("NOT PARTICIAPNT")
+
+          window.location.href = "/Error404";
+        }
+        console.log("------IS PARTIICPANTS")
+
+        let moddedData = data.getEvent;
+        console.log("EVENT CHATROOM Event Data", moddedData);
+        //get image urls
+        if (moddedData.coverImage) {
+          try {
+            const imgUrl = await Storage.get("eventCovers/"+moddedData.coverImage);
+            moddedData = { ...moddedData, imgUrl };
+          } catch (error) {
+            console.error('Error fetching image URL:', error);
+          }
+        }
+
+        setEventDetails(moddedData);
+
         // Check if the chat room exists
         const listChatRoomsResponse = await API.graphql(
           graphqlOperation(queries.listChatRooms, {
@@ -39,7 +71,7 @@ const EventDashboard = ({ theme, userData }) => {
         } else {
           // Chat room does not exist, create a new one
           const newChatRoomInput = {
-            name: 'New Chatroom', // Provide a suitable name
+            name: eventDetails?.title, // Provide a suitable name
             type: 'event', // Provide a suitable type
             eventId: eventId,
           };
@@ -61,7 +93,7 @@ const EventDashboard = ({ theme, userData }) => {
    fetchOrCreateChatRoomObject();
     }
  
-  },[eventId]);
+  },[eventId,userData]);
 
 
 
@@ -76,7 +108,7 @@ const EventDashboard = ({ theme, userData }) => {
       {/* ChatRoom component */}
       <Grid container spacing={2} style={{ marginTop: '-3%',width:"100%" }}>
         <Grid item xs={12}>
-          <ChatRoom userData={userData} theme={theme}/>
+          <ChatRoom userData={userData} theme={theme} chatRoom={chatRoom}/>
         </Grid>
       </Grid>
     </Container>
