@@ -99,6 +99,7 @@ export const getMessage = /* GraphQL */ `
       imageContent
       sender
       chatRoomId
+      senderName
       createdAt
       updatedAt
     }
@@ -117,6 +118,7 @@ export const listMessages = /* GraphQL */ `
         imageContent
         sender
         chatRoomId
+        senderName
         createdAt
         updatedAt
       }

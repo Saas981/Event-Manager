@@ -28,6 +28,7 @@ export default function MessageUpdateForm(props) {
     imageContent: "",
     sender: "",
     chatRoomId: "",
+    senderName: "",
   };
   const [textContent, setTextContent] = React.useState(
     initialValues.textContent
@@ -37,6 +38,7 @@ export default function MessageUpdateForm(props) {
   );
   const [sender, setSender] = React.useState(initialValues.sender);
   const [chatRoomId, setChatRoomId] = React.useState(initialValues.chatRoomId);
+  const [senderName, setSenderName] = React.useState(initialValues.senderName);
   const [errors, setErrors] = React.useState({});
   const resetStateValues = () => {
     const cleanValues = messageRecord
@@ -46,6 +48,7 @@ export default function MessageUpdateForm(props) {
     setImageContent(cleanValues.imageContent);
     setSender(cleanValues.sender);
     setChatRoomId(cleanValues.chatRoomId);
+    setSenderName(cleanValues.senderName);
     setErrors({});
   };
   const [messageRecord, setMessageRecord] = React.useState(messageModelProp);
@@ -64,6 +67,7 @@ export default function MessageUpdateForm(props) {
     imageContent: [],
     sender: [],
     chatRoomId: [{ type: "Required" }],
+    senderName: [],
   };
   const runValidationTasks = async (
     fieldName,
@@ -95,6 +99,7 @@ export default function MessageUpdateForm(props) {
           imageContent,
           sender,
           chatRoomId,
+          senderName,
         };
         const validationResponses = await Promise.all(
           Object.keys(validations).reduce((promises, fieldName) => {
@@ -154,6 +159,7 @@ export default function MessageUpdateForm(props) {
               imageContent,
               sender,
               chatRoomId,
+              senderName,
             };
             const result = onChange(modelFields);
             value = result?.textContent ?? value;
@@ -181,6 +187,7 @@ export default function MessageUpdateForm(props) {
               imageContent: value,
               sender,
               chatRoomId,
+              senderName,
             };
             const result = onChange(modelFields);
             value = result?.imageContent ?? value;
@@ -208,6 +215,7 @@ export default function MessageUpdateForm(props) {
               imageContent,
               sender: value,
               chatRoomId,
+              senderName,
             };
             const result = onChange(modelFields);
             value = result?.sender ?? value;
@@ -235,6 +243,7 @@ export default function MessageUpdateForm(props) {
               imageContent,
               sender,
               chatRoomId: value,
+              senderName,
             };
             const result = onChange(modelFields);
             value = result?.chatRoomId ?? value;
@@ -248,6 +257,34 @@ export default function MessageUpdateForm(props) {
         errorMessage={errors.chatRoomId?.errorMessage}
         hasError={errors.chatRoomId?.hasError}
         {...getOverrideProps(overrides, "chatRoomId")}
+      ></TextField>
+      <TextField
+        label="Sender name"
+        isRequired={false}
+        isReadOnly={false}
+        value={senderName}
+        onChange={(e) => {
+          let { value } = e.target;
+          if (onChange) {
+            const modelFields = {
+              textContent,
+              imageContent,
+              sender,
+              chatRoomId,
+              senderName: value,
+            };
+            const result = onChange(modelFields);
+            value = result?.senderName ?? value;
+          }
+          if (errors.senderName?.hasError) {
+            runValidationTasks("senderName", value);
+          }
+          setSenderName(value);
+        }}
+        onBlur={() => runValidationTasks("senderName", senderName)}
+        errorMessage={errors.senderName?.errorMessage}
+        hasError={errors.senderName?.hasError}
+        {...getOverrideProps(overrides, "senderName")}
       ></TextField>
       <Flex
         justifyContent="space-between"

@@ -17,12 +17,14 @@ export declare type MessageCreateFormInputValues = {
     imageContent?: string;
     sender?: string;
     chatRoomId?: string;
+    senderName?: string;
 };
 export declare type MessageCreateFormValidationValues = {
     textContent?: ValidationFunction<string>;
     imageContent?: ValidationFunction<string>;
     sender?: ValidationFunction<string>;
     chatRoomId?: ValidationFunction<string>;
+    senderName?: ValidationFunction<string>;
 };
 export declare type PrimitiveOverrideProps<T> = Partial<T> & React.DOMAttributes<HTMLDivElement>;
 export declare type MessageCreateFormOverridesProps = {
@@ -31,6 +33,7 @@ export declare type MessageCreateFormOverridesProps = {
     imageContent?: PrimitiveOverrideProps<TextFieldProps>;
     sender?: PrimitiveOverrideProps<TextFieldProps>;
     chatRoomId?: PrimitiveOverrideProps<TextFieldProps>;
+    senderName?: PrimitiveOverrideProps<TextFieldProps>;
 } & EscapeHatchProps;
 export declare type MessageCreateFormProps = React.PropsWithChildren<{
     overrides?: MessageCreateFormOverridesProps | undefined | null;

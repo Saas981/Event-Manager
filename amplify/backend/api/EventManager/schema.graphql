@@ -32,6 +32,7 @@ type Message @model @auth(rules: [{allow: public}]) {
   imageContent: String
   sender: String
   chatRoomId: ID!
+  senderName: String
 }
 
 type ChatRoom @model @auth(rules: [{allow: public}]) {

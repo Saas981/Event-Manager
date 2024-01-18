@@ -20,7 +20,7 @@ const EventDashboard = ({ theme, userData }) => {
         //Check if event exists
          const { data } = await API.graphql(graphqlOperation(queries.getEvent, { id: eventId }));
         if (!data.getEvent) { 
-                      console.log("NO EVENT EXISTS")
+                   //   console.log("NO EVENT EXISTS")
 
         window.location.href="/Error404"
         }
@@ -28,14 +28,14 @@ const EventDashboard = ({ theme, userData }) => {
            const participants = JSON.parse(data.getEvent.participants);
         //Check if the user is a participant
     if (userData && !participants[0].hasOwnProperty(userData?.id)) {
-                  console.log("NOT PARTICIAPNT")
+                 // console.log("NOT PARTICIAPNT")
 
           window.location.href = "/Error404";
         }
-        console.log("------IS PARTIICPANTS")
+        //console.log("------IS PARTIICPANTS")
 
         let moddedData = data.getEvent;
-        console.log("EVENT CHATROOM Event Data", moddedData);
+       // console.log("EVENT CHATROOM Event Data", moddedData);
         //get image urls
         if (moddedData.coverImage) {
           try {
@@ -58,7 +58,7 @@ const EventDashboard = ({ theme, userData }) => {
         );
 
         const chatRooms = listChatRoomsResponse.data.listChatRooms.items;
-          console.log("CHART OOTMSMSS ",chatRooms)
+        //  console.log("CHART OOTMSMSS ",chatRooms)
         if (chatRooms.length > 0) {
           // Chat room exists, retrieve the first one
           const existingChatRoomId = chatRooms[0].id;

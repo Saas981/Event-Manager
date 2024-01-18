@@ -1,98 +1,43 @@
-import React, { useEffect, useState,useRef  } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import { Container, Typography, Grid, List, ListItem, ListItemAvatar, Avatar, ListItemText } from '@mui/material';
-import { Input, Button, styled,Skeleton } from '@mui/joy';
+import { Input, Button, styled, Skeleton } from '@mui/joy';
+import { API, graphqlOperation } from 'aws-amplify';
+import * as queries from '../graphql/queries';
 
-
-const ChatRoom = ({userData,theme,chatRoom}) => {
-      const containerRef = useRef(null);
-
-        const [chatMessages, setChatMessages] = useState([]);
-        const messages = [
-    {
-      id: '1',
-      textContent: 'Hey, how is it going?',
-      sender: 'user1@example.com',
-      chatRoomId: 'chatRoom1',
-    },
-    {
-      id: '2',
-      textContent: 'Not bad, just working on some coding projects.',
-      sender: 'b4364e20-5fc3-4b67-868a-08b516a0e60e',
-      chatRoomId: 'chatRoom1',
-    },
-    {
-      id: '3',
-      textContent: 'That sounds interesting. Anything exciting?',
-      sender: 'user1@example.com',
-      chatRoomId: 'chatRoom1',
-    },
-    {
-      id: '1',
-      textContent: 'Hey, how is it going?',
-      sender: 'user1@example.com',
-      chatRoomId: 'chatRoom1',
-    },
-    {
-      id: '2',
-      textContent: 'Not bad, just working on some coding projects.',
-      sender: 'b4364e20-5fc3-4b67-868a-08b516a0e60e',
-      chatRoomId: 'chatRoom1',
-    },
-    {
-      id: '3',
-      textContent: 'That sounds interesting. Anything exciting?',
-      sender: 'user1@example.com',
-      chatRoomId: 'chatRoom1',
-    },{
-      id: '1',
-      textContent: 'Hey, how is it going?',
-      sender: 'user1@example.com',
-      chatRoomId: 'chatRoom1',
-    },
-    {
-      id: '2',
-      textContent: 'Not bad, just working on some coding projects.',
-      sender: 'b4364e20-5fc3-4b67-868a-08b516a0e60e',
-      chatRoomId: 'chatRoom1',
-    },
-    {
-      id: '3',
-      textContent: 'That sounds interesting. Anything exciting?',
-      sender: 'user1@example.com',
-      chatRoomId: 'chatRoom1',
-    },{
-      id: '1',
-      textContent: 'Hey, how is it going?',
-      sender: 'user1@example.com',
-      chatRoomId: 'chatRoom1',
-    },
-    {
-      id: '2',
-      textContent: 'Not bad, just working on some coding projects.',
-      sender: 'b4364e20-5fc3-4b67-868a-08b516a0e60e',
-      chatRoomId: 'chatRoom1',
-    },
-    {
-      id: '3',
-      textContent: 'That sounds interesting. Anything exciting?',
-      sender: 'user1@example.com',
-      chatRoomId: 'chatRoom1',
-    },
-    // Add more messages as needed
-  ];
-
-
+const ChatRoom = ({ userData, theme, chatRoom }) => {
+  const containerRef = useRef(null);
+  const [chatMessages, setChatMessages] = useState([]);
 
   useEffect(() => {
-    // Check if the sender is equal to the current user and update isUser field
-    const updatedMessages = messages.map((message) => ({
+    const fetchMessages = async () => {
+      try {
+        if (chatRoom) {
+          const messagesResponse = await API.graphql(
+            graphqlOperation(queries.listMessages, {
+              filter: { chatRoomId: { eq: chatRoom.id } },
+              limit: 100, // Adjust the limit as needed
+            })
+          );
+
+          const fetchedMessages = messagesResponse.data.listMessages.items.map((message) => ({
       ...message,
       isUser: message.sender === userData?.id, // Assuming user has an 'id' property
     }));
 
-    setChatMessages(updatedMessages);
-  }, [userData?.id]); 
-      
+  
+          setChatMessages(fetchedMessages);
+        }
+      } catch (error) {
+        console.error('Error fetching messages:', error);
+      }
+    };
+
+    fetchMessages();
+  }, [chatRoom]);
+
+
+
+
     const scrollToBottom = () => {
         console.log("CONTAINER REF ",containerRef)
     containerRef.current.scrollTop = containerRef.current.scrollHeight;
@@ -103,6 +48,8 @@ const ChatRoom = ({userData,theme,chatRoom}) => {
      useEffect(() => {
     scrollToBottom()
   }, [chatMessages,containerRef]);
+
+
 
 
    return (
@@ -173,25 +120,40 @@ const ChatRoom = ({userData,theme,chatRoom}) => {
     
     }}>
           {/* MESSAGES GO HERE */}
-            {chatMessages.map((message) => (
-    <>
-
-        <Grid container key={message.id} direction={message.isUser ? 'row-reverse' : 'row'} justifyContent={message.isUser ? 'flex-end' : 'flex-start'} alignItems="center">
-
-            <Grid item xs={0.4}>
-<Avatar sx={{marginLeft:"30% "}} src={message.avatar} />
-            </Grid>
-             <Grid item xs={11}>
-  <StyledMessage key={message.id} isUser={message.isUser}>
-              
-              <Typography sx={{ marginLeft: '10px', fontFamily:"Poppins",
-    fontWeight:"500", }}>{message.textContent}</Typography>
-            </StyledMessage>            </Grid>
-             </Grid>
+          {chatMessages.map((message) => (
+  <Grid container key={message.id} direction={message.isUser ? 'row-reverse' : 'row'} justifyContent={message.isUser ? 'flex-end' : 'flex-start'} alignItems="center">
+    <Grid item xs={0.4}>
+      <Avatar sx={{ marginLeft: message.isUser ? '30%' : '0%' }} src={message.avatar} />
+    </Grid>
+    <Grid item xs={11}>
+      <StyledMessage key={message.id} isUser={message.isUser}>
+        {message.isUser ?(
+            <>
+            <Typography sx={{ marginLeft: '10px', fontFamily: "Poppins", fontWeight: "500" }}>
+          {message.textContent}
+        </Typography>
+            <Typography variant="caption" sx={{ marginLeft: '10px', fontFamily: "Poppins", fontWeight: "400", color: '#777' }}>
+          {message.senderName}
+        </Typography>
+        </>
+        ):(
+            <>
+            <Typography variant="caption" sx={{ marginRight: '10px', fontFamily: "Poppins", fontWeight: "400", color: '#777' }}>
+          {message.senderName}
+        </Typography>
+        <Typography sx={{ marginLeft: '0px', fontFamily: "Poppins", fontWeight: "500" ,fontSize:"1em"}}>
+          {message.textContent}
+        </Typography>
+        </>
+        )}
+           
+        
     
-          
-            </>
-          ))}
+      </StyledMessage>
+    </Grid>
+  </Grid>
+))}
+
 
 
 
@@ -244,7 +206,7 @@ const StyledMessage = styled('div')(({ isUser }) => ({
     alignItems: 'flex-end',
     margin: '2% 6%',
     marginRight: isUser && "0%",
-        marginLeft: isUser && "46%",
+        marginLeft: isUser && "auto",
 
     padding: '12px',
     borderRadius: '10px',

@@ -123,6 +123,7 @@ export const onCreateMessage = /* GraphQL */ `
       imageContent
       sender
       chatRoomId
+      senderName
       createdAt
       updatedAt
     }
@@ -136,6 +137,7 @@ export const onUpdateMessage = /* GraphQL */ `
       imageContent
       sender
       chatRoomId
+      senderName
       createdAt
       updatedAt
     }
@@ -149,6 +151,7 @@ export const onDeleteMessage = /* GraphQL */ `
       imageContent
       sender
       chatRoomId
+      senderName
       createdAt
       updatedAt
     }

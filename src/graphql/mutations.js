@@ -144,6 +144,7 @@ export const createMessage = /* GraphQL */ `
       imageContent
       sender
       chatRoomId
+      senderName
       createdAt
       updatedAt
     }
@@ -160,6 +161,7 @@ export const updateMessage = /* GraphQL */ `
       imageContent
       sender
       chatRoomId
+      senderName
       createdAt
       updatedAt
     }
@@ -176,6 +178,7 @@ export const deleteMessage = /* GraphQL */ `
       imageContent
       sender
       chatRoomId
+      senderName
       createdAt
       updatedAt
     }
