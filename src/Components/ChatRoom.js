@@ -2,11 +2,19 @@ import React, { useEffect, useState, useRef } from 'react';
 import { Container, Typography, Grid, List, ListItem, ListItemAvatar, Avatar, ListItemText } from '@mui/material';
 import { Input, Button, styled, Skeleton } from '@mui/joy';
 import { API, graphqlOperation } from 'aws-amplify';
+import { CircularProgress } from '@mui/material';
+
 import * as queries from '../graphql/queries';
+import * as mutations from "../graphql/mutations"
+import * as subscriptions from "../graphql/subscriptions"
 
 const ChatRoom = ({ userData, theme, chatRoom }) => {
   const containerRef = useRef(null);
   const [chatMessages, setChatMessages] = useState([]);
+  const [message, setMessage] = useState('');
+  const [isTimeoutActive, setIsTimeoutActive] = useState(false);
+
+
 
   useEffect(() => {
     const fetchMessages = async () => {
@@ -36,13 +44,32 @@ const ChatRoom = ({ userData, theme, chatRoom }) => {
   }, [chatRoom]);
 
 
+  useEffect(()=>{
+    console.log("SUBSCRIPTION CRETED")
+          const subscription = API.graphql(
+      graphqlOperation(subscriptions.onCreateMessage, { chatRoomId: chatRoom?.id })
+    ).subscribe({
+      next: (messageData) => {
+        // Update the state with the new message
+        const newMessage = messageData.value.data.onCreateMessage;
+        newMessage.isUser =  (message.sender === userData?.id)
+
+        console.log("SUBSC RIBED NEW MESSAGE ICNOMGIN NOW ",newMessage)
+
+        setChatMessages((prevMessages) => [...prevMessages, newMessage]);
+      },
+      error: (error) => {
+        console.error('Subscription error:', error);
+      },
+    });
+  },[])
+
+
 
 
     const scrollToBottom = () => {
         console.log("CONTAINER REF ",containerRef)
     containerRef.current.scrollTop = containerRef.current.scrollHeight;
-
-
   }
 
      useEffect(() => {
@@ -50,6 +77,50 @@ const ChatRoom = ({ userData, theme, chatRoom }) => {
   }, [chatMessages,containerRef]);
 
 
+  //MESSAGE FUNCTIONS
+
+  
+  const handleMessageChange= (event) =>{
+    setMessage(event.target.value)
+  }
+
+
+
+
+ const handleKeyPress = async (event) => {
+    if (event.key === 'Enter' && !isTimeoutActive && userData && chatRoom) {
+      console.log('Message value:', message);
+      setMessage('');
+      setIsTimeoutActive(true);
+
+      try {
+        // Create a new message using GraphQL mutation
+        const createMessageResponse = await API.graphql(
+          graphqlOperation(mutations.createMessage, {
+            input: {
+              textContent: message,
+              sender: userData?.id,
+              senderName: userData?.name,
+              chatRoomId: chatRoom?.id,
+            },
+          })
+        );
+
+        console.log('New Message Created:', createMessageResponse.data.createMessage);
+
+        // Fetch and update the messages after creating a new one
+       
+
+        // Set a timeout to re-enable Enter key after a delay (e.g., 2 seconds)
+        setTimeout(() => {
+          setIsTimeoutActive(false);
+        }, 2000); // Adjust the timeout duration as needed
+      } catch (error) {
+        console.error('Error creating message:', error);
+        setIsTimeoutActive(false); // Reset isTimeoutActive in case of an error
+      }
+    }
+  };
 
 
    return (
@@ -158,13 +229,27 @@ const ChatRoom = ({ userData, theme, chatRoom }) => {
 
 
             </Grid>
-             <Grid item xs={12}>
- <StyledInput
-              fullWidth
-              variant="outlined"
-              placeholder="Type your message..."
-            />
-            </Grid>
+
+
+
+                {/* INPUT */}
+            <Grid item xs={12} sx={{position:"relative"}}>
+        <StyledInput
+          fullWidth
+          variant="outlined"
+          placeholder="Type your message..."
+              disabled={isTimeoutActive} 
+          value={message}
+          onChange={(event) => handleMessageChange(event)}
+          onKeyDown={(event) => handleKeyPress(event)}
+        />
+        {isTimeoutActive && <CircularProgress  color="secondary" size={20} sx={{ marginLeft: 2,position:"absolute",top:"40%",right:"50%" }} />}
+      </Grid>
+
+
+
+
+
            </Grid>
                    
            
