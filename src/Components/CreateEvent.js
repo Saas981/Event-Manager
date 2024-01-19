@@ -211,7 +211,7 @@ const handleBlur = (field) => {
   </Grid>
   <Grid item xs={12} sx={{marginTop:"10px"}}>
   <TextField
-  label="Organizer Name"
+  label=""
   fullWidth
   variant="outlined"
   value={userData?.username} // Set the value to userData.username
