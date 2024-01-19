@@ -40,7 +40,7 @@ const CreateEvent = ({userId,theme,userData}) => {
     capacity: 1,
     participants:`[ { "${userId}": { "permissions": "admin" } } ]`,
     description: '',
-    organizer: userData.username,
+    organizer: userData?.username,
     coverImage:'',
   });
   const [snackbarOpen, setSnackbarOpen] = useState(false);
@@ -214,7 +214,7 @@ const handleBlur = (field) => {
   label="Organizer Name"
   fullWidth
   variant="outlined"
-  value={userData.username} // Set the value to userData.username
+  value={userData?.username} // Set the value to userData.username
   onChange={(e) => handleChange('organizer', e.target.value)}
   disabled // Set the disabled prop to make it disabled
   sx={{ fontFamily: 'Inter', mb: 2 }}
