@@ -117,7 +117,7 @@ setTimeout(() => {
       handleChange("participants",`[ { "${userId}": { "permissions": "admin" } } ]`)
 
       // Check if title and organizer are provided before moving to the next step
-      if (!eventDetails.title || !eventDetails.organizer) {
+      if (!eventDetails.title) {
         openSnackbar("Please fill in the required fields: Title and Organizer.");
         return;
       }
