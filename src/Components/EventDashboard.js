@@ -66,10 +66,35 @@ const EventDashboard = ({ theme, userData }) => {
           const getChatRoomResponse = await API.graphql(
             graphqlOperation(queries.getChatRoom, { id: existingChatRoomId })
           );
-          const existingChatRoom = getChatRoomResponse.data.getChatRoom;
-          console.log('Existing Chat Room:', existingChatRoom);
-          setChatRoom(existingChatRoom);
-        } else {
+
+
+    const existingChatRoom = getChatRoomResponse.data.getChatRoom;
+  console.log('Existing Chat Room:', existingChatRoom);
+
+  // Check if participants are different
+  if (JSON.stringify(existingChatRoom.participants) !== JSON.stringify(moddedData.participants)) {
+    // Participants are different, update the chat room
+    try {
+      const updateChatRoomResponse = await API.graphql(
+        graphqlOperation(mutations.updateChatRoom, {
+          input: {
+            id: existingChatRoomId,
+            participants: moddedData.participants,
+          },
+        })
+      );
+
+      const updatedChatRoom = updateChatRoomResponse.data.updateChatRoom;
+      console.log('Chat Room Updated:', updatedChatRoom);
+      setChatRoom(updatedChatRoom);
+    } catch (error) {
+      console.error('Error updating chat room:', error);
+    }
+  } else {
+    // Participants are the same, no need to update
+    setChatRoom(existingChatRoom);
+  }
+} else {
           // Chat room does not exist, create a new one
           const newChatRoomInput = {
             name: moddedData?.title, // Provide a suitable name
