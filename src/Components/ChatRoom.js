@@ -254,7 +254,7 @@ console.log("USER RETRIEVED000000000000000", Object.keys(participantsArray[0]))
     
     }}>
           {/* MESSAGES GO HERE */}
-          {chatMessages.map((message) => (
+          {chatMessages.slice(-50).map((message) => (
   <Grid container key={message.id} direction={message.isUser ? 'row-reverse' : 'row'} justifyContent={message.isUser ? 'flex-end' : 'flex-start'} alignItems="center">
     <Grid item xs={0.4}>
       <Avatar sx={{ marginLeft: message.isUser ? '30%' : '0%' }} src={message.imgUrl} />
