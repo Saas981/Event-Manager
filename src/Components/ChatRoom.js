@@ -3,6 +3,7 @@ import { Container, Typography, Grid, List, ListItem, ListItemAvatar, Avatar, Li
 import { Input, Button, styled, Skeleton } from '@mui/joy';
 import { API, graphqlOperation } from 'aws-amplify';
 import { CircularProgress } from '@mui/material';
+import { Storage } from 'aws-amplify';
 
 import * as queries from '../graphql/queries';
 import * as mutations from "../graphql/mutations"
@@ -11,8 +12,10 @@ import * as subscriptions from "../graphql/subscriptions"
 const ChatRoom = ({ userData, theme, chatRoom }) => {
   const containerRef = useRef(null);
   const [chatMessages, setChatMessages] = useState([]);
+  const [pushMessage,setPushMessage] = useState()
   const [message, setMessage] = useState('');
   const [isTimeoutActive, setIsTimeoutActive] = useState(false);
+  const [participants, setParticipants] = useState([]);
 
 
 
@@ -20,6 +23,53 @@ const ChatRoom = ({ userData, theme, chatRoom }) => {
     const fetchMessages = async () => {
       try {
         if (chatRoom) {
+
+            console.log("CHATROOM DETAILS ",chatRoom)
+            const participantsString = chatRoom.participants;
+const participantsArray = JSON.parse(participantsString);
+
+// Extract the keys from the objects in the array
+const participantUserIds = Object.keys(participantsArray[0])
+
+//    const participantUserIds = JSON.parse(chatRoom.participants).map((participant) => Object.keys(participant)[0]);
+console.log("USER RETRIEVED000000000000000", Object.keys(participantsArray[0]))
+
+          // Fetch user details using listUsers
+          const usersResponse = await API.graphql(
+            graphqlOperation(queries.listUsers, {
+              filter: {
+            or: participantUserIds.map(id => ({ id: { eq: id } }))
+          },
+            })
+          );
+
+            const users = usersResponse.data.listUsers.items
+                  const usersWithImgUrl = await Promise.all(users.map(async (user) => {
+          if (user.profilePicture) {
+            try {
+              const imgUrl = await Storage.get(user.profilePicture);
+              return { ...user, imgUrl };
+            } catch (error) {
+              console.error('Error fetching data:', error);
+              return user; // Return the user without imgUrl in case of an error
+            }
+          } else {
+            return user; // Return the user without imgUrl if profilePicture is not present
+          }
+        }));
+
+           
+
+          // Update state with fetched user details
+          console.log("RETRIVED SUERS ",usersWithImgUrl)
+          
+          setParticipants(usersWithImgUrl);
+
+
+
+
+
+
           const messagesResponse = await API.graphql(
             graphqlOperation(queries.listMessages, {
               filter: { chatRoomId: { eq: chatRoom.id } },
@@ -27,13 +77,19 @@ const ChatRoom = ({ userData, theme, chatRoom }) => {
             })
           );
 
-          const fetchedMessages = messagesResponse.data.listMessages.items.map((message) => ({
-      ...message,
-      isUser: message.sender === userData?.id, // Assuming user has an 'id' property
-    }));
+            const fetchedMessages = messagesResponse.data.listMessages.items.map((message) => {
+          const participant = usersWithImgUrl.find((p) => p.id === message.sender);
+          return {
+            ...message,
+            isUser: message.sender === userData?.id,
+            imgUrl: participant?.imgUrl, // Retrieve imgUrl from participant object
+          };
+        });
+        console.log("RIGHT NOW PARTIICPANTS ",usersWithImgUrl)
+        console.log("IMG URL FETCEHDN MESSAGES ",fetchedMessages)
+        setChatMessages(fetchedMessages);
 
-  
-          setChatMessages(fetchedMessages);
+       
         }
       } catch (error) {
         console.error('Error fetching messages:', error);
@@ -45,18 +101,15 @@ const ChatRoom = ({ userData, theme, chatRoom }) => {
 
 
   useEffect(()=>{
-    console.log("SUBSCRIPTION CRETED")
+   // console.log("SUBSCRIPTION CRETED")
           const subscription = API.graphql(
       graphqlOperation(subscriptions.onCreateMessage, { chatRoomId: chatRoom?.id })
     ).subscribe({
       next: (messageData) => {
+        
         // Update the state with the new message
         const newMessage = messageData.value.data.onCreateMessage;
-        newMessage.isUser =  (message.sender === userData?.id)
-
-        console.log("SUBSC RIBED NEW MESSAGE ICNOMGIN NOW ",newMessage)
-
-        setChatMessages((prevMessages) => [...prevMessages, newMessage]);
+                setPushMessage(newMessage)
       },
       error: (error) => {
         console.error('Subscription error:', error);
@@ -64,11 +117,27 @@ const ChatRoom = ({ userData, theme, chatRoom }) => {
     });
   },[])
 
+  useEffect(()=>{
+    if(userData && participants && pushMessage){
+        const newMessage = pushMessage
+         const participant = participants.find((p) => p.id === newMessage.sender);
+        console.log("NEW MESAAGE",newMessage)
+                console.log("NEW Participants",participant)
+                console.log("NEW userData",userData?.id)
+
+        newMessage.isUser =  (newMessage.sender === userData?.id)
+        newMessage.imgUrl = participant?.imgUrl
+    
+        //console.log("SUBSC RIBED NEW MESSAGE ICNOMGIN NOW ",newMessage)
+       // console.log("DATA ID ",userData?.id)
+        setChatMessages((prevMessages) => [...prevMessages, newMessage]);
+    }
+  },[userData,participants,pushMessage])
+
 
 
 
     const scrollToBottom = () => {
-        console.log("CONTAINER REF ",containerRef)
     containerRef.current.scrollTop = containerRef.current.scrollHeight;
   }
 
@@ -127,27 +196,21 @@ const ChatRoom = ({ userData, theme, chatRoom }) => {
     <Container maxWidth="lg" style={{ marginTop: '20px', border: '1px solid #ccc', borderRadius: '5px', padding: '10px' }}>
       <Grid container spacing={2}>
         {/* Left half with user list */}
-        <Grid item xs={4}>
-          <StyledTypography variant="h6" align="center">
-            Participants
-          </StyledTypography>
-          <List sx={{backgroundColor:"#f8f8f8",borderRadius:"10px",height:"auto"}}>
-            {/* Static user list (replace with dynamic data) */}
-            <ListItem>
-              <ListItemAvatar>
-                <Avatar alt="User 1" src="static_pfp_1.jpg" />
-              </ListItemAvatar>
-              <ListItemText primary="User 1" />
-            </ListItem>
-            <ListItem>
-              <ListItemAvatar>
-                <Avatar alt="User 2" src="static_pfp_2.jpg" />
-              </ListItemAvatar>
-              <ListItemText primary="User 2" />
-            </ListItem>
-            {/* Add more users as needed */}
-          </List>
-        </Grid>
+     <Grid item xs={4}>
+      <StyledTypography variant="h6" align="center">
+        Participants
+      </StyledTypography>
+      <List sx={{ backgroundColor: '#f8f8f8', borderRadius: '10px', height: 'auto' }}>
+        {participants.map((participant, index) => (
+          <ListItem key={participant.id}>
+            <ListItemAvatar>
+              <Avatar alt={participant.name} src={participant.imgUrl} />
+            </ListItemAvatar>
+            <ListItemText primary={participant.name} />
+          </ListItem>
+        ))}
+      </List>
+    </Grid>
 
         {/* Right half with the chatroom */}
         <Grid item xs={8}>
@@ -194,7 +257,7 @@ const ChatRoom = ({ userData, theme, chatRoom }) => {
           {chatMessages.map((message) => (
   <Grid container key={message.id} direction={message.isUser ? 'row-reverse' : 'row'} justifyContent={message.isUser ? 'flex-end' : 'flex-start'} alignItems="center">
     <Grid item xs={0.4}>
-      <Avatar sx={{ marginLeft: message.isUser ? '30%' : '0%' }} src={message.avatar} />
+      <Avatar sx={{ marginLeft: message.isUser ? '30%' : '0%' }} src={message.imgUrl} />
     </Grid>
     <Grid item xs={11}>
       <StyledMessage key={message.id} isUser={message.isUser}>
@@ -296,6 +359,7 @@ const StyledMessage = styled('div')(({ isUser }) => ({
     padding: '12px',
     borderRadius: '10px',
     width:'fit-content', 
+    maxWidth:"60%",
     minWidth:"25%",
     backgroundColor: isUser ? '#B5BBFD' : '#e9e9e9', // Use purple for isUser, and default color otherwise
     fontFamily: 'Poppins',

@@ -11,6 +11,7 @@ const EventDashboard = ({ theme, userData }) => {
   const { eventId } = useParams();
   const [chatRoom, setChatRoom] = useState(null);
   const [eventDetails, setEventDetails]= useState(null)
+  const [chatParticipants,setChatParticipants] = useState(null)
 
 
   useEffect(() => {
@@ -71,9 +72,10 @@ const EventDashboard = ({ theme, userData }) => {
         } else {
           // Chat room does not exist, create a new one
           const newChatRoomInput = {
-            name: eventDetails?.title, // Provide a suitable name
+            name: moddedData?.title, // Provide a suitable name
             type: 'event', // Provide a suitable type
             eventId: eventId,
+            participants:moddedData?.participants,
           };
 
           const createChatRoomResponse = await API.graphql(
