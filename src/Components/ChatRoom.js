@@ -13,6 +13,7 @@ const ChatRoom = ({ userData, theme, chatRoom }) => {
   const containerRef = useRef(null);
   const [chatMessages, setChatMessages] = useState([]);
   const [pushMessage,setPushMessage] = useState()
+  const [characters,setCharacters] = useState(250);
   const [message, setMessage] = useState('');
   const [isTimeoutActive, setIsTimeoutActive] = useState(false);
   const [participants, setParticipants] = useState([]);
@@ -148,10 +149,15 @@ console.log("USER RETRIEVED000000000000000", Object.keys(participantsArray[0]))
 
   //MESSAGE FUNCTIONS
 
+  const handleMessageChange = (event) => {
+    const inputValue = event.target.value;
   
-  const handleMessageChange= (event) =>{
-    setMessage(event.target.value)
-  }
+    // Limit the input value to 200 characters
+    const limitedValue = inputValue.slice(0, 250);
+     setCharacters(250-limitedValue.length)
+    setMessage(limitedValue);
+  };
+  
 
 
 
@@ -261,25 +267,49 @@ console.log("USER RETRIEVED000000000000000", Object.keys(participantsArray[0]))
     </Grid>
     <Grid item xs={11}>
       <StyledMessage key={message.id} isUser={message.isUser}>
-        {message.isUser ?(
-            <>
-            <Typography sx={{ marginLeft: '10px', fontFamily: "Poppins", fontWeight: "500" }}>
-          {message.textContent}
-        </Typography>
-            <Typography variant="caption" sx={{ marginLeft: '10px', fontFamily: "Poppins", fontWeight: "400", color: '#777' }}>
-          {message.senderName}
-        </Typography>
-        </>
-        ):(
-            <>
-            <Typography variant="caption" sx={{ marginRight: '10px', fontFamily: "Poppins", fontWeight: "400", color: '#777' }}>
-          {message.senderName}
-        </Typography>
-        <Typography sx={{ marginLeft: '0px', fontFamily: "Poppins", fontWeight: "500" ,fontSize:"1em"}}>
-          {message.textContent}
-        </Typography>
-        </>
-        )}
+      {message.isUser ? (
+  <>
+    <Typography sx={{
+      marginLeft: '10px',
+      fontFamily: "Poppins",
+      fontWeight: "500",
+      whiteSpace: 'break-spaces',
+      wordBreak:'break-all', // Add this style to handle long strings without spaces
+    }}>
+      {message.textContent}
+    </Typography>
+    <Typography variant="caption" sx={{
+      marginLeft: '10px',
+      fontFamily: "Poppins",
+      fontWeight: "400",
+      color: '#777'
+    }}>
+      {message.senderName}
+    </Typography>
+  </>
+) : (
+  <>
+    <Typography variant="caption" sx={{
+      marginRight: '10px',
+      fontFamily: "Poppins",
+      fontWeight: "400",
+      color: '#777'
+    }}>
+      {message.senderName}
+    </Typography>
+    <Typography sx={{
+      marginLeft: '0px',
+      fontFamily: "Poppins",
+      fontWeight: "500",
+      fontSize: "1em",
+      wordBreak:'break-all',
+      whiteSpace: 'break-spaces', // Add this style to handle long strings without spaces
+    }}>
+      {message.textContent}
+    </Typography>
+  </>
+)}
+
            
         
     
@@ -306,6 +336,7 @@ console.log("USER RETRIEVED000000000000000", Object.keys(participantsArray[0]))
           onChange={(event) => handleMessageChange(event)}
           onKeyDown={(event) => handleKeyPress(event)}
         />
+        <Typography sx={{ marginLeft: 2,display:characters>250 ?"none":"flex",position:"absolute",fontSize:"0.65rem",top:"80%",right:"3.5%",color:characters>50 ?"#577" :"#f77",fontFamily:"Poppins",fontWeight:"500", }}>{characters} characters left</Typography> 
         {isTimeoutActive && <CircularProgress  color="secondary" size={20} sx={{ marginLeft: 2,position:"absolute",top:"40%",right:"50%" }} />}
       </Grid>
 
@@ -350,7 +381,9 @@ const StyledTypography = styled(Typography)({
 // Custom styled Message component
 const StyledMessage = styled('div')(({ isUser }) => ({
     display: 'flex',
-
+ overflowWrap: 'break-word',
+ whiteSpace: 'break-spaces',
+ 
     alignItems: 'flex-end',
     margin: '2% 6%',
     marginRight: isUser && "0%",
