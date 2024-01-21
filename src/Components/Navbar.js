@@ -28,7 +28,7 @@ import { Auth } from 'aws-amplify';
 import '../Styles/Navbar.css';
 import { styled, alpha } from '@mui/material/styles';
 import SearchIcon from '@mui/icons-material/Search';
-
+import EmailIcon from '@mui/icons-material/Email';
 import Box from '@mui/material/Box';
 import InputBase from '@mui/material/InputBase';
 
@@ -120,7 +120,7 @@ const Navbar = ({ user,setTheme,theme,userData }) => {
               <Home />
             </IconButton>
          
-            <Typography variant="h6" style={{ flexGrow: 1, marginLeft: '10px', fontFamily: 'Poppins, sans-serif' }}>
+            <Typography variant="h6" style={{ flexGrow: 1, marginLeft: 'x', fontFamily: 'Poppins, sans-serif' }}>
               Event Manager
             </Typography>
             {1!=1 ? (
@@ -156,11 +156,11 @@ const Navbar = ({ user,setTheme,theme,userData }) => {
                 {user ? (
                   
                   <>
-            <Button color="inherit" className="nav-button" component={Link} to="/about" style={{ marginTop: "4px", marginRight: '3%', fontFamily: 'Poppins, sans-serif' }}>
+            <Button color="inherit" className="nav-button" component={Link} to="/about" style={{ marginTop: "4px", marginRight: '3%', fontFamily: 'Poppins, sans-serif',fontSize:"0.8rem" }}>
                   About
                   <Info style={{ marginLeft: '5px' }} />
                 </Button>
-                <Button color="inherit" className="nav-button" component={Link} to="/contact" style={{ marginTop: "4px", marginRight: '51%', fontFamily: 'Poppins, sans-serif' }}>
+                <Button color="inherit" className="nav-button" component={Link} to="/contact" style={{ marginTop: "4px", marginRight: '48%', fontFamily: 'Poppins, sans-serif',fontSize:"0.8rem"  }}>
                   Contact
                   <ContactMail style={{ marginLeft: '5px' }} />
                     
@@ -185,6 +185,11 @@ const Navbar = ({ user,setTheme,theme,userData }) => {
         }}
             />
           </Search>
+              <IconButton className="nav-button" edge="start" color="inherit" component={Link} to="/notifications" sx={{marginRight:"1.5%"}}>
+                 <EmailIcon sx={{fontSize:"28px"}}/>
+            </IconButton>
+
+        
                   <Button color="inherit" className="nav-button" style={{ marginRight: '1px' }}>
                     <StyledBadge
                       overlap="circular"

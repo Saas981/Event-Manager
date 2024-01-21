@@ -16,6 +16,7 @@ import UnauthorizedPage from './Components/UnauthorizedPage'
 import Search from './Components/Search';
 import Dashboard from './Components/Dashboard'
 import EventDashboard from './Components/EventDashboard';
+import NotificationsPage from './Components/Notifications'
 import { Container, Grid } from '@mui/material';
 import './App.css'; 
 
@@ -232,6 +233,7 @@ function App({ signOut}) {
               <Route path="/create" element={<CreateEvent userId={user} userData={userData}/>} />
               <Route path="/join/:eventId" element={<JoinEventPage user={user}/>} />
               <Route path="/profile" element={<Profile userData={userData} theme={theme}/>}/>
+              <Route path="/notifications" element={<NotificationsPage userData={userData} theme={theme}/>}/>
 
                             <Route path="/unauthorized" element={<UnauthorizedPage theme={theme}/>}/>
 
