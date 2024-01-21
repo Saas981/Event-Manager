@@ -1,13 +1,18 @@
 import React, { useEffect, useState, useRef } from 'react';
-import { Container, Typography, Grid, List, ListItem, ListItemAvatar, Avatar, ListItemText } from '@mui/material';
+import { Container, Typography, Grid, List, ListItem, ListItemAvatar, Avatar, ListItemText,Box, FormControl } from '@mui/material';
 import { Input, Button, styled, Skeleton } from '@mui/joy';
 import { API, graphqlOperation } from 'aws-amplify';
 import { CircularProgress } from '@mui/material';
 import { Storage } from 'aws-amplify';
-
+import TuneIcon from '@mui/icons-material/Tune';
 import * as queries from '../graphql/queries';
 import * as mutations from "../graphql/mutations"
 import * as subscriptions from "../graphql/subscriptions"
+import Uploader from './Uploader';
+import Select from '@mui/joy/Select';
+import Option from '@mui/joy/Option';
+
+import IconButton from '@mui/joy/IconButton';
 
 const ChatRoom = ({ userData, theme, chatRoom }) => {
   const containerRef = useRef(null);
@@ -17,6 +22,27 @@ const ChatRoom = ({ userData, theme, chatRoom }) => {
   const [message, setMessage] = useState('');
   const [isTimeoutActive, setIsTimeoutActive] = useState(false);
   const [participants, setParticipants] = useState([]);
+  const [isSettings,SetIsSettings] = useState(false)
+    const [savedFile, setSavedFile]= React.useState();
+    const [background,setBackground] = React.useState('none');
+  const gradientMappings = {
+  default: 'linear-gradient(90deg, rgba(2,0,36,1) 0%, rgba(255,0,175,1) 0%, rgba(0,212,255,1) 100%)',
+  halloween: 'linear-gradient(135deg, #ff9900 0%, #ff6600 100%)',
+  midnight: 'linear-gradient(135deg, #080819 0%, #222244 100%)',
+  lgbtRainbow: 'linear-gradient(45deg, #f79cd4 0%, #fbd2c9 16.666%, #fff5ba 33.333%, #b4f2e1 50%, #a8ddf6 66.666%, #d7aefb 83.333%, #f79cd4 100%)',
+  pastelSunset: 'linear-gradient(to right, #ff9999, #ffcc99)',
+  oceanBreeze: 'linear-gradient(to right, #66c2ff, #99ccff)',
+  mintyFresh: 'linear-gradient(to right, #aaffc3, #ccffd9)',
+  disgustingTheme: 'linear-gradient(45deg, #b39c8e 0%, #8b7765 16.666%, #634f42 33.333%, #402d20 50%, #402d20 66.666%, #634f42 83.333%, #8b7765 100%)',
+  
+  // Add more gradient mappings as needed
+};
+
+      const handleBackgroundChange = (event,newValue) => {
+        console.log("BACKGROUND THEEM SELECTED ", newValue)
+    const selectedGradient = gradientMappings[newValue] || gradientMappings.default;
+    setBackground(selectedGradient);
+  };
 
 
 
@@ -139,7 +165,11 @@ console.log("USER RETRIEVED000000000000000", Object.keys(participantsArray[0]))
 
 
     const scrollToBottom = () => {
+      if(containerRef?.current)
+      {
     containerRef.current.scrollTop = containerRef.current.scrollHeight;
+
+      }
   }
 
      useEffect(() => {
@@ -198,6 +228,15 @@ console.log("USER RETRIEVED000000000000000", Object.keys(participantsArray[0]))
   };
 
 
+
+
+const toggleSettings = () =>{
+  SetIsSettings(!isSettings)
+}
+
+
+
+
    return (
     <Container maxWidth="lg" style={{ marginTop: '20px', border: '1px solid #ccc', borderRadius: '5px', padding: '10px' }}>
       <Grid container spacing={2}>
@@ -219,16 +258,23 @@ console.log("USER RETRIEVED000000000000000", Object.keys(participantsArray[0]))
     </Grid>
 
         {/* Right half with the chatroom */}
-        <Grid item xs={8}>
+        <Grid item xs={8} >
           {/* Chat messages go here (static) */}
           
-          <StyledTypography variant="h6" align="center">
-  {chatRoom ? (
-    chatRoom.name
-  ) : (
-    <Skeleton variant="rectangular" width={200} height="1.5em" sx={{ margin: 'auto' }} />
-  )}
-</StyledTypography>
+          <StyledTypography variant="h6" sx={{position:"relative", display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+    {chatRoom ? (
+      <span>{chatRoom.name}</span>
+    ) : (
+      <Skeleton variant="rectangular" width={200} height="1.5em" sx={{ margin: 'auto' }} />
+    )}
+   <Box sx={{ position: "absolute", top: "20%", right: "3%" }}>
+    <IconButton onClick={toggleSettings}>
+      <TuneIcon />
+    </IconButton>
+  </Box>
+  </StyledTypography>
+
+
 
 
           {/* Display static messages */}
@@ -236,8 +282,34 @@ console.log("USER RETRIEVED000000000000000", Object.keys(participantsArray[0]))
           {/* Text input bar */}
           <div style={{ display: 'flex', alignItems: 'flex-end', borderRadius: '10px', backgroundColor: "#f8f8f8", minHeight: "500px" }}>
            
-           <Grid container>
-            <Grid ref={containerRef} item xs={12} sx={{    backgroundColor: 'none',
+           {/* SETTINGS BELOW */}
+           {isSettings?(
+              <Grid container>
+      <Grid item xs={6}>
+        <Typography>Background Theme</Typography>
+        <FormControl fullWidth>
+          <Select
+            defaultValue={background}
+            onChange={handleBackgroundChange}
+          >
+             <Option value="default">Default</Option>
+  <Option value="halloween">Halloween</Option>
+  <Option value="midnight">Midnight</Option>
+  <Option value="lgbtRainbow">LGBT </Option>
+     <Option value="pastelSunset">pastelSunset</Option>
+  <Option value="oceanBreeze">oceanBreeze</Option>
+  <Option value="mintyFresh">mintyFresh </Option>
+  <Option value="disgustingTheme">surpise</Option>
+
+          </Select>
+        </FormControl>
+      </Grid>
+           </Grid>
+           ):
+           (
+          // MESSAGES BELOW
+      <Grid container>
+            <Grid ref={containerRef} item xs={12} sx={{    background: background,
     maxHeight: '450px',
     overflowY: 'auto',
      '&::-webkit-scrollbar': {
@@ -249,7 +321,7 @@ console.log("USER RETRIEVED000000000000000", Object.keys(participantsArray[0]))
       marginRight:"4px",
     },
     '&::-webkit-scrollbar-track': {
-      backgroundColor: '#e8e8e8', // Color of the track
+      backgroundColor: 'none', // Color of the track
     },
         'scroll-behavior': 'smooth',
     'scroll-margin': '0px',
@@ -345,6 +417,9 @@ console.log("USER RETRIEVED000000000000000", Object.keys(participantsArray[0]))
 
 
            </Grid>
+
+           )}
+     
                    
            
            
@@ -372,6 +447,7 @@ const StyledInput = styled(Input)({
 const StyledTypography = styled(Typography)({
   background: '#f0f0f0',
   padding: '10px',
+  position:"relative",
   fontFamily:"Poppins",
   borderRadius: '5px',
   marginBottom: '10px',

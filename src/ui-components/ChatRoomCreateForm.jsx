@@ -28,6 +28,7 @@ export default function ChatRoomCreateForm(props) {
     admins: "",
     participants: "",
     eventId: "",
+    settings: "",
   };
   const [name, setName] = React.useState(initialValues.name);
   const [type, setType] = React.useState(initialValues.type);
@@ -36,6 +37,7 @@ export default function ChatRoomCreateForm(props) {
     initialValues.participants
   );
   const [eventId, setEventId] = React.useState(initialValues.eventId);
+  const [settings, setSettings] = React.useState(initialValues.settings);
   const [errors, setErrors] = React.useState({});
   const resetStateValues = () => {
     setName(initialValues.name);
@@ -43,6 +45,7 @@ export default function ChatRoomCreateForm(props) {
     setAdmins(initialValues.admins);
     setParticipants(initialValues.participants);
     setEventId(initialValues.eventId);
+    setSettings(initialValues.settings);
     setErrors({});
   };
   const validations = {
@@ -51,6 +54,7 @@ export default function ChatRoomCreateForm(props) {
     admins: [],
     participants: [],
     eventId: [],
+    settings: [],
   };
   const runValidationTasks = async (
     fieldName,
@@ -83,6 +87,7 @@ export default function ChatRoomCreateForm(props) {
           admins,
           participants,
           eventId,
+          settings,
         };
         const validationResponses = await Promise.all(
           Object.keys(validations).reduce((promises, fieldName) => {
@@ -142,6 +147,7 @@ export default function ChatRoomCreateForm(props) {
               admins,
               participants,
               eventId,
+              settings,
             };
             const result = onChange(modelFields);
             value = result?.name ?? value;
@@ -170,6 +176,7 @@ export default function ChatRoomCreateForm(props) {
               admins,
               participants,
               eventId,
+              settings,
             };
             const result = onChange(modelFields);
             value = result?.type ?? value;
@@ -198,6 +205,7 @@ export default function ChatRoomCreateForm(props) {
               admins: value,
               participants,
               eventId,
+              settings,
             };
             const result = onChange(modelFields);
             value = result?.admins ?? value;
@@ -226,6 +234,7 @@ export default function ChatRoomCreateForm(props) {
               admins,
               participants: value,
               eventId,
+              settings,
             };
             const result = onChange(modelFields);
             value = result?.participants ?? value;
@@ -254,6 +263,7 @@ export default function ChatRoomCreateForm(props) {
               admins,
               participants,
               eventId: value,
+              settings,
             };
             const result = onChange(modelFields);
             value = result?.eventId ?? value;
@@ -267,6 +277,35 @@ export default function ChatRoomCreateForm(props) {
         errorMessage={errors.eventId?.errorMessage}
         hasError={errors.eventId?.hasError}
         {...getOverrideProps(overrides, "eventId")}
+      ></TextField>
+      <TextField
+        label="Settings"
+        isRequired={false}
+        isReadOnly={false}
+        value={settings}
+        onChange={(e) => {
+          let { value } = e.target;
+          if (onChange) {
+            const modelFields = {
+              name,
+              type,
+              admins,
+              participants,
+              eventId,
+              settings: value,
+            };
+            const result = onChange(modelFields);
+            value = result?.settings ?? value;
+          }
+          if (errors.settings?.hasError) {
+            runValidationTasks("settings", value);
+          }
+          setSettings(value);
+        }}
+        onBlur={() => runValidationTasks("settings", settings)}
+        errorMessage={errors.settings?.errorMessage}
+        hasError={errors.settings?.hasError}
+        {...getOverrideProps(overrides, "settings")}
       ></TextField>
       <Flex
         justifyContent="space-between"

@@ -82,6 +82,7 @@ export const createEvent = /* GraphQL */ `
       organizer
       rating
       coverImage
+      status
       createdAt
       updatedAt
     }
@@ -105,6 +106,7 @@ export const updateEvent = /* GraphQL */ `
       organizer
       rating
       coverImage
+      status
       createdAt
       updatedAt
     }
@@ -128,6 +130,7 @@ export const deleteEvent = /* GraphQL */ `
       organizer
       rating
       coverImage
+      status
       createdAt
       updatedAt
     }
@@ -196,6 +199,7 @@ export const createChatRoom = /* GraphQL */ `
       admins
       participants
       eventId
+      settings
       createdAt
       updatedAt
     }
@@ -213,6 +217,7 @@ export const updateChatRoom = /* GraphQL */ `
       admins
       participants
       eventId
+      settings
       createdAt
       updatedAt
     }
@@ -230,6 +235,7 @@ export const deleteChatRoom = /* GraphQL */ `
       admins
       participants
       eventId
+      settings
       createdAt
       updatedAt
     }

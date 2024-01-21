@@ -59,6 +59,7 @@ export const getEvent = /* GraphQL */ `
       organizer
       rating
       coverImage
+      status
       createdAt
       updatedAt
     }
@@ -84,6 +85,7 @@ export const listEvents = /* GraphQL */ `
         organizer
         rating
         coverImage
+        status
         createdAt
         updatedAt
       }
@@ -135,6 +137,7 @@ export const getChatRoom = /* GraphQL */ `
       admins
       participants
       eventId
+      settings
       createdAt
       updatedAt
     }
@@ -154,6 +157,7 @@ export const listChatRooms = /* GraphQL */ `
         admins
         participants
         eventId
+        settings
         createdAt
         updatedAt
       }

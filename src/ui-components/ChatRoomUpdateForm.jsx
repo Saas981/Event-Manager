@@ -29,6 +29,7 @@ export default function ChatRoomUpdateForm(props) {
     admins: "",
     participants: "",
     eventId: "",
+    settings: "",
   };
   const [name, setName] = React.useState(initialValues.name);
   const [type, setType] = React.useState(initialValues.type);
@@ -37,6 +38,7 @@ export default function ChatRoomUpdateForm(props) {
     initialValues.participants
   );
   const [eventId, setEventId] = React.useState(initialValues.eventId);
+  const [settings, setSettings] = React.useState(initialValues.settings);
   const [errors, setErrors] = React.useState({});
   const resetStateValues = () => {
     const cleanValues = chatRoomRecord
@@ -47,6 +49,7 @@ export default function ChatRoomUpdateForm(props) {
     setAdmins(cleanValues.admins);
     setParticipants(cleanValues.participants);
     setEventId(cleanValues.eventId);
+    setSettings(cleanValues.settings);
     setErrors({});
   };
   const [chatRoomRecord, setChatRoomRecord] = React.useState(chatRoomModelProp);
@@ -66,6 +69,7 @@ export default function ChatRoomUpdateForm(props) {
     admins: [],
     participants: [],
     eventId: [],
+    settings: [],
   };
   const runValidationTasks = async (
     fieldName,
@@ -98,6 +102,7 @@ export default function ChatRoomUpdateForm(props) {
           admins,
           participants,
           eventId,
+          settings,
         };
         const validationResponses = await Promise.all(
           Object.keys(validations).reduce((promises, fieldName) => {
@@ -158,6 +163,7 @@ export default function ChatRoomUpdateForm(props) {
               admins,
               participants,
               eventId,
+              settings,
             };
             const result = onChange(modelFields);
             value = result?.name ?? value;
@@ -186,6 +192,7 @@ export default function ChatRoomUpdateForm(props) {
               admins,
               participants,
               eventId,
+              settings,
             };
             const result = onChange(modelFields);
             value = result?.type ?? value;
@@ -214,6 +221,7 @@ export default function ChatRoomUpdateForm(props) {
               admins: value,
               participants,
               eventId,
+              settings,
             };
             const result = onChange(modelFields);
             value = result?.admins ?? value;
@@ -242,6 +250,7 @@ export default function ChatRoomUpdateForm(props) {
               admins,
               participants: value,
               eventId,
+              settings,
             };
             const result = onChange(modelFields);
             value = result?.participants ?? value;
@@ -270,6 +279,7 @@ export default function ChatRoomUpdateForm(props) {
               admins,
               participants,
               eventId: value,
+              settings,
             };
             const result = onChange(modelFields);
             value = result?.eventId ?? value;
@@ -283,6 +293,35 @@ export default function ChatRoomUpdateForm(props) {
         errorMessage={errors.eventId?.errorMessage}
         hasError={errors.eventId?.hasError}
         {...getOverrideProps(overrides, "eventId")}
+      ></TextField>
+      <TextField
+        label="Settings"
+        isRequired={false}
+        isReadOnly={false}
+        value={settings}
+        onChange={(e) => {
+          let { value } = e.target;
+          if (onChange) {
+            const modelFields = {
+              name,
+              type,
+              admins,
+              participants,
+              eventId,
+              settings: value,
+            };
+            const result = onChange(modelFields);
+            value = result?.settings ?? value;
+          }
+          if (errors.settings?.hasError) {
+            runValidationTasks("settings", value);
+          }
+          setSettings(value);
+        }}
+        onBlur={() => runValidationTasks("settings", settings)}
+        errorMessage={errors.settings?.errorMessage}
+        hasError={errors.settings?.hasError}
+        {...getOverrideProps(overrides, "settings")}
       ></TextField>
       <Flex
         justifyContent="space-between"
