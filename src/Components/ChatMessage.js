@@ -12,7 +12,8 @@ const StyledMessage = styled('div')(({ isUser }) => ({
   padding: '12px',
   borderRadius: '10px',
   width: 'fit-content',
-  minWidth: "25%",
+  minWidth: "20%",
+  maxWidth:"60%",
   backgroundColor: isUser ? '#B5BBFD' : '#e9e9e9', // Use purple for isUser, and default color otherwise
   fontFamily: 'Poppins',
   color: '#000',
@@ -24,7 +25,7 @@ const StyledMessage = styled('div')(({ isUser }) => ({
   },
 }));
 
-const ChatMessage = ({ message, onDelete }) => {
+const ChatMessage = ({ message, onDelete,isAdmin }) => {
   const [isHovered, setIsHovered] = useState(false);
 
   return (
@@ -36,29 +37,71 @@ const ChatMessage = ({ message, onDelete }) => {
     >
       {message.isUser ? (
         <>
+    <Box sx={{ position: "relative", width: "100%",display:"flex",alignItems:"flex-start",flexDirection:"column" }}>
+  <Typography
+    variant="caption"
+    sx={{
+      fontFamily: "Poppins",
+      fontWeight: "400",
+        marginLeft:"3px",
+      color: '#777',
+       
+    }}
+  >
+    {message.senderName}
+  </Typography>
+  
           <Typography sx={{
-            marginLeft: '10px',
+            marginLeft: '5px',
+            marginRight:"5px",
             fontFamily: "Poppins",
             fontWeight: "500",
+            alignSelf:"flex-start",
+            textAlign:"left",
             whiteSpace: 'break-spaces',
             wordBreak: 'break-all',
           }}>
             {message.textContent}
           </Typography>
-          <Typography variant="caption" sx={{
-            marginLeft: '10px',
-            fontFamily: "Poppins",
-            fontWeight: "400",
-            color: '#777'
-          }}>
-            {message.senderName}
-          </Typography>
+         
+          </Box>
+           {1==1 && (
+             <IconButton
+  className="delete-icon"
+  style={{
+    transition: 'opacity 0.5s',
+    transition: 'opacity 0.5s',
+
+    position: "absolute",
+    top: "1%",
+    right: "1%",
+    borderRadius: "40%",
+    padding: "1%",
+    margin: "5px",
+    marginRight: "8px",
+    marginTop: "8px",
+    opacity: isHovered ? 1 : 0, // Set opacity based on isHovered
+  }}
+  onClick={() => onDelete(message.id,message.sender)}
+  sx={{
+    '&:hover': {
+      color: '#dd4d4f', // Set the shade of danger red
+    },
+  }}
+>
+  <DeleteIcon sx={{ fontSize: "18px", padding: "5%" }} />
+</IconButton>
+      )}
         </>
       ) :  (
-        <Box sx={{position:"relative"}}>
+        <>
+        <Box sx={{position:"relative",display:'flex-block'}}>
           <Typography variant="caption" sx={{
             marginRight: '10px',
             fontFamily: "Poppins",
+            display:"inline-block",
+                    textAlign: "right", // Align the sender name to the right
+
             fontWeight: "400",
             color: '#777'
           }}>
@@ -74,16 +117,35 @@ const ChatMessage = ({ message, onDelete }) => {
           }}>
             {message.textContent}
           </Typography>
-           {isHovered && (
-              <IconButton
-          className="delete-icon"
-          style={{transition: 'opacity 0.3s',  }}
-          onClick={() => onDelete(message.id)}
-        >
-          <DeleteIcon sx={{fontSize:"18px",padding:"5%"}}/>
-        </IconButton>      
-      )}
+         
         </Box>
+        {isAdmin && (
+  <IconButton
+    className="delete-icon"
+    style={{
+      transition: 'opacity 0.5s',
+      position: "absolute",
+      top: "1%",
+      right: "1%",
+      borderRadius: "40%",
+      padding: "1%",
+      margin: "5px",
+      opacity: isHovered ? 1 : 0, // Set opacity based on isHovered
+    }}
+    onClick={() => onDelete(message.id)}
+      sx={{
+    '&:hover': {
+      color: '#dd4d4f', // Set the shade of danger red
+    },
+  }}
+  >
+    <DeleteIcon sx={{ fontSize: "18px", padding: "5%", transition: 'opacity 1s' }} />
+  </IconButton>
+)}
+
+
+
+        </>
       )}
 
    

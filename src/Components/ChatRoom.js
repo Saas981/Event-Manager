@@ -22,6 +22,7 @@ const ChatRoom = ({ userData, theme, chatRoom }) => {
   const [message, setMessage] = useState('');
   const [isTimeoutActive, setIsTimeoutActive] = useState(false);
   const [participants, setParticipants] = useState([]);
+  const [scroll, setScroll] = useState(true)
   const [isSettings,SetIsSettings] = useState(false)
     const [savedFile, setSavedFile]= React.useState();
     const [background,setBackground] = React.useState('none');
@@ -112,9 +113,11 @@ console.log("USER RETRIEVED000000000000000", Object.keys(participantsArray[0]))
             imgUrl: participant?.imgUrl, // Retrieve imgUrl from participant object
           };
         });
-        console.log("RIGHT NOW PARTIICPANTS ",usersWithImgUrl)
-        console.log("IMG URL FETCEHDN MESSAGES ",fetchedMessages)
-        setChatMessages(fetchedMessages);
+   const sortedMessages = fetchedMessages.sort((a, b) => new Date(a.createdAt) - new Date(b.createdAt));
+
+console.log("RIGHT NOW PARTICIPANTS ", usersWithImgUrl);
+console.log("SORTED MESSAGES ", sortedMessages);
+setChatMessages(sortedMessages);
 
        
         }
@@ -137,6 +140,7 @@ console.log("USER RETRIEVED000000000000000", Object.keys(participantsArray[0]))
         // Update the state with the new message
         const newMessage = messageData.value.data.onCreateMessage;
                 setPushMessage(newMessage)
+                
       },
       error: (error) => {
         console.error('Subscription error:', error);
@@ -158,6 +162,7 @@ console.log("USER RETRIEVED000000000000000", Object.keys(participantsArray[0]))
         //console.log("SUBSC RIBED NEW MESSAGE ICNOMGIN NOW ",newMessage)
        // console.log("DATA ID ",userData?.id)
         setChatMessages((prevMessages) => [...prevMessages, newMessage]);
+        
     }
   },[userData,participants,pushMessage])
 
@@ -173,8 +178,12 @@ console.log("USER RETRIEVED000000000000000", Object.keys(participantsArray[0]))
   }
 
      useEffect(() => {
-    scrollToBottom()
-  }, [chatMessages,containerRef]);
+      if(scroll){
+           scrollToBottom()
+      }
+ 
+  }, [chatMessages,scroll]);
+
 
 
   //MESSAGE FUNCTIONS
@@ -197,6 +206,7 @@ console.log("USER RETRIEVED000000000000000", Object.keys(participantsArray[0]))
       console.log('Message value:', message);
       setMessage('');
       setIsTimeoutActive(true);
+        setScroll(true)
 
       try {
         // Create a new message using GraphQL mutation
@@ -210,15 +220,17 @@ console.log("USER RETRIEVED000000000000000", Object.keys(participantsArray[0]))
             },
           })
         );
-
         console.log('New Message Created:', createMessageResponse.data.createMessage);
 
         // Fetch and update the messages after creating a new one
        
 
         // Set a timeout to re-enable Enter key after a delay (e.g., 2 seconds)
+           
+
         setTimeout(() => {
           setIsTimeoutActive(false);
+
         }, 2000); // Adjust the timeout duration as needed
       } catch (error) {
         console.error('Error creating message:', error);
@@ -234,9 +246,35 @@ const toggleSettings = () =>{
   SetIsSettings(!isSettings)
 }
 
-const handleDeleteMessage= () =>{
-  console.log("deleting messaeg")
-}
+const handleDeleteMessage = async (id, sender) => {
+  setScroll(false)
+  console.log(JSON.parse(chatRoom.participants)[0][userData.id].permissions)
+  const isAdmin = JSON.parse(chatRoom.participants)[0][userData.id].permissions == "admin"
+  if (userData.id === sender || isAdmin) {
+    console.log("Deleting message with id:", id, " by sender:", sender);
+
+    try {
+      // Delete the message using GraphQL mutation
+      await API.graphql(
+        graphqlOperation(mutations.deleteMessage, {
+          input: {
+            id: id,
+          },
+        })
+      );
+
+      // Update the state to remove the deleted message
+      setChatMessages((prevMessages) => prevMessages.filter((message) => message.id !== id));
+    } catch (error) {
+      console.error('Error deleting message:', error);
+    }
+  } else {
+    console.log("You don't have permission to delete this message.");
+    // Handle the case where the user doesn't have permission to delete the message
+    // You can show a notification or handle it as needed
+  }
+};
+
 
 
 
@@ -342,56 +380,9 @@ const handleDeleteMessage= () =>{
       <Avatar sx={{ marginLeft: message.isUser ? '30%' : '50%' }} src={message.imgUrl} />
     </Grid>
     <Grid item xs={11}>
-      {/* <StyledMessage key={message.id} isUser={message.isUser}>
-      {message.isUser ? (
-  <>
-    <Typography sx={{
-      marginLeft: '10px',
-      fontFamily: "Poppins",
-      fontWeight: "500",
-      whiteSpace: 'break-spaces',
-      wordBreak:'break-all', // Add this style to handle long strings without spaces
-    }}>
-      {message.textContent}
-    </Typography>
-    <Typography variant="caption" sx={{
-      marginLeft: '10px',
-      fontFamily: "Poppins",
-      fontWeight: "400",
-      color: '#777'
-    }}>
-      {message.senderName}
-    </Typography>
-  </>
-) : (
-  <>
-    <Typography variant="caption" sx={{
-      marginRight: '10px',
-      fontFamily: "Poppins",
-      fontWeight: "400",
-      color: '#777'
-    }}>
-      {message.senderName}
-    </Typography>
-    <Typography sx={{
-      marginLeft: '0px',
-      fontFamily: "Poppins",
-      fontWeight: "500",
-      fontSize: "1em",
-      wordBreak:'break-all',
-      whiteSpace: 'break-spaces', // Add this style to handle long strings without spaces
-    }}>
-      {message.textContent}
-    </Typography>
-  </>
-)}
-
-           
-        
     
-      </StyledMessage> */}
        <ChatMessage
-       
+            isAdmin = {JSON.parse(chatRoom.participants)[0][userData.id].permissions == "admin" || message.sender == userData.id}
             message={message}
             onDelete={handleDeleteMessage} // Replace with your actual delete message logic
           />
