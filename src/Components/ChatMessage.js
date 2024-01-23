@@ -59,7 +59,7 @@ const ChatMessage = ({ message, onDelete,isAdmin }) => {
             alignSelf:"flex-start",
             textAlign:"left",
             whiteSpace: 'break-spaces',
-            wordBreak: 'break-all',
+           
           }}>
             {message.textContent}
           </Typography>
@@ -112,7 +112,6 @@ const ChatMessage = ({ message, onDelete,isAdmin }) => {
             fontFamily: "Poppins",
             fontWeight: "500",
             fontSize: "1em",
-            wordBreak: 'break-all',
             whiteSpace: 'break-spaces',
           }}>
             {message.textContent}
