@@ -11,7 +11,7 @@ import * as subscriptions from "../graphql/subscriptions"
 import Uploader from './Uploader';
 import Select from '@mui/joy/Select';
 import Option from '@mui/joy/Option';
-
+import ChatMessage from './ChatMessage';
 import IconButton from '@mui/joy/IconButton';
 
 const ChatRoom = ({ userData, theme, chatRoom }) => {
@@ -234,6 +234,10 @@ const toggleSettings = () =>{
   SetIsSettings(!isSettings)
 }
 
+const handleDeleteMessage= () =>{
+  console.log("deleting messaeg")
+}
+
 
 
 
@@ -338,7 +342,7 @@ const toggleSettings = () =>{
       <Avatar sx={{ marginLeft: message.isUser ? '30%' : '50%' }} src={message.imgUrl} />
     </Grid>
     <Grid item xs={11}>
-      <StyledMessage key={message.id} isUser={message.isUser}>
+      {/* <StyledMessage key={message.id} isUser={message.isUser}>
       {message.isUser ? (
   <>
     <Typography sx={{
@@ -385,7 +389,12 @@ const toggleSettings = () =>{
            
         
     
-      </StyledMessage>
+      </StyledMessage> */}
+       <ChatMessage
+       
+            message={message}
+            onDelete={handleDeleteMessage} // Replace with your actual delete message logic
+          />
     </Grid>
   </Grid>
 ))}
