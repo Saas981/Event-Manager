@@ -10,6 +10,7 @@ import * as mutations from "../graphql/mutations"
 import * as subscriptions from "../graphql/subscriptions"
 import Uploader from './Uploader';
 import Select from '@mui/joy/Select';
+import SecurityRoundedIcon from '@mui/icons-material/SecurityRounded';
 import Option from '@mui/joy/Option';
 import ChatMessage from './ChatMessage';
 import IconButton from '@mui/joy/IconButton';
@@ -287,13 +288,27 @@ const handleDeleteMessage = async (id, sender) => {
       <StyledTypography variant="h6" align="center">
         Participants
       </StyledTypography>
-      <List sx={{ backgroundColor: '#f8f8f8', borderRadius: '10px', height: 'auto' }}>
+           <List sx={{ backgroundColor: '#f8f8f8', borderRadius: '10px', height: 'auto',fontFamily:"Poppins" }}>
         {participants.map((participant, index) => (
           <ListItem key={participant.id}>
             <ListItemAvatar>
               <Avatar alt={participant.name} src={participant.imgUrl} />
             </ListItemAvatar>
-            <ListItemText primary={participant.name} />
+<ListItemText
+        primary={participant.name }
+        primaryTypographyProps={{
+          sx: {
+            fontWeight:JSON.parse(chatRoom.participants)[0][participant.id].permissions === "admin" && 600,
+            color: JSON.parse(chatRoom.participants)[0][participant.id].permissions === "admin" && "#FF6668" ,
+            fontFamily: "Poppins",
+            fontSize: "16px", // Adjust the font size as needed
+          },
+        }}
+      />            
+            {JSON.parse(chatRoom.participants)[0][participant.id].permissions === "admin" && (
+              // Conditionally render admin icon or apply color change
+              <SecurityRoundedIcon  /> // Replace this with your admin icon or color change component
+            )}
           </ListItem>
         ))}
       </List>

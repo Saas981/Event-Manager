@@ -20,6 +20,7 @@ const darkTheme = createTheme({
     },
     text: {
      primary: '#08041c',
+      secondary: '#231f69',
     },
     action: {
       active: '#ffffff', // Active (selected) item color
