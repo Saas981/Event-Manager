@@ -8,15 +8,20 @@ import TuneIcon from '@mui/icons-material/Tune';
 import * as queries from '../graphql/queries';
 import * as mutations from "../graphql/mutations"
 import * as subscriptions from "../graphql/subscriptions"
-import Uploader from './Uploader';
 import Select from '@mui/joy/Select';
 import SecurityRoundedIcon from '@mui/icons-material/SecurityRounded';
 import Option from '@mui/joy/Option';
 import ChatMessage from './ChatMessage';
 import IconButton from '@mui/joy/IconButton';
+import Uploader from './ChatUploader';
+import AttachFileIcon from '@mui/icons-material/AttachFile';
+
 
 const ChatRoom = ({ userData, theme, chatRoom }) => {
   const containerRef = useRef(null);
+  const [showImageUploader,setShowImageUploader] = useState(false);
+  const [savedFiles, setSavedFiles] = React.useState([]);
+
   const [chatMessages, setChatMessages] = useState([]);
   const [pushMessage,setPushMessage] = useState()
   const [characters,setCharacters] = useState(250);
@@ -25,10 +30,9 @@ const ChatRoom = ({ userData, theme, chatRoom }) => {
   const [participants, setParticipants] = useState([]);
   const [scroll, setScroll] = useState(true)
   const [isSettings,SetIsSettings] = useState(false)
-    const [savedFile, setSavedFile]= React.useState();
-    const [background,setBackground] = React.useState('none');
+    const [background,setBackground] = React.useState('#fafbfb');
   const gradientMappings = {
-  default: 'linear-gradient(90deg, rgba(2,0,36,1) 0%, rgba(255,0,175,1) 0%, rgba(0,212,255,1) 100%)',
+  default: '  #f8f0f7',
   halloween: 'linear-gradient(135deg, #ff9900 0%, #ff6600 100%)',
   midnight: 'linear-gradient(135deg, #080819 0%, #222244 100%)',
   lgbtRainbow: 'linear-gradient(45deg, #f79cd4 0%, #fbd2c9 16.666%, #fff5ba 33.333%, #b4f2e1 50%, #a8ddf6 66.666%, #d7aefb 83.333%, #f79cd4 100%)',
@@ -38,6 +42,22 @@ const ChatRoom = ({ userData, theme, chatRoom }) => {
   disgustingTheme: 'linear-gradient(45deg, #b39c8e 0%, #8b7765 16.666%, #634f42 33.333%, #402d20 50%, #402d20 66.666%, #634f42 83.333%, #8b7765 100%)',
   
   // Add more gradient mappings as needed
+};
+
+
+const handleFileUpload = (e) => {
+  const newFiles = Array.from(e.target.files);
+  setSavedFiles([...savedFiles, ...newFiles]);
+};
+
+const handlePaste = (e) => {
+  const items = e.clipboardData.items;
+  for (let i = 0; i < items.length; i++) {
+    if (items[i].type.indexOf('image') !== -1) {
+      const blob = items[i].getAsFile();
+      setSavedFiles([...savedFiles, blob]);
+    }
+  }
 };
 
       const handleBackgroundChange = (event,newValue) => {
@@ -232,7 +252,7 @@ setChatMessages(sortedMessages);
         setTimeout(() => {
           setIsTimeoutActive(false);
 
-        }, 2000); // Adjust the timeout duration as needed
+        }, 1000); // Adjust the timeout duration as needed
       } catch (error) {
         console.error('Error creating message:', error);
         setIsTimeoutActive(false); // Reset isTimeoutActive in case of an error
@@ -281,7 +301,7 @@ const handleDeleteMessage = async (id, sender) => {
 
 
    return (
-    <Container maxWidth="lg" style={{ marginTop: '20px', border: '1px solid #ccc', borderRadius: '5px', padding: '10px' }}>
+    <Container maxWidth="100%" style={{ marginTop: '5px',  borderRadius: '5px', padding: '0px 30px',paddingTop:"0px", }}>
       <Grid container spacing={2}>
         {/* Left half with user list */}
      <Grid item xs={4}>
@@ -413,19 +433,58 @@ const handleDeleteMessage = async (id, sender) => {
 
 
                 {/* INPUT */}
-            <Grid item xs={12} sx={{position:"relative"}}>
-        <StyledInput
-          fullWidth
-          variant="outlined"
-          placeholder="Type your message..."
-              disabled={isTimeoutActive} 
-          value={message}
-          onChange={(event) => handleMessageChange(event)}
-          onKeyDown={(event) => handleKeyPress(event)}
+<Grid item xs={12} sx={{ position: "relative", justifyContent:"center" }}>
+
+<Grid container>
+  <Grid item xs={12} sx={{ marginBottom: "-3%", padding: "16px", justifyContent:"center",alignItems:"center" }}>
+   
+      <Box sx={{ backgroundColor: "#efefef", width: "95%", borderRadius: "10px", padding: "8px", marginBottom: "8px" }}>
+        {savedFiles && savedFiles.map((file, index) => (
+        <img
+         key={index}
+          src={URL.createObjectURL(file)}
+          alt={`Uploaded ${index + 1}`}
+          style={{ maxWidth: '100%', maxHeight: '60px', borderRadius: '10px',margin:"0px 1%" }}
         />
-        <Typography sx={{ marginLeft: 2,display:characters>250 ?"none":"flex",position:"absolute",fontSize:"0.65rem",top:"80%",right:"3.5%",color:characters>50 ?"#577" :"#f77",fontFamily:"Poppins",fontWeight:"500", }}>{characters} characters left</Typography> 
-        {isTimeoutActive && <CircularProgress  color="secondary" size={20} sx={{ marginLeft: 2,position:"absolute",top:"40%",right:"50%" }} />}
-      </Grid>
+         ))}
+      </Box>
+   
+  </Grid>
+  <Grid item xs={12} sx={{ position: "relative" }} onPaste={handlePaste}>
+    <StyledInput
+      fullWidth
+      variant="outlined"
+      placeholder="Type your message..."
+      disabled={isTimeoutActive}
+      value={message}
+      onChange={(event) => handleMessageChange(event)}
+      onKeyDown={(event) => handleKeyPress(event)}
+    />
+    <Typography sx={{ marginLeft: 2, display: characters > 250 ? "none" : "flex", position: "absolute", fontSize: "0.65rem", top: "80%", right: "3.5%", color: characters > 50 ? "#577" : "#f77", fontFamily: "Poppins", fontWeight: "500" }}>{characters} characters left</Typography>
+    {isTimeoutActive && <CircularProgress color="secondary" size={20} sx={{ marginLeft: 2, position: "absolute", top: "40%", right: "50%" }} />}
+    <IconButton
+      sx={{ position: "absolute", top: "50%", right: "5%", transform: "translateY(-50%)", borderRadius: '50%' }}
+      component="label"
+      htmlFor="upload-input"
+    >
+      <AttachFileIcon sx={{ fontSize: 20 }} />
+      <input
+        type="file"
+        id="upload-input"
+        multiple
+        accept="image/*"
+        style={{ display: 'none' }}
+        onChange={handleFileUpload}
+      />
+    </IconButton>
+  </Grid>
+</Grid>
+ 
+
+  
+                
+
+</Grid>
 
 
 
@@ -464,8 +523,9 @@ const StyledTypography = styled(Typography)({
   padding: '10px',
   position:"relative",
   fontFamily:"Poppins",
+  zIndex:100,
   borderRadius: '5px',
-  marginBottom: '10px',
+  marginBottom: '-10px',
   color: '#333',
 });
 

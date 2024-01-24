@@ -76,8 +76,8 @@ const ChatMessage = ({ message, onDelete,isAdmin }) => {
     top: "1%",
     right: "1%",
     borderRadius: "40%",
-    padding: "1%",
-    margin: "5px",
+    padding: "5px",
+    margin: "4px",
     marginRight: "8px",
     marginTop: "8px",
     opacity: isHovered ? 1 : 0, // Set opacity based on isHovered
@@ -138,7 +138,7 @@ const ChatMessage = ({ message, onDelete,isAdmin }) => {
     },
   }}
   >
-    <DeleteIcon sx={{ fontSize: "18px", padding: "5%", transition: 'opacity 1s' }} />
+    <DeleteIcon sx={{ fontSize: "18px", padding: "4%", transition: 'opacity 1s' }} />
   </IconButton>
 )}
 
