@@ -21,7 +21,7 @@ import ErrorOutlineSharpIcon from '@mui/icons-material/ErrorOutlineSharp';
 
 
 
-const ChatRoom = ({ userData, theme, chatRoom }) => {
+const ChatRoom = ({ userData, theme, chatRoom,identityId }) => {
   const containerRef = useRef(null);
   const [showImageUploader,setShowImageUploader] = useState(false);
   const [savedFiles, setSavedFiles] = React.useState([]);
@@ -253,26 +253,57 @@ setChatMessages(sortedMessages);
 
 
  const handleKeyPress = async (event) => {
-    if (event.key === 'Enter' && !isTimeoutActive && userData && chatRoom) {
-      console.log('Message value:', message);
-      setMessage('');
-      setIsTimeoutActive(true);
-        setScroll(true)
+  if (event.key === 'Enter' && !isTimeoutActive && userData && chatRoom) {
+    console.log('Message value:', message);
+    setMessage('');
+    setIsTimeoutActive(true);
+    setScroll(true);
 
-      try {
-        // Create a new message using GraphQL mutation
+    try {
+      // Check if there are files to upload
+      if (savedFiles.length > 0) {
+        // Upload each file to S3 storage
+        console.log("Multiple files")
+        const filePromises = savedFiles.map(async (file, index) => {
+          const fileName = `chatRooms/${chatRoom.id}/${userData.id}-${Date.now()}-${index}-${file.name}`;
+          await Storage.put(fileName, file, {
+            level: 'protected', // Adjust the level according to your requirements
+          });
+          return fileName;
+        });
+        // Wait for all uploads to complete
+        const fileUrls = await Promise.all(filePromises);
+        console.log("FILE URLS ",fileUrls)
+
+        // Create a new message with imageContent using GraphQL mutation
         const createMessageResponse = await API.graphql(
           graphqlOperation(mutations.createMessage, {
             input: {
               textContent: message,
-              sender: userData?.id,
-              senderName: userData?.name,
-              chatRoomId: chatRoom?.id,
+              sender: userData.id,
+              senderName: userData.name,
+              chatRoomId: chatRoom.id,
+              imageContent: JSON.stringify(fileUrls), // Add the file URLs to imageContent
             },
           })
         );
-        console.log('New Message Created:', createMessageResponse.data.createMessage);
 
+        console.log('New Message Created:', createMessageResponse.data.createMessage);
+      } else {
+        // Create a new message with only textContent
+        const createMessageResponse = await API.graphql(
+          graphqlOperation(mutations.createMessage, {
+            input: {
+              textContent: message,
+              sender: userData.id,
+              senderName: userData.name,
+              chatRoomId: chatRoom.id,
+            },
+          })
+        );
+
+        console.log('New Message Created:', createMessageResponse.data.createMessage);
+        }
         // Fetch and update the messages after creating a new one
        
 
@@ -281,7 +312,7 @@ setChatMessages(sortedMessages);
 
         setTimeout(() => {
           setIsTimeoutActive(false);
-
+          setSavedFiles([])
         }, 1000); // Adjust the timeout duration as needed
       } catch (error) {
         console.error('Error creating message:', error);
@@ -298,13 +329,20 @@ const toggleSettings = () =>{
 }
 
 const handleDeleteMessage = async (id, sender) => {
-  setScroll(false)
-  console.log(JSON.parse(chatRoom.participants)[0][userData.id].permissions)
-  const isAdmin = JSON.parse(chatRoom.participants)[0][userData.id].permissions == "admin"
-  if (userData.id === sender || isAdmin) {
-    console.log("Deleting message with id:", id, " by sender:", sender);
+  setScroll(false);
+  const isAdmin = JSON.parse(chatRoom.participants)[0][userData.id].permissions === 'admin';
 
+  if (userData.id === sender || isAdmin) {
     try {
+      // Retrieve the message to obtain imageContent
+      const response = await API.graphql(
+        graphqlOperation(queries.getMessage, {
+          id: id,
+        })
+      );
+
+      const message = response.data.getMessage;
+
       // Delete the message using GraphQL mutation
       await API.graphql(
         graphqlOperation(mutations.deleteMessage, {
@@ -315,7 +353,21 @@ const handleDeleteMessage = async (id, sender) => {
       );
 
       // Update the state to remove the deleted message
-      setChatMessages((prevMessages) => prevMessages.filter((message) => message.id !== id));
+      setChatMessages((prevMessages) => prevMessages.filter((msg) => msg.id !== id));
+
+      // Delete associated files from storage
+      if (message && message.imageContent) {
+        const imagePaths = JSON.parse(message.imageContent);
+        await Promise.all(
+          imagePaths.map(async (imagePath) => {
+            const imgKey = imagePath.split('/').pop(); // Get the key of the image from the path
+            await Storage.remove(imagePath, {
+              level: 'protected',
+              identityId: identityId,
+            });
+          })
+        );
+      }
     } catch (error) {
       console.error('Error deleting message:', error);
     }
@@ -445,19 +497,21 @@ const handleDeleteImage = (index) => {
     }}>
           {/* MESSAGES GO HERE */}
           {chatMessages.slice(-50).map((message) => (
-  <Grid container key={message.id} direction={message.isUser ? 'row-reverse' : 'row'} justifyContent={message.isUser ? 'flex-end' : 'flex-start'} alignItems="center">
-    <Grid item xs={0.4}>
-      <Avatar sx={{ marginLeft: message.isUser ? '30%' : '50%' }} src={message.imgUrl} />
-    </Grid>
-    <Grid item xs={11}>
-    
-       <ChatMessage
+            <ChatMessage
             isAdmin = {JSON.parse(chatRoom.participants)[0][userData.id].permissions == "admin" || message.sender == userData.id}
             message={message}
             onDelete={handleDeleteMessage} // Replace with your actual delete message logic
+            identityId={identityId}
           />
-    </Grid>
-  </Grid>
+  // <Grid container key={message.id} direction={message.isUser ? 'row-reverse' : 'row'} justifyContent={message.isUser ? 'flex-end' : 'flex-start'} alignItems="center">
+  //   <Grid item xs={0.4}>
+  //     <Avatar sx={{ marginLeft: message.isUser ? '30%' : '50%' }} src={message.imgUrl} />
+  //   </Grid>
+  //   <Grid item xs={11}>
+    
+       
+  //   </Grid>
+  // </Grid>
 ))}
 
 
@@ -468,7 +522,7 @@ const handleDeleteImage = (index) => {
 
 
                 {/* INPUT */}
-<Grid item xs={12} sx={{ position: "relative", justifyContent: "center", borderTop: '1px solid #bbb' }}>
+<Grid item xs={12} sx={{ position: "relative", justifyContent: "center", borderTop: '1px solid #bbb',backgroundColor:"#eee" }}>
 
 <Grid container>
   {savedFiles.length > 0 && (

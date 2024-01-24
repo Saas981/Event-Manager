@@ -53,6 +53,7 @@ function App({ signOut}) {
   const [user, setUser] = React.useState(null);
   const [userEmail, setUserEmail] = React.useState(null);
  const [userData, setUserData]= React.useState(null)
+ const [identityId,setIdentityId] = React.useState(null)
 
 
 
@@ -103,13 +104,17 @@ function App({ signOut}) {
   useEffect(() => {
     const currentAuthenticatedUser = async () => {
       try {
+        const credentials = await Auth.currentUserCredentials();
+
+
         const userDetails = await Auth.currentAuthenticatedUser();
-        console.dir( userDetails);
+       
         //console.log(`The userId: ${userId}`);
         //console.log(`The signInDetails: ${JSON.stringify(signInDetails)}`);
        // console.log(name)
        setUser(userDetails.username)
        setUserEmail(userDetails.attributes.email)
+       setIdentityId(credentials.identityId)
       } catch (err) {
         console.log(err);
       }
@@ -238,7 +243,7 @@ function App({ signOut}) {
                             <Route path="/unauthorized" element={<UnauthorizedPage theme={theme}/>}/>
 
               <Route path='*' element={<ErrorPage theme={theme}/>}  />
-                         <Route path="/event/:eventId" element={<EventDashboard theme={theme} userId={user} userData={userData}/>} />
+                         <Route path="/event/:eventId" element={<EventDashboard theme={theme} userId={user} userData={userData} identityId={identityId}/>} />
 
              <Route path="/edit/:eventId" element={<EditEvent  userData={userData}/>} />
               {/* <Route path="/profile/:username" element={<Profile theme={theme}/>}/> */}

@@ -1,7 +1,9 @@
-import React, { useState } from 'react';
+import React, { useState,useEffect } from 'react';
 import { Typography, IconButton,Box } from '@mui/material';
+import { Container, Grid, List, ListItem, ListItemAvatar, Avatar, ListItemText, FormControl } from '@mui/material';
 import DeleteIcon from '@mui/icons-material/Delete';
 import { styled } from '@mui/joy';
+import { Storage } from 'aws-amplify';
 
 const StyledMessage = styled('div')(({ isUser }) => ({
   display: 'flex',
@@ -25,16 +27,59 @@ const StyledMessage = styled('div')(({ isUser }) => ({
   },
 }));
 
-const ChatMessage = ({ message, onDelete,isAdmin }) => {
+
+
+const ChatMessage = ({ message, onDelete,isAdmin,identityId }) => {
   const [isHovered, setIsHovered] = useState(false);
+  const [imageElements, setImageElements] = useState(null);
+
+    useEffect(() => {
+    const fetchImages = async () => {
+      if (message.imageContent && message.imageContent.length > 0) {
+        const imagePaths = JSON.parse(message.imageContent);
+        const images = await Promise.all(
+          imagePaths.map(async (imagePath, index) => {
+            console.log("IMAGE URL ",imagePath)
+            console.log("IDENTITY ID ",identityId)
+            const imgUrl = await Storage.get(imagePath,{
+  level: 'protected',
+  identityId: identityId // the identityId of that user
+});
+            const file = await fetch(imgUrl).then((res) => res.blob());
+
+            return (
+              <img
+                key={index}
+                src={URL.createObjectURL(file)}
+                alt={`Image ${index + 1}`}
+                style={{ maxWidth: '100%', maxHeight: '200px', borderRadius: '10px', margin: '0px 1%' }}
+              />
+            );
+          })
+        );
+
+        setImageElements(images);
+      }
+    };
+
+    fetchImages();
+  }, [message.imageContent]);
+  
 
   return (
-    <StyledMessage
-      key={message.id}
-      isUser={message.isUser}
-      onMouseEnter={() => setIsHovered(true)}
-      onMouseLeave={() => setIsHovered(false)}
-    >
+    <>
+
+     <Grid container key={message.id} direction={message.isUser ? 'row-reverse' : 'row'} justifyContent={message.isUser ? 'flex-end' : 'flex-start'} alignItems="center">
+      <Grid item xs={0.4}>
+        <Avatar sx={{ marginLeft: message.isUser ? '30%' : '50%' }} src={message.imgUrl} />
+      </Grid>
+      <Grid item xs={11}>
+  <StyledMessage
+        key={message.id}
+        isUser={message.isUser}
+        onMouseEnter={() => setIsHovered(true)}
+        onMouseLeave={() => setIsHovered(false)}
+        >
       {message.isUser ? (
         <>
     <Box sx={{ position: "relative", width: "100%",display:"flex",alignItems:"flex-start",flexDirection:"column" }}>
@@ -147,8 +192,57 @@ const ChatMessage = ({ message, onDelete,isAdmin }) => {
         </>
       )}
 
-   
+
+
     </StyledMessage>
+
+      </Grid>
+    
+
+      </Grid>
+
+         {imageElements &&(
+     <Grid container sx={{marginTop:"-5.1%"}} direction={message.isUser ? 'row-reverse' : 'row'} justifyContent={message.isUser ? 'flex-end' : 'flex-start'} alignItems="center">
+             <Grid item xs={0.4}>
+        {/* <Avatar sx={{ marginLeft: message.isUser ? '30%' : '50%' }} src={message.imgUrl} /> */}
+      </Grid>
+      <Grid item xs={11}>
+<StyledMessage sx={{}}
+        key={message.id}
+        isUser={message.isUser}
+        onMouseEnter={() => setIsHovered(true)}
+        onMouseLeave={() => setIsHovered(false)}
+        >
+     {imageElements && imageElements.length > 0 && (
+        <>
+          {imageElements.map((imgElement, index) => (
+        <Box sx={{ display: 'flex', flexDirection: 'row', flexWrap: 'wrap', }}>
+        
+            <div key={index} style={{ margin: '0px 1%' }}>
+              {imgElement}
+            </div>
+          
+        </Box>
+        ))}
+        </>
+      )}
+         </StyledMessage>
+      </Grid>
+        
+            </Grid>
+
+    )}
+
+
+
+
+
+
+
+
+      
+          
+    </>
   );
 };
 

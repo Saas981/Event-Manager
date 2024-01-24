@@ -7,7 +7,7 @@ import * as mutations from '../graphql/mutations';
 import * as queries from '../graphql/queries';
 import { Storage } from 'aws-amplify';
 
-const EventDashboard = ({ theme, userData }) => {
+const EventDashboard = ({ theme, userData,identityId }) => {
   const { eventId } = useParams();
   const [chatRoom, setChatRoom] = useState(null);
   const [eventDetails, setEventDetails]= useState(null)
@@ -15,7 +15,7 @@ const EventDashboard = ({ theme, userData }) => {
 
 
   useEffect(() => {
-   
+    
     const fetchOrCreateChatRoomObject = async () => {
       try {
         //Check if event exists
@@ -135,7 +135,7 @@ const EventDashboard = ({ theme, userData }) => {
       {/* ChatRoom component */}
       <Grid container spacing={2} style={{ marginTop: '-3%',width:"100%" }}>
         <Grid item xs={12}>
-          <ChatRoom userData={userData} theme={theme} chatRoom={chatRoom}/>
+          <ChatRoom userData={userData} theme={theme} chatRoom={chatRoom} identityId={identityId}/>
         </Grid>
       </Grid>
     </Container>
