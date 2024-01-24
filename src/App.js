@@ -219,7 +219,7 @@ function App({ signOut}) {
             direction="column"
             justifyContent="center"
             alignItems="center"
-            style={{ paddingTop: '9%', }}
+            style={{ paddingTop: '8%', }}
             
           >
             <Routes>

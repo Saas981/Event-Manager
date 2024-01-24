@@ -111,7 +111,7 @@ const Navbar = ({ user,setTheme,theme,userData }) => {
   style={{
     opacity: 1,
       background: `linear-gradient(to right, ${theme.palette.primary.main}, ${theme.palette.secondary.main})`,
-    
+    padding:"0.5%",
     borderRadius: 0,
   }}
 >       <Container>

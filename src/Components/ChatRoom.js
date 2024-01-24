@@ -10,18 +10,23 @@ import * as mutations from "../graphql/mutations"
 import * as subscriptions from "../graphql/subscriptions"
 import Select from '@mui/joy/Select';
 import SecurityRoundedIcon from '@mui/icons-material/SecurityRounded';
+import DeleteIcon from '@mui/icons-material/Delete';
 import Option from '@mui/joy/Option';
 import ChatMessage from './ChatMessage';
 import IconButton from '@mui/joy/IconButton';
 import Uploader from './ChatUploader';
 import AttachFileIcon from '@mui/icons-material/AttachFile';
+import Snackbar from '@mui/joy/Snackbar';
+import ErrorOutlineSharpIcon from '@mui/icons-material/ErrorOutlineSharp';
+
 
 
 const ChatRoom = ({ userData, theme, chatRoom }) => {
   const containerRef = useRef(null);
   const [showImageUploader,setShowImageUploader] = useState(false);
   const [savedFiles, setSavedFiles] = React.useState([]);
-
+    const [snackbarOpen, setSnackbarOpen] = useState(false);
+    const [snackbarMessage,setSnackbarMessage] = useState("An error occured")
   const [chatMessages, setChatMessages] = useState([]);
   const [pushMessage,setPushMessage] = useState()
   const [characters,setCharacters] = useState(250);
@@ -44,11 +49,36 @@ const ChatRoom = ({ userData, theme, chatRoom }) => {
   // Add more gradient mappings as needed
 };
 
+const MAX_FILE_COUNT = 16;
+const MAX_FILE_SIZE_MB = 8;
+const isFileSizeValid = (file) => file.size / (1024 * 1024) <= MAX_FILE_SIZE_MB;
+
 
 const handleFileUpload = (e) => {
-  const newFiles = Array.from(e.target.files);
-  setSavedFiles([...savedFiles, ...newFiles]);
+  const selectedFiles = Array.from(e.target.files);
+
+  // Check if the total file count is within limits
+  if (savedFiles.length + selectedFiles.length > MAX_FILE_COUNT) {
+    // Display an error message or take appropriate action
+    console.error('Exceeded maximum file count.');
+    return;
+  }
+
+  // Check if each file size is within limits
+  if (selectedFiles.some((file) => !isFileSizeValid(file))) {
+    // Display an error message or take appropriate action
+    console.error('Some files exceed the maximum size limit.');
+   setSnackbarMessage("That file exceeds the maximum size limit of 8MB")
+   setSnackbarOpen(true)
+    return;
+  }
+
+  // Add valid files to savedFiles state
+  setSavedFiles((prevFiles) => [...prevFiles, ...selectedFiles]);
 };
+
+// Function to display remaining file count
+const remainingFileCount = MAX_FILE_COUNT - savedFiles.length;
 
 const handlePaste = (e) => {
   const items = e.clipboardData.items;
@@ -296,6 +326,11 @@ const handleDeleteMessage = async (id, sender) => {
   }
 };
 
+const handleDeleteImage = (index) => {
+  const newSavedFiles = [...savedFiles];
+  newSavedFiles.splice(index, 1);
+  setSavedFiles(newSavedFiles);
+};
 
 
 
@@ -433,23 +468,76 @@ const handleDeleteMessage = async (id, sender) => {
 
 
                 {/* INPUT */}
-<Grid item xs={12} sx={{ position: "relative", justifyContent:"center" }}>
+<Grid item xs={12} sx={{ position: "relative", justifyContent: "center", borderTop: '1px solid #bbb' }}>
 
 <Grid container>
-  <Grid item xs={12} sx={{ marginBottom: "-3%", padding: "16px", justifyContent:"center",alignItems:"center" }}>
-   
-      <Box sx={{ backgroundColor: "#efefef", width: "95%", borderRadius: "10px", padding: "8px", marginBottom: "8px" }}>
-        {savedFiles && savedFiles.map((file, index) => (
-        <img
-         key={index}
-          src={URL.createObjectURL(file)}
-          alt={`Uploaded ${index + 1}`}
-          style={{ maxWidth: '100%', maxHeight: '60px', borderRadius: '10px',margin:"0px 1%" }}
-        />
-         ))}
+  {savedFiles.length > 0 && (
+    <Grid item xs={12} sx={{ marginBottom: "-3%", padding: "12px", justifyContent: "center", alignItems: "center",width:"100%",
+ }}>
+      <Box sx={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'center', alignItems: 'center' }}>
+        {savedFiles.map((file, index) => (
+          <Box
+            key={index}
+            sx={{
+              position: 'relative',
+              marginRight: '1%',
+              marginBottom: '8px',
+              overflow: 'hidden',
+              '&:hover img': { transform: 'scale(1.2)' },
+              '&:hover button': { transform: 'scale(2.2)' },
+              borderRadius: '10px',
+            }}
+          >
+            <img
+              src={URL.createObjectURL(file)}
+              alt={`Uploaded ${index + 1}`}
+              style={{ maxWidth: '100%', maxHeight: '60px', borderRadius: '10px', transition: 'transform 0.2s' }}
+            />
+            <IconButton
+              color="neutral"
+              sx={{
+                width: '100%',
+                position: 'absolute',
+                top: '20%',
+                right: '3%',
+                backgroundColor: 'rgba(245, 245, 245)',
+                padding: '0px',
+                borderRadius: '50%',
+                transform: 'scale(0)',
+                transition: 'transform 0.2s',
+                opacity: "0.6",
+              }}
+              onClick={() => handleDeleteImage(index)}
+            >
+              <DeleteIcon sx={{ fontSize: "12px" }} />
+            </IconButton>
+          </Box>
+        ))}
       </Box>
-   
-  </Grid>
+      {/* Display remaining file count */}
+      <Box
+  sx={{
+    width: "95%",
+    margin:"auto",
+    marginTop:"0px",
+    padding: 'auto',
+    textAlign: 'center', // Align on the right side
+  }}
+>
+  <Typography
+    variant="caption"
+    sx={{
+      color: remainingFileCount > 0 ? '#8BC34A' : '#FF8A80',fontFamily:'Inter' // Lighter green and red colors
+    }}
+  >
+    {MAX_FILE_COUNT-remainingFileCount}/{MAX_FILE_COUNT} files
+  </Typography>
+</Box>
+
+  
+    </Grid>
+  )}
+
   <Grid item xs={12} sx={{ position: "relative" }} onPaste={handlePaste}>
     <StyledInput
       fullWidth
@@ -500,8 +588,31 @@ const handleDeleteMessage = async (id, sender) => {
            
            
           </div>
+
+
         </Grid>
       </Grid>
+
+      <Snackbar
+        variant="soft"
+        color="danger"
+        autoHideDuration={3000}
+        open={snackbarOpen}
+        anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
+        startDecorator={<ErrorOutlineSharpIcon />}
+        endDecorator={
+          <Button
+            onClick={() => setSnackbarOpen(false)}
+            size="sm"
+            variant="soft"
+            color="danger"
+          >
+            Dismiss
+          </Button>
+        }
+      >
+        {snackbarMessage}
+      </Snackbar>
     </Container>
   );
 };
