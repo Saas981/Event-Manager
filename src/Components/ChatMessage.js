@@ -2,6 +2,8 @@ import React, { useState,useEffect } from 'react';
 import { Typography, IconButton,Box } from '@mui/material';
 import { Container, Grid, List, ListItem, ListItemAvatar, Avatar, ListItemText, FormControl } from '@mui/material';
 import DeleteIcon from '@mui/icons-material/Delete';
+import { Link as BlueLink } from '@mui/material';
+
 import { styled } from '@mui/joy';
 import Backdrop from '@mui/material/Backdrop';
 import { Storage } from 'aws-amplify';
@@ -70,6 +72,39 @@ const ChatMessage = ({ message, onDelete,isAdmin,identityId }) => {
   }, [message.imageContent]);
   
 
+   const renderContent = () => {
+    // Check if textContent looks like a URL
+    const isLink = /^(https?|ftp):\/\/[^\s/$.?#].[^\s]*$/.test(message.textContent);
+
+    if (isLink) {
+      // If it's a link, render a blue link component
+      return (
+        <BlueLink href={message.textContent} target="_blank" rel="noopener noreferrer">
+          {message.textContent}
+        </BlueLink>
+      );
+    } else {
+      // If it's not a link, render regular text
+      return (
+        <Typography
+          sx={{
+            marginLeft: '5px',
+            marginRight: '5px',
+            fontFamily: 'Poppins',
+            fontWeight: '500',
+            alignSelf: 'flex-start',
+            textAlign: 'left',
+            whiteSpace: 'break-spaces',
+          }}
+        >
+          {message.textContent}
+        </Typography>
+      );
+    }
+  };
+
+
+
   return (
     <>
 
@@ -100,18 +135,7 @@ const ChatMessage = ({ message, onDelete,isAdmin,identityId }) => {
     {message.senderName}
   </Typography>
   
-          <Typography sx={{
-            marginLeft: '5px',
-            marginRight:"5px",
-            fontFamily: "Poppins",
-            fontWeight: "500",
-            alignSelf:"flex-start",
-            textAlign:"left",
-            whiteSpace: 'break-spaces',
-           
-          }}>
-            {message.textContent}
-          </Typography>
+          {renderContent()}
          
           </Box>
            {1==1 && (
