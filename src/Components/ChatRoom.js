@@ -183,7 +183,7 @@ setChatMessages(sortedMessages);
 
   useEffect(()=>{
    // console.log("SUBSCRIPTION CRETED")
-          const subscription = API.graphql(
+          const subscription1 = API.graphql(
       graphqlOperation(subscriptions.onCreateMessage, { chatRoomId: chatRoom?.id })
     ).subscribe({
       next: (messageData) => {
@@ -196,7 +196,23 @@ setChatMessages(sortedMessages);
       error: (error) => {
         console.error('Subscription error:', error);
       },
-    });
+    })
+    
+              const subscription2 = API.graphql(
+      graphqlOperation(subscriptions.onDeleteMessage, { chatRoomId: chatRoom?.id })
+    ).subscribe({
+      next: (messageData) => {
+        
+        // Update the state with the new message
+        const newMessage = messageData.value.data.onCreateMessage;
+                setPushMessage(newMessage)
+                
+      },
+      error: (error) => {
+        console.error('Subscription error:', error);
+      },
+    })
+
   },[])
 
   useEffect(()=>{
