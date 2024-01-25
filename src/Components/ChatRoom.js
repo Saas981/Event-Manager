@@ -227,7 +227,10 @@ setChatMessages(sortedMessages);
 
       }
   }
-
+  useEffect(() => {
+    // Scroll to the top of the page when the component mounts
+    window.scrollTo(0, 0);
+  }, []);
      useEffect(() => {
       if(scroll){
            scrollToBottom()
@@ -425,7 +428,7 @@ const handleDeleteImage = (index) => {
         <Grid item xs={8} >
           {/* Chat messages go here (static) */}
           
-          <StyledTypography variant="h6" sx={{position:"relative", display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+          <StyledTypography variant="h6" sx={{position:"relative", display: 'flex', alignItems: 'top', justifyContent: 'center' }}>
     {chatRoom ? (
       <span>{chatRoom.name}</span>
     ) : (
@@ -444,7 +447,7 @@ const handleDeleteImage = (index) => {
           {/* Display static messages */}
 
           {/* Text input bar */}
-          <div style={{ display: 'flex', alignItems: 'flex-end', borderRadius: '10px', backgroundColor: "#f8f8f8", minHeight: "500px" }}>
+          <div style={{ display: 'flex', alignItems: 'flex-end', borderRadius: '10px', backgroundColor: "#f8f8f8",height:"500px" }}>
            
            {/* SETTINGS BELOW */}
            {isSettings?(
@@ -472,9 +475,10 @@ const handleDeleteImage = (index) => {
            ):
            (
           // MESSAGES BELOW
-      <Grid container>
-            <Grid ref={containerRef} item xs={12} sx={{    background: background,
-    maxHeight: '450px',
+      <Grid container >
+        <div sx={{maxHeight:""}}>
+    <Grid ref={containerRef} item xs={12} sx={{    background: background,
+  height:savedFiles[0]?"300px":"400px",
     overflowY: 'auto',
      '&::-webkit-scrollbar': {
       width: '8px', // Set the width of the scrollbar
@@ -518,6 +522,8 @@ const handleDeleteImage = (index) => {
 
 
             </Grid>
+        </div>
+        
 
 
 
