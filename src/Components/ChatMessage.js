@@ -41,11 +41,9 @@ const ChatMessage = ({ message, onDelete,isAdmin,identityId }) => {
           imagePaths.map(async (imagePath, index) => {
             console.log("IMAGE URL ",imagePath)
             console.log("IDENTITY ID ",identityId)
-            const imgUrl = await Storage.get(imagePath,{
-  level: 'protected',
-  identityId: identityId // the identityId of that user
-});
+            const imgUrl = await Storage.get(imagePath);
             const file = await fetch(imgUrl).then((res) => res.blob());
+            console.log("IDENTITY ID ",imgUrl)
 
             return (
               <img

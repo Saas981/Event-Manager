@@ -270,7 +270,7 @@ setChatMessages(sortedMessages);
         const filePromises = savedFiles.map(async (file, index) => {
           const fileName = `chatRooms/${chatRoom.id}/${userData.id}-${Date.now()}-${index}-${file.name}`;
           await Storage.put(fileName, file, {
-            level: 'protected', // Adjust the level according to your requirements
+             contentType: "image/png",
           });
           return fileName;
         });
@@ -364,10 +364,7 @@ const handleDeleteMessage = async (id, sender) => {
         await Promise.all(
           imagePaths.map(async (imagePath) => {
             const imgKey = imagePath.split('/').pop(); // Get the key of the image from the path
-            await Storage.remove(imagePath, {
-              level: 'protected',
-              identityId: identityId,
-            });
+            await Storage.remove(imagePath);
           })
         );
       }
