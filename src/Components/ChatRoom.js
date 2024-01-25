@@ -458,7 +458,7 @@ const handleDeleteImage = (index) => {
           {/* Display static messages */}
 
           {/* Text input bar */}
-          <div style={{ display: 'flex', alignItems: 'flex-end', borderRadius: '10px', backgroundColor: "#f8f8f8",height:"500px" }}>
+          <div style={{ display: 'inline', alignItems: 'flex-end', borderRadius: '10px', backgroundColor: "#f8f8f8",height:"500px", width:"100%", }}>
            
            {/* SETTINGS BELOW */}
            {isSettings?(
@@ -486,10 +486,11 @@ const handleDeleteImage = (index) => {
            ):
            (
           // MESSAGES BELOW
-      <Grid container >
-        <div sx={{maxHeight:""}}>
+      <Grid container sx={{display: 'inline', width:"100%",}} >
+        <div sx={{ display: 'inline', width:"100%",}}>
     <Grid ref={containerRef} item xs={12} sx={{    background: background,
   height:savedFiles[0]?"300px":"400px",
+ 
     overflowY: 'auto',
      '&::-webkit-scrollbar': {
       width: '8px', // Set the width of the scrollbar
