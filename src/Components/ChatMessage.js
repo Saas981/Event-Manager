@@ -3,6 +3,7 @@ import { Typography, IconButton,Box } from '@mui/material';
 import { Container, Grid, List, ListItem, ListItemAvatar, Avatar, ListItemText, FormControl } from '@mui/material';
 import DeleteIcon from '@mui/icons-material/Delete';
 import { styled } from '@mui/joy';
+import Backdrop from '@mui/material/Backdrop';
 import { Storage } from 'aws-amplify';
 
 const StyledMessage = styled('div')(({ isUser }) => ({
@@ -32,27 +33,32 @@ const StyledMessage = styled('div')(({ isUser }) => ({
 const ChatMessage = ({ message, onDelete,isAdmin,identityId }) => {
   const [isHovered, setIsHovered] = useState(false);
   const [imageElements, setImageElements] = useState(null);
+  const [open, setOpen] = React.useState(false);
+  const [selectedImage, setSelectedImage] = useState(null);
 
-    useEffect(() => {
+  const handleClose = () => {
+    setOpen(false);
+  };
+
+  const handleOpen = (image) => {
+    setSelectedImage(image);
+    setOpen(true);
+  };
+
+
+  useEffect(() => {
     const fetchImages = async () => {
       if (message.imageContent && message.imageContent.length > 0) {
         const imagePaths = JSON.parse(message.imageContent);
         const images = await Promise.all(
           imagePaths.map(async (imagePath, index) => {
-            console.log("IMAGE URL ",imagePath)
-            console.log("IDENTITY ID ",identityId)
             const imgUrl = await Storage.get(imagePath);
             const file = await fetch(imgUrl).then((res) => res.blob());
-            console.log("IDENTITY ID ",imgUrl)
-
-            return (
-              <img
-                key={index}
-                src={URL.createObjectURL(file)}
-                alt={`Image ${index + 1}`}
-                style={{ maxWidth: '100%', maxHeight: '200px', borderRadius: '10px', margin: '0px 1%' }}
-              />
-            );
+            return {
+              index,
+              file,
+              imagePath,
+            };
           })
         );
 
@@ -214,13 +220,21 @@ const ChatMessage = ({ message, onDelete,isAdmin,identityId }) => {
      {imageElements && imageElements.length > 0 && (
         <>
           {imageElements.map((imgElement, index) => (
-        <Box sx={{ display: 'flex', flexDirection: 'row', flexWrap: 'wrap', }}>
-        
-            <div key={index} style={{ margin: '0px 1%' }}>
-              {imgElement}
-            </div>
-          
-        </Box>
+         <Box
+                key={imgElement.index}
+                style={{ margin: '0px 1%', cursor: 'pointer' }}
+                onClick={() => handleOpen(imgElement)}
+              >
+                <img
+                  src={URL.createObjectURL(imgElement.file)}
+                  alt={`Image ${imgElement.index + 1}`}
+                  style={{
+                    maxWidth: '100%',
+                    maxHeight: '200px',
+                    borderRadius: '10px',
+                  }}
+                />
+              </Box>
         ))}
         </>
       )}
@@ -232,7 +246,20 @@ const ChatMessage = ({ message, onDelete,isAdmin,identityId }) => {
     )}
 
 
-
+       {selectedImage && (
+       <Backdrop
+       sx={{ color: '#111', zIndex: (theme) => theme.zIndex.drawer + 1, backgroundColor: 'rgba(0, 0, 0, 0.7)' }}
+       open={open}
+       onClick={handleClose}
+     >
+       <img
+         src={URL.createObjectURL(selectedImage.file)}
+         alt={`Selected Image`}
+         style={{ maxWidth: '70%', maxHeight: '70%', borderRadius: '10px' }}
+       />
+     </Backdrop>
+     
+      )}
 
 
 
