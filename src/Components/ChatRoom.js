@@ -199,19 +199,17 @@ setChatMessages(sortedMessages);
     })
     
               const subscription2 = API.graphql(
-      graphqlOperation(subscriptions.onDeleteMessage, { chatRoomId: chatRoom?.id })
-    ).subscribe({
-      next: (messageData) => {
-        
-        // Update the state with the new message
-        const newMessage = messageData.value.data.onCreateMessage;
-                setPushMessage(newMessage)
-                
-      },
-      error: (error) => {
-        console.error('Subscription error:', error);
-      },
-    })
+     graphqlOperation(subscriptions.onDeleteMessage, { chatRoomId: chatRoom?.id })
+).subscribe({
+  next: (messageData) => {
+    // Update the state with the new message
+    const deletedMessage = messageData.value.data.onDeleteMessage;
+
+    // Use the filter method to remove the deleted message from the array
+    setChatMessages((prevMessages) => prevMessages.filter((message) => message.id !== deletedMessage.id));
+  },
+  // Handle errors or other subscription events if needed
+});
 
   },[])
 
