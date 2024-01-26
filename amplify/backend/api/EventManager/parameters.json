@@ -2,5 +2,11 @@
   "AppSyncApiName": "EventManager",
   "DynamoDBBillingMode": "PAY_PER_REQUEST",
   "DynamoDBEnableServerSideEncryption": false,
-  "AuthModeLastUpdated": "2024-01-16T16:37:46.778Z"
+  "AuthModeLastUpdated": "2024-01-25T18:20:12.503Z",
+  "AuthCognitoUserPoolId": {
+    "Fn::GetAtt": [
+      "authEventManager",
+      "Outputs.UserPoolId"
+    ]
+  }
 }

@@ -19,7 +19,14 @@ const EventDashboard = ({ theme, userData,identityId }) => {
     const fetchOrCreateChatRoomObject = async () => {
       try {
         //Check if event exists
-         const { data } = await API.graphql(graphqlOperation(queries.getEvent, { id: eventId }));
+        const { data } = await API.graphql({
+          query: queries.getEvent,
+          variables: {
+            id: eventId,
+          },
+          authMode: 'AMAZON_COGNITO_USER_POOLS', // Specify the authentication mode
+        });
+        
         if (!data.getEvent) { 
                    //   console.log("NO EVENT EXISTS")
 
@@ -50,22 +57,30 @@ const EventDashboard = ({ theme, userData,identityId }) => {
         setEventDetails(moddedData);
 
         // Check if the chat room exists
-        const listChatRoomsResponse = await API.graphql(
-          graphqlOperation(queries.listChatRooms, {
+        const listChatRoomsResponse = await API.graphql({
+          query: queries.listChatRooms,
+          variables: {
             filter: {
               eventId: { eq: eventId },
             },
-          })
-        );
+          },
+          authMode: 'AMAZON_COGNITO_USER_POOLS', // Specify the authentication mode
+        });
+        
 
         const chatRooms = listChatRoomsResponse.data.listChatRooms.items;
         //  console.log("CHART OOTMSMSS ",chatRooms)
         if (chatRooms.length > 0) {
           // Chat room exists, retrieve the first one
           const existingChatRoomId = chatRooms[0].id;
-          const getChatRoomResponse = await API.graphql(
-            graphqlOperation(queries.getChatRoom, { id: existingChatRoomId })
-          );
+          const getChatRoomResponse = await API.graphql({
+            query: queries.getChatRoom,
+            variables: {
+              id: existingChatRoomId,
+            },
+            authMode: 'AMAZON_COGNITO_USER_POOLS', // Specify the authentication mode
+          });
+          
 
 
     const existingChatRoom = getChatRoomResponse.data.getChatRoom;
@@ -75,14 +90,17 @@ const EventDashboard = ({ theme, userData,identityId }) => {
   if (JSON.stringify(existingChatRoom.participants) !== JSON.stringify(moddedData.participants)) {
     // Participants are different, update the chat room
     try {
-      const updateChatRoomResponse = await API.graphql(
-        graphqlOperation(mutations.updateChatRoom, {
+      const updateChatRoomResponse = await API.graphql({
+        query: mutations.updateChatRoom,
+        variables: {
           input: {
             id: existingChatRoomId,
             participants: moddedData.participants,
           },
-        })
-      );
+        },
+        authMode: 'AMAZON_COGNITO_USER_POOLS', // Specify the authentication mode
+      });
+      
 
       const updatedChatRoom = updateChatRoomResponse.data.updateChatRoom;
       console.log('Chat Room Updated:', updatedChatRoom);
@@ -103,9 +121,14 @@ const EventDashboard = ({ theme, userData,identityId }) => {
             participants:moddedData?.participants,
           };
 
-          const createChatRoomResponse = await API.graphql(
-            graphqlOperation(mutations.createChatRoom, { input: newChatRoomInput })
-          );
+          const createChatRoomResponse = await API.graphql({
+            query: mutations.createChatRoom,
+            variables: {
+              input: newChatRoomInput,
+            },
+            authMode: 'AMAZON_COGNITO_USER_POOLS', // Specify the authentication mode
+          });
+          
 
           const newChatRoom = createChatRoomResponse.data.createChatRoom;
           console.log('New Chat Room Created:', newChatRoom);

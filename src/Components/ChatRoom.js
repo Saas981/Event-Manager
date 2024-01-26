@@ -149,12 +149,15 @@ console.log("USER RETRIEVED000000000000000", Object.keys(participantsArray[0]))
 
 
 
-          const messagesResponse = await API.graphql(
-            graphqlOperation(queries.listMessages, {
+          const messagesResponse = await API.graphql({
+            query: queries.listMessages,
+            variables: {
               filter: { chatRoomId: { eq: chatRoom.id } },
               limit: 100, // Adjust the limit as needed
-            })
-          );
+            },
+            authMode: 'AMAZON_COGNITO_USER_POOLS', // Specify the authentication mode
+          });
+          
 
             const fetchedMessages = messagesResponse.data.listMessages.items.map((message) => {
           const participant = usersWithImgUrl.find((p) => p.id === message.sender);
@@ -183,9 +186,11 @@ setChatMessages(sortedMessages);
 
   useEffect(()=>{
    // console.log("SUBSCRIPTION CRETED")
-          const subscription1 = API.graphql(
-      graphqlOperation(subscriptions.onCreateMessage, { chatRoomId: chatRoom?.id })
-    ).subscribe({
+         const subscription1 = API.graphql({
+  query: subscriptions.onCreateMessage,
+  variables: { chatRoomId: chatRoom?.id },
+  authMode: 'AMAZON_COGNITO_USER_POOLS', // Specify the authentication mode
+}).subscribe({
       next: (messageData) => {
         
         // Update the state with the new message
@@ -198,9 +203,11 @@ setChatMessages(sortedMessages);
       },
     })
     
-              const subscription2 = API.graphql(
-     graphqlOperation(subscriptions.onDeleteMessage, { chatRoomId: chatRoom?.id })
-).subscribe({
+             const subscription2 = API.graphql({
+  query: subscriptions.onDeleteMessage,
+  variables: { chatRoomId: chatRoom?.id },
+  authMode: 'AMAZON_COGNITO_USER_POOLS', // Specify the authentication mode
+}).subscribe({
   next: (messageData) => {
     // Update the state with the new message
     const deletedMessage = messageData.value.data.onDeleteMessage;
@@ -293,8 +300,9 @@ setChatMessages(sortedMessages);
         console.log("FILE URLS ",fileUrls)
 
         // Create a new message with imageContent using GraphQL mutation
-        const createMessageResponse = await API.graphql(
-          graphqlOperation(mutations.createMessage, {
+        const createMessageResponse = await API.graphql({
+          query: mutations.createMessage,
+          variables: {
             input: {
               textContent: message,
               sender: userData.id,
@@ -302,22 +310,27 @@ setChatMessages(sortedMessages);
               chatRoomId: chatRoom.id,
               imageContent: JSON.stringify(fileUrls), // Add the file URLs to imageContent
             },
-          })
-        );
+          },
+          authMode: 'AMAZON_COGNITO_USER_POOLS', // Specify the authentication mode
+        });
+        
 
         console.log('New Message Created:', createMessageResponse.data.createMessage);
       } else {
         // Create a new message with only textContent
-        const createMessageResponse = await API.graphql(
-          graphqlOperation(mutations.createMessage, {
+        const createMessageResponse = await API.graphql({
+          query: mutations.createMessage,
+          variables: {
             input: {
               textContent: message,
               sender: userData.id,
               senderName: userData.name,
               chatRoomId: chatRoom.id,
             },
-          })
-        );
+          },
+          authMode: 'AMAZON_COGNITO_USER_POOLS', // Specify the authentication mode
+        });
+        
 
         console.log('New Message Created:', createMessageResponse.data.createMessage);
         }
@@ -352,22 +365,27 @@ const handleDeleteMessage = async (id, sender) => {
   if (userData.id === sender || isAdmin) {
     try {
       // Retrieve the message to obtain imageContent
-      const response = await API.graphql(
-        graphqlOperation(queries.getMessage, {
+      const response = await API.graphql({
+        query: queries.getMessage,
+        variables: {
           id: id,
-        })
-      );
-
+        },
+        authMode: 'AMAZON_COGNITO_USER_POOLS', // Specify the authentication mode
+      });
+      
       const message = response.data.getMessage;
 
       // Delete the message using GraphQL mutation
-      await API.graphql(
-        graphqlOperation(mutations.deleteMessage, {
+      await API.graphql({
+        query: mutations.deleteMessage,
+        variables: {
           input: {
             id: id,
           },
-        })
-      );
+        },
+        authMode: 'AMAZON_COGNITO_USER_POOLS', // Specify the authentication mode
+      });
+      
 
       // Update the state to remove the deleted message
       setChatMessages((prevMessages) => prevMessages.filter((msg) => msg.id !== id));

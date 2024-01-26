@@ -27,8 +27,14 @@ const JoinEventPage = ({ user, theme }) => {
   useEffect(() => {
     const fetchEventDetails = async () => {
       try {
-        const { data } = await API.graphql(graphqlOperation(getEvent, { id: eventId }));
-        if (!data.getEvent) { 
+        const { data } = await API.graphql({
+          query: getEvent,
+          variables: {
+            id: eventId,
+          },
+          authMode: 'AMAZON_COGNITO_USER_POOLS', // Specify the authentication mode
+        });
+                if (!data.getEvent) { 
           window.location.href="/Error404"
           
           
@@ -103,6 +109,7 @@ const JoinEventPage = ({ user, theme }) => {
             participants: JSON.stringify(updatedEventDetails.participants),
           },
         },
+        authMode: 'AMAZON_COGNITO_USER_POOLS',
       });
 
       console.log('Event updated:', updateEventResponse);
@@ -145,6 +152,7 @@ const JoinEventPage = ({ user, theme }) => {
             participants: JSON.stringify(updatedEventDetails.participants),
           },
         },
+        authMode: 'AMAZON_COGNITO_USER_POOLS',
       });
 
       console.log('Event updated:', updateEventResponse);

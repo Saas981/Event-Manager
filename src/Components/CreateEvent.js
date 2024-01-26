@@ -86,6 +86,7 @@ const openSnackbar = (message) => {
 
        const createEventResponse = await API.graphql({ 
          query: mutations.createEvent,
+          authMode: 'AMAZON_COGNITO_USER_POOLS',
          variables: {
            input: updatedEventDetails,
          }
@@ -115,6 +116,7 @@ setTimeout(() => {
   const handleNext = () => {
     if (activeStep === 0) {
       handleChange("participants",`[ { "${userId}": { "permissions": "admin" } } ]`)
+      handleChange("organizer",`${userData?.username}`)
 
       // Check if title and organizer are provided before moving to the next step
       if (!eventDetails.title) {

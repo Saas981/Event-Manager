@@ -22,11 +22,20 @@ const Dashboard = ({ userId, theme }) => {
 
   const fetchEvents = async () => {
     try {
-      const { data } = await API.graphql(graphqlOperation(listEvents));
+      const { data } = await API.graphql({
+      query: listEvents,
+      authMode: 'AMAZON_COGNITO_USER_POOLS', // Specify the authentication mode
+    });
 
       let moddedData = data.listEvents.items.filter((event) => {
         const participants = JSON.parse(event.participants);
-        return participants[0].hasOwnProperty(userId);
+        if(participants){
+            return participants[0]?.hasOwnProperty(userId);
+        }
+        else{
+          return null;
+        }
+      
       });
 
       moddedData = await Promise.all(
@@ -55,8 +64,14 @@ const Dashboard = ({ userId, theme }) => {
 
   const checkAdminStatus = async () => {
     try {
-      const response = await API.graphql(graphqlOperation(getEvent, { id: "admin" }));
-      const adminDetails = response.data.getEvent;
+      const response = await API.graphql({
+        query: getEvent,
+        variables: {
+          id: "admin",
+        },
+        authMode: 'AMAZON_COGNITO_USER_POOLS', // Specify the authentication mode
+      });
+            const adminDetails = response.data.getEvent;
       const adminParticipants = JSON.parse(adminDetails.participants);
 
       setIsAdmin(adminParticipants[0].hasOwnProperty(userId) && adminParticipants[0][userId]["permissions"] === "admin");
@@ -72,7 +87,16 @@ const Dashboard = ({ userId, theme }) => {
 
   const handleDelete = async (eventId,imageName) => {
     try {
-      const response = await API.graphql(graphqlOperation(deleteEvent, { input: { id: eventId } }));
+      const response = await API.graphql({
+        query: deleteEvent,
+        variables: {
+          input: {
+            id: eventId,
+          },
+        },
+        authMode: 'AMAZON_COGNITO_USER_POOLS', // Specify the authentication mode
+      });
+      
       const fileResponse = await Storage.remove(imageName);
       console.log('Event deleted successfully:', response);
       fetchEvents();
@@ -83,7 +107,14 @@ const Dashboard = ({ userId, theme }) => {
 
   const handleLeave = async (eventId) => {
     try {
-      const response = await API.graphql(graphqlOperation(getEvent, { id: eventId }));
+      const response = await API.graphql({
+        query: getEvent,
+        variables: {
+          id: eventId,
+        },
+        authMode: 'AMAZON_COGNITO_USER_POOLS', // Specify the authentication mode
+      });
+      
       const eventDetails = response.data.getEvent;
 
       let participants = JSON.parse(eventDetails.participants);
@@ -104,6 +135,7 @@ const Dashboard = ({ userId, theme }) => {
                 participants: JSON.stringify(participants),
               },
             },
+            authMode: 'AMAZON_COGNITO_USER_POOLS',
           });
 
           console.log('Left the event:', updateEventResponse);

@@ -55,7 +55,14 @@ const [snackbarMessage, setSnackbarMessage] = useState('');
   useEffect(() => {
     const fetchEventDetails = async () => {
       try {
-        const { data } = await API.graphql(graphqlOperation(getEvent, { id: eventId }));
+        const { data } = await API.graphql({
+          query: getEvent,
+          variables: {
+            id: eventId,
+          },
+          authMode: 'AMAZON_COGNITO_USER_POOLS', // Specify the authentication mode
+        });
+        
         if (!data.getEvent) { 
           window.location.href="/Error404"
           
@@ -165,6 +172,7 @@ const [snackbarMessage, setSnackbarMessage] = useState('');
         variables: {
           input: updatedEventDetails,
         },
+        authMode: 'AMAZON_COGNITO_USER_POOLS',
       });
   
       console.log("Event updated successfully:", updateEventResponse);
