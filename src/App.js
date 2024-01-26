@@ -123,7 +123,7 @@ function App({ signOut}) {
                   console.log("WINDOW HREF ",window.location.href)
 
                   const notAllowedPaths = ["/dashboard", "/create", "/event", "/join", "/edit"];
-                  if (notallowedPaths.includes(window.location.pathname)) {
+                  if (notAllowedPaths.includes(window.location.pathname)) {
                     window.location.href = '/login';
                   }
                   
