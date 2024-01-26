@@ -35,10 +35,10 @@ const EventDashboard = ({ theme, userData,identityId }) => {
 
            const participants = JSON.parse(data.getEvent.participants);
         //Check if the user is a participant
-    if (userData && !participants[0].hasOwnProperty(userData?.id)) {
+    if (userData && (!participants[0].hasOwnProperty(userData?.id) || participants[0][userData?.id]["permissions"]=="waitlist") ){
                  // console.log("NOT PARTICIAPNT")
 
-          window.location.href = "/Error404";
+          window.location.href = "/unauthorized";
         }
         //console.log("------IS PARTIICPANTS")
 

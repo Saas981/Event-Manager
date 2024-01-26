@@ -70,13 +70,14 @@ const [snackbarMessage, setSnackbarMessage] = useState('');
         }
         
         const participants = JSON.parse(data.getEvent.participants);
-        console.log("PARTICIAPNTS ",participants[0].hasOwnProperty(userId))
-        console.log("USERID ",userId)
+        console.log("PARTICIAPNTS ",(participants[0][userData.id]["permissions"]!="admin"))
+        console.log("USERID ",userData.id)
         
-        if(userId){
+        if(userData){
             
                  // window.location.href="/unauthorized"
-            if (participants[0][userId]["permissions"]!="admin") {
+            if (participants[0][userData.id]["permissions"]!="admin") {
+              console.log("REDIERECTING IN 1 2 3")
                window.location.href = "/unauthorized";
             }
 
