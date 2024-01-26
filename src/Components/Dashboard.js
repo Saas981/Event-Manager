@@ -20,6 +20,10 @@ const Dashboard = ({ userId, theme }) => {
   const [events, setEvents] = useState([]);
   const [isAdmin, setIsAdmin] = useState(false);
 
+
+  
+
+
   const fetchEvents = async () => {
     try {
       const { data } = await API.graphql({

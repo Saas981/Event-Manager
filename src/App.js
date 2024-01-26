@@ -112,10 +112,21 @@ function App({ signOut}) {
         //console.log(`The userId: ${userId}`);
         //console.log(`The signInDetails: ${JSON.stringify(signInDetails)}`);
        // console.log(name)
+       console.log("ABC USER DETAILS ",userDetails)
+      //  if(!userDetails){
+        
+      //  }
        setUser(userDetails.username)
        setUserEmail(userDetails.attributes.email)
        setIdentityId(credentials.identityId)
       } catch (err) {
+                  console.log("WINDOW HREF ",window.location.href)
+
+                  const notAllowedPaths = ["/dashboard", "/create", "/event", "/join", "/edit"];
+                  if (notallowedPaths.includes(window.location.pathname)) {
+                    window.location.href = '/login';
+                  }
+                  
         console.log(err);
       }
     };
