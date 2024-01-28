@@ -83,32 +83,47 @@ const Search = ({userData,setUserData}) => {
   };
 
 
-  const handleAddFriend = (userId) =>{
+  const handleAddFriend = async (userId) =>{
     console.log(" firend id",userId)
     console.log("EXSTING friends ",JSON.parse(userData?.friends)[0][userId])
-      let friends = JSON.parse(userData?.friends);
+    let friends = JSON.parse(userData?.friends);
 
+    const notificationInput = {
+      sender: userData?.id,
+      recepient: userId,
+      type: 'FRIEND_REQUEST', // You can define other types as needed
+      message: `You have a new friend request from ${userData.username}.`,
+      status: 'UNREAD', // Set initial status
+      other: null, // Additional data if needed
+    };
 
-      friends[0][userId] = { status:"friend" };
+    // Call the createNotification mutation
+    const createNotificationResponse = await API.graphql({
+      query: mutations.createNotification,
+      variables: { input: notificationInput },
+      authMode: 'AMAZON_COGNITO_USER_POOLS', // Ensure proper authentication
+    });
+
+    //   friends[0][userId] = { status:"friend" };
      
-          setUserData((prevUserData) => ({
-      ...prevUserData,
-      friends: JSON.stringify(friends),
-    }));
+    // setUserData((prevUserData) => ({
+    //   ...prevUserData,
+    //   friends: JSON.stringify(friends),
+    // }));
   }
 
     const handleRemoveFriend = (userId) =>{
     console.log(" firend id",userId)
     console.log("EXSTING friends ",userData?.friends)
-      let friends = JSON.parse(userData?.friends);
+    //   let friends = JSON.parse(userData?.friends);
 
 
-      friends[0][userId] = { status:"oldFriend" };
+    //   friends[0][userId] = { status:"oldFriend" };
      
-          setUserData((prevUserData) => ({
-      ...prevUserData,
-      friends: JSON.stringify(friends),
-    }));
+    //       setUserData((prevUserData) => ({
+    //   ...prevUserData,
+    //   friends: JSON.stringify(friends),
+    // }));
   }
 
 

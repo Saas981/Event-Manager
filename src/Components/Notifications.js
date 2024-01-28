@@ -1,19 +1,160 @@
-import React from 'react';
-import { Container, Typography, Paper } from '@mui/material';
+import React, { useEffect, useState } from 'react';
+import { Container, Typography, Paper,  IconButton } from '@mui/material';
+import { API, graphqlOperation } from 'aws-amplify';
+import { Button } from '@mui/joy';
+import { listNotifications } from '../graphql/queries';
+import NotificationsIcon from '@mui/icons-material/Notifications';
+import PersonAddRoundedIcon from '@mui/icons-material/PersonAddRounded';
+import CheckIcon from '@mui/icons-material/Check';
+import ClearIcon from '@mui/icons-material/Clear';
+import * as mutations from '../graphql/mutations';
+import * as queries from '../graphql/queries'
 
-const NotificationsPage = () => {
+const NotificationsPage = ({ userData,setUserData }) => {
+  const [notifications, setNotifications] = useState([]);
+
+  useEffect(() => {
+    const fetchNotifications = async () => {
+      try {
+        if (userData?.id) {
+          const response = await API.graphql({
+            query: listNotifications,
+            variables: {
+              filter: { recepient: { eq: userData.id } },
+              limit: 100,
+            },
+            authMode: 'AMAZON_COGNITO_USER_POOLS',
+          });
+
+          setNotifications(response.data.listNotifications.items);
+        }
+      } catch (error) {
+        console.error('Error fetching notifications:', error);
+        // Handle error appropriately
+      }
+    };
+
+    fetchNotifications();
+  }, [userData]);
+
+  const handleAccept = async (senderId, notificationId) => {
+    try {
+        console.log("SENDER ID",senderId)
+      // Fetch the user data of the sender
+      const getUserResponse = await API.graphql(graphqlOperation(queries.getUser, { id: senderId }));
+      const senderData = getUserResponse.data.getUser;
+        console.log("THIS IS YOUR FRIEND ",getUserResponse)
+      // Update the sender's friends attribute
+      let senderFriends = JSON.parse(senderData?.friends);
+      senderFriends[0][userData?.id] = { status: "friend" };
+  
+      // Perform the update using the updateUser mutation
+      const updateSenderResponse = await API.graphql({
+        query: mutations.updateUser,
+        variables: {
+          input: {
+            id: senderId,
+            friends: JSON.stringify(senderFriends),
+            // Include any other fields you want to update
+          },
+        },
+      });
+  
+     console.log('Update sender response:', updateSenderResponse);
+  
+      // Update the current user's friends attribute
+      let currentUserFriends = JSON.parse(userData?.friends);
+      currentUserFriends[0][senderId] = { status: "friend" };
+            console.log("PAST USER FIRENDS ",JSON.parse(userData?.friends))
+
+      console.log("CURRENT USER FIRENDS ",currentUserFriends)
+      setUserData((prevUserData) => ({
+        ...prevUserData,
+        friends: JSON.stringify(currentUserFriends),
+      }));
+  
+      // Delete the notification
+        const deleteNotificationResponse = await API.graphql({
+      query: mutations.deleteNotification,
+      variables: {
+        input: {
+          id: notificationId,
+        },
+      },
+      authMode: 'AMAZON_COGNITO_USER_POOLS', // Specify the authentication mode
+    });
+  
+      console.log('Delete notification response:', deleteNotificationResponse);
+  
+      // Implement the logic to accept the friend request
+     console.log(`Updated Friend RESPONSE : ${updateSenderResponse}`);
+    } catch (error) {
+      console.error('Error accepting friend request:', error);
+      // Handle error appropriately
+    }
+  };
+  
+
+  const handleDecline = async (notificationId) => {
+    // Implement the logic to decline the friend request
+             const deleteNotificationResponse = await API.graphql({
+      query: mutations.deleteNotification,
+      variables: {
+        input: {
+          id: notificationId,
+        },
+      },
+      authMode: 'AMAZON_COGNITO_USER_POOLS', // Specify the authentication mode
+    });
+  
+      console.log('Delete notification response:', deleteNotificationResponse);
+    console.log(`Declined friend request with notificationId: ${notificationId}`);
+  };
+
   return (
     <Container sx={{ marginTop: '2rem' }}>
-      <Paper elevation={3} sx={{ borderRadius: '15px', padding: '2rem' }}>
-        <Typography variant="h5" sx={{ marginBottom: '1rem' }}>
-          Notifications
+      <Paper elevation={3} sx={{ borderRadius: '15px', padding: '2rem', backgroundColor: '#eee' }}>
+        <Typography variant="h5" sx={{ marginBottom: '1rem', display: 'flex', alignItems: 'center', fontFamily: 'Poppins' }}>
+          <NotificationsIcon sx={{ marginRight: '0.5rem' }} /> Notifications
         </Typography>
-        {/* Add your content here */}
-        <Typography>
-          Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam nec velit at justo
-          fermentum facilisis id quis leo. Ut venenatis elit quis ligula consectetur, in vulputate
-          purus iaculis. Donec efficitur volutpat justo, a consectetur libero cursus vel.
-        </Typography>
+
+        {notifications.map((notification) => (
+          <Paper
+            key={notification.id}
+            elevation={2}
+            sx={{ padding: '1rem', marginBottom: '1rem', borderRadius: '8px' }}
+          >
+            <Typography sx={{ fontFamily: 'Poppins' }}>
+              <PersonAddRoundedIcon sx={{ margin: 'auto', marginRight: '1%', fontSize: '24px' }} />
+              {notification.message}
+            </Typography>
+            {notification.type === 'FRIEND_REQUEST' && (
+              <div sx={{ display: 'flex', justifyContent: 'flex-end', marginTop: '0.5rem' }}>
+                <Button
+                 variant="soft"
+                  color="success"
+                  startIcon={<CheckIcon />}
+                  onClick={() => handleAccept(notification.sender,notification.id)}
+                >
+                  Accept
+                </Button>
+                <Button
+                  variant="soft"
+                  color="danger"
+                  startIcon={<ClearIcon />}
+                  onClick={() => handleDecline(notification.id)}
+                  sx={{ marginLeft: '1rem' }}
+                >
+                  Decline
+                </Button>
+              </div>
+            )}
+          </Paper>
+        ))}
+
+        {notifications.length === 0 && (
+          <Typography sx={{ color: 'gray' }}>No notifications available.</Typography>
+        )}
       </Paper>
     </Container>
   );

@@ -1,3 +1,13 @@
+type Notification @model @auth(rules: [{allow: private}]) {
+  id: ID!
+  sender: String
+  recepient: String
+  type: String
+  message: String
+  status: String
+  other: String
+}
+
 type User @model @auth(rules: [{allow: public}]) {
   id: ID!
   email: AWSEmail

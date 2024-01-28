@@ -249,7 +249,7 @@ function App({ signOut}) {
               <Route path="/create" element={<CreateEvent userId={user} userData={userData}/>} />
               <Route path="/join/:eventId" element={<JoinEventPage user={user}/>} />
               <Route path="/profile" element={<Profile userData={userData} theme={theme}/>}/>
-              <Route path="/notifications" element={<NotificationsPage userData={userData} theme={theme}/>}/>
+              <Route path="/notifications" element={<NotificationsPage userData={userData} setUserData={setUserData} theme={theme}/>}/>
 
                             <Route path="/unauthorized" element={<UnauthorizedPage theme={theme}/>}/>
 
