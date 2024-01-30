@@ -1,5 +1,5 @@
 
-import React, { useState } from 'react';
+import React, { useState,useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 import {
@@ -29,6 +29,8 @@ import '../Styles/Navbar.css';
 import { styled, alpha } from '@mui/material/styles';
 import SearchIcon from '@mui/icons-material/Search';
 import EmailIcon from '@mui/icons-material/Email';
+import { API, graphqlOperation } from 'aws-amplify';
+import { listNotifications } from '../graphql/queries';
 import Box from '@mui/material/Box';
 import InputBase from '@mui/material/InputBase';
 
@@ -50,6 +52,7 @@ const Navbar = ({ user,setTheme,theme,userData }) => {
   const [anchorEl, setAnchorEl] = React.useState(null);
   const [loading, setLoading] = useState(false); // Added loading state
   const [searchQuery, setSearchQuery] = useState('');
+  const [totalNotifications,setTotalNotifications] = useState(0)
   const navigate = useNavigate();
 
 
@@ -65,7 +68,32 @@ const Navbar = ({ user,setTheme,theme,userData }) => {
   };
 
 
+const fetchAndSetTotalNotifications = async () => {
+  try {
+    if (userData?.id) {
+      // Fetch notifications for the current user
+      const response = await API.graphql({
+        query: listNotifications,
+        variables: {
+          filter: { recepient: { eq: userData.id } },
+          limit: 100,
+        },
+        authMode: 'AMAZON_COGNITO_USER_POOLS', // Specify the authentication mode
+      });
 
+      // Update the total number of notifications
+      setTotalNotifications(response.data.listNotifications.items.length);
+    }
+  } catch (error) {
+    console.error('Error fetching notifications:', error);
+    // Handle error appropriately
+  }
+};
+
+// Call the function in useEffect
+useEffect(() => {
+  fetchAndSetTotalNotifications();
+}, [userData]);
 
 
   console.log("CURRENT USER ",user)
@@ -186,7 +214,9 @@ const Navbar = ({ user,setTheme,theme,userData }) => {
             />
           </Search>
               <IconButton className="nav-button" edge="start" color="inherit" component={Link} to="/notifications" sx={{marginRight:"1.5%"}}>
-                 <EmailIcon sx={{fontSize:"28px"}}/>
+              <Badge badgeContent={totalNotifications}  color='error'>
+                 <EmailIcon sx={{fontSize:"26px"}}/>
+                 </Badge>
             </IconButton>
 
         

@@ -115,15 +115,15 @@ const Search = ({userData,setUserData}) => {
     const handleRemoveFriend = (userId) =>{
     console.log(" firend id",userId)
     console.log("EXSTING friends ",userData?.friends)
-    //   let friends = JSON.parse(userData?.friends);
+      let friends = JSON.parse(userData?.friends);
 
 
-    //   friends[0][userId] = { status:"oldFriend" };
+      friends[0][userId] = { status:"oldFriend" };
      
-    //       setUserData((prevUserData) => ({
-    //   ...prevUserData,
-    //   friends: JSON.stringify(friends),
-    // }));
+          setUserData((prevUserData) => ({
+      ...prevUserData,
+      friends: JSON.stringify(friends),
+    }));
   }
 
 
