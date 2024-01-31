@@ -96,7 +96,7 @@ export const getEvent = /* GraphQL */ `
       organizer
       rating
       coverImage
-      status
+      private
       createdAt
       updatedAt
     }
@@ -122,7 +122,7 @@ export const listEvents = /* GraphQL */ `
         organizer
         rating
         coverImage
-        status
+        private
         createdAt
         updatedAt
       }

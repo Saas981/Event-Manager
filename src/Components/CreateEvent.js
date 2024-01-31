@@ -42,6 +42,7 @@ const CreateEvent = ({userId,theme,userData}) => {
     description: '',
     organizer: userData?.username,
     coverImage:'',
+    private: true,
   });
   const [snackbarOpen, setSnackbarOpen] = useState(false);
 const [snackbarMessage, setSnackbarMessage] = useState('');
@@ -318,7 +319,39 @@ const handleBlur = (field) => {
   <Grid item xs={12}>
     {/* Left side - Image upload */}
     <Grid container spacing={2}>
-      <Grid item xs={6} sx={{ color: '#bfa3ff' }}>
+      <Grid item xs={3} sx={{ color: '#bfa3ff' }}>
+      <FormControlLabel
+  labelPlacement="top"
+  color="#888888"
+  style={{
+    fontFamily: 'Poppins',
+    fontSize: '12px', // Added 'px' to specify the unit
+    marginBottom: '2px', // Changed 'mb' to 'marginBottom' for clarity
+    color: '#1f1f1f',
+  }}  control={
+    <PurpleSwitch
+      defaultChecked
+      size="large"
+      value={eventDetails.private}
+      onChange={(e) => handleChange('private', e.target.checked)}
+      color="default"
+    />
+  }
+  label={
+    <span
+      style={{
+        fontFamily: 'Poppins', // Set your desired font family
+        fontSize: '14px', // Set your desired font size
+      }}
+    >
+      Private
+    </span>
+  }
+/>
+
+               
+      </Grid>
+            <Grid item xs={4} sx={{ color: '#bfa3ff' }}>
         <FormControlLabel
          labelPlacement="top"
          color="#888888"
@@ -334,11 +367,21 @@ const handleBlur = (field) => {
               color="default"
             />
           }
-          label="Reoccuring"
+          label={
+            <span
+              style={{
+                fontFamily: 'Poppins', // Set your desired font family
+                fontSize: '14px', // Set your desired font size
+              }}
+            >
+              Reoccuring
+            </span>
+          }
        
         />
+               
       </Grid>
-      <Grid item xs={6}>
+      <Grid item xs={5}>
         <TextField
           label="Capacity"
           type="number"

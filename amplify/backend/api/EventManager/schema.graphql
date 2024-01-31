@@ -34,7 +34,7 @@ type Event @model @auth(rules: [{allow: private}]) {
   organizer: String
   rating: Float
   coverImage: String
-  status: String
+  private: String
 }
 
 type Message @model @auth(rules: [{allow: private}]) {

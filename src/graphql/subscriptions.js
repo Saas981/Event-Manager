@@ -121,7 +121,7 @@ export const onCreateEvent = /* GraphQL */ `
       organizer
       rating
       coverImage
-      status
+      private
       createdAt
       updatedAt
     }
@@ -142,7 +142,7 @@ export const onUpdateEvent = /* GraphQL */ `
       organizer
       rating
       coverImage
-      status
+      private
       createdAt
       updatedAt
     }
@@ -163,7 +163,7 @@ export const onDeleteEvent = /* GraphQL */ `
       organizer
       rating
       coverImage
-      status
+      private
       createdAt
       updatedAt
     }
