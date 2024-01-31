@@ -33,6 +33,7 @@ import { API, graphqlOperation } from 'aws-amplify';
 import { listNotifications } from '../graphql/queries';
 import Box from '@mui/material/Box';
 import InputBase from '@mui/material/InputBase';
+import { onCreateNotification } from '../graphql/subscriptions';
 
 const StyledBadge = styled(Badge)(({ theme }) => ({
   '& .MuiBadge-badge': {
@@ -57,7 +58,15 @@ const Navbar = ({ user,setTheme,theme,userData }) => {
 
 
   
+  useEffect(() => {
+    const currentHref = window.location.href;
 
+    if (currentHref.endsWith('/notifications')) {
+      console.log('You are on the /notifications page.');
+      setTotalNotifications(0)
+      // Add any additional logic you want to perform when on the /notifications page
+    }
+  }, [window.location.href]); 
 
 
 
@@ -72,6 +81,32 @@ const Navbar = ({ user,setTheme,theme,userData }) => {
     setSearchQuery('');
     navigate(`/search`);
   };
+
+  useEffect(() => {
+    if (userData?.id) {
+      const subscription = API.graphql({
+        query: onCreateNotification,
+        variables: { recepient: userData.id },
+        authMode: 'AMAZON_COGNITO_USER_POOLS', // Specify the authentication mode
+      }).subscribe({
+        next: () => {
+          // Increment the total number of notifications by 1 when a new notification is received
+          setTotalNotifications((prevTotal) => prevTotal + 1);
+        },
+        error: (error) => {
+          console.error('Error in notification subscription:', error);
+          // Handle error appropriately
+        },
+      });
+  
+      // Clean up the subscription when the component unmounts
+      return () => {
+        subscription.unsubscribe();
+      };
+    }
+  }, [userData]);
+  
+  
 
 
 const fetchAndSetTotalNotifications = async () => {

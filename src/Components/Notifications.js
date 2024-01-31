@@ -6,6 +6,7 @@ import { listNotifications } from '../graphql/queries';
 import { updateNotification } from '../graphql/mutations';
 import NotificationsIcon from '@mui/icons-material/Notifications';
 import PersonAddRoundedIcon from '@mui/icons-material/PersonAddRounded';
+import PrivacyTipIcon from '@mui/icons-material/PrivacyTip';
 import CheckIcon from '@mui/icons-material/Check';
 import ClearIcon from '@mui/icons-material/Clear';
 import * as mutations from '../graphql/mutations';
@@ -27,7 +28,12 @@ const NotificationsPage = ({ userData,setUserData }) => {
             authMode: 'AMAZON_COGNITO_USER_POOLS',
           });
 
-          setNotifications(response.data.listNotifications.items);
+             const sortedNotifications = response.data.listNotifications.items.sort((a, b) =>
+        new Date(b.createdAt) - new Date(a.createdAt)
+      );
+
+      setNotifications(sortedNotifications);
+
 
           // Update the status of fetched UNREAD notifications to READ
           if (response.data.listNotifications.items.length > 0) {
@@ -155,12 +161,24 @@ const NotificationsPage = ({ userData,setUserData }) => {
             elevation={2}
             sx={{ padding: '1rem', marginBottom: '1rem', borderRadius: '8px' }}
           >
-            <Typography sx={{ fontFamily: 'Poppins' }}>
-              <PersonAddRoundedIcon sx={{ margin: 'auto', marginRight: '1%', fontSize: '24px' }} />
-              {notification.message}
-            </Typography>
+<Typography
+  sx={{
+    fontFamily: 'Poppins',
+    display: 'flex',
+    alignItems: 'center',
+    marginBottom:"1%"
+  }}
+>
+  {notification.type === 'FRIEND_REQUEST' ? (
+    <PersonAddRoundedIcon sx={{ fontSize: '24px', marginRight: '1%' }} />
+  ) : (
+    <PrivacyTipIcon sx={{ fontSize: '24px', marginRight: '1%' }} />
+  )}
+  {notification.message}
+</Typography>
+
             {notification.type === 'FRIEND_REQUEST' && (
-              <div sx={{ display: 'flex', justifyContent: 'flex-end', marginTop: '0.5rem' }}>
+              <div sx={{ display: 'flex', justifyContent: 'flex-end', marginTop: '5%' }}>
                 <Button
                  variant="soft"
                   color="success"

@@ -6,7 +6,7 @@ import ModalClose from '@mui/joy/ModalClose';
 import  Button from "@mui/joy/Button"
 import Snackbar from '@mui/joy/Snackbar';
 import ErrorOutlineSharpIcon from '@mui/icons-material/ErrorOutlineSharp';
-
+import { notify } from '../Functions/notificationUtil';
 import Switch from '@mui/material/Switch';
 import ModalDialog from '@mui/joy/ModalDialog';
 import Input from '@mui/joy/Input';
@@ -48,6 +48,26 @@ const Settings = ({ themeType,setTheme,userData,setUserData,theme }) => {
     inputLabel: '',
     inputValue: '',
   });
+
+
+  const handleAccountDeletion =async  () =>{
+    
+  try {
+  
+
+    // Customize notification content based on your needs
+    const notificationMessage = `Someone Tried to Delete Your Account`;
+
+    // Use the createNotification function
+    await notify(userData.id, userData.id, "SYSTEM", notificationMessage, 'UNREAD', null);
+
+    console.log('Notification sent successfully.');
+  } catch (error) {
+    console.error('Error sending notification:', error);
+    // Handle the error as needed
+  }
+
+  }
 
   useEffect(() => {
     const fetchProfilePicture = async () => {
@@ -259,7 +279,7 @@ const Settings = ({ themeType,setTheme,userData,setUserData,theme }) => {
                  <Typography variant="body1" mb={3} sx={{ fontFamily: 'Poppins', textAlign: 'left', fontSize: '16px', lineHeight: '1.5' }}>
                   Are you sure that you want to delete your account? This will immediately log you out of your account and you will not be able to log in again.
                 </Typography>
-                <Button variant="soft" color="danger" size="lg" sx={{ width:"100%",borderRadius:"15px", fontFamily: 'Poppins', fontSize: '16px', padding: '10px 30px',backgroundColor: "#ffa3a4", '&:hover': { backgroundColor: "#FF6668" } }}>
+                <Button onClick={handleAccountDeletion} variant="soft" color="danger" size="lg" sx={{ width:"100%",borderRadius:"15px", fontFamily: 'Poppins', fontSize: '16px', padding: '10px 30px',backgroundColor: "#ffa3a4", '&:hover': { backgroundColor: "#FF6668" } }}>
                   Delete Account
                 </Button>
               </div>
