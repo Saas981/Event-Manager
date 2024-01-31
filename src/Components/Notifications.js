@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Container, Typography, Paper, Button, Grid } from '@mui/material';
+import { Container, Typography, Paper, Grid } from '@mui/material';
 import { API, graphqlOperation } from 'aws-amplify';
 import NotificationsIcon from '@mui/icons-material/Notifications';
 import PersonAddRoundedIcon from '@mui/icons-material/PersonAddRounded';
@@ -9,7 +9,7 @@ import ClearIcon from '@mui/icons-material/Clear';
 import DeleteIcon from '@mui/icons-material/Delete';
 import * as mutations from '../graphql/mutations';
 import * as queries from '../graphql/queries';
-
+import { Button } from '@mui/joy';
 const NotificationsPage = ({ userData, setUserData }) => {
   const [notifications, setNotifications] = useState([]);
 
@@ -123,20 +123,31 @@ const NotificationsPage = ({ userData, setUserData }) => {
   };
 
   const handleDecline = async (notificationId) => {
-    // Implement the logic to decline the friend request
-    const deleteNotificationResponse = await API.graphql({
-      query: mutations.deleteNotification,
-      variables: {
-        input: {
-          id: notificationId,
+    try {
+      // Implement the logic to decline the friend request
+      const deleteNotificationResponse = await API.graphql({
+        query: mutations.deleteNotification,
+        variables: {
+          input: {
+            id: notificationId,
+          },
         },
-      },
-      authMode: 'AMAZON_COGNITO_USER_POOLS', // Specify the authentication mode
-    });
-
-    console.log('Delete notification response:', deleteNotificationResponse);
-    console.log(`Declined friend request with notificationId: ${notificationId}`);
+        authMode: 'AMAZON_COGNITO_USER_POOLS',
+      });
+  
+      console.log('Delete notification response:', deleteNotificationResponse);
+      console.log(`Declined friend request with notificationId: ${notificationId}`);
+  
+      // Update state to remove the declined notification
+      setNotifications((prevNotifications) =>
+        prevNotifications.filter((notification) => notification.id !== notificationId)
+      );
+    } catch (error) {
+      console.error('Error declining friend request:', error);
+      // Handle error appropriately
+    }
   };
+  
 
   const handleClearAll = async () => {
     try {
@@ -215,10 +226,10 @@ const NotificationsPage = ({ userData, setUserData }) => {
             {notification.type === 'FRIEND_REQUEST' && (
               <div sx={{ display: 'flex', justifyContent: 'flex-end', marginTop: '5%' }}>
                 <Button
-                  variant="soft"
+                 variant="soft"
                   color="success"
                   startIcon={<CheckIcon />}
-                  onClick={() => handleAccept(notification.sender, notification.id)}
+                  onClick={() => handleAccept(notification.sender,notification.id)}
                 >
                   Accept
                 </Button>
