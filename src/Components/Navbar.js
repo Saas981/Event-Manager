@@ -56,6 +56,12 @@ const Navbar = ({ user,setTheme,theme,userData }) => {
   const navigate = useNavigate();
 
 
+  
+
+
+
+
+
     const handleSearch = () => {
     // Navigate to the search page with the current searchQuery
     navigate(`/search/${searchQuery}`);
@@ -73,14 +79,16 @@ const fetchAndSetTotalNotifications = async () => {
     if (userData?.id) {
       // Fetch notifications for the current user
       const response = await API.graphql({
-        query: listNotifications,
-        variables: {
-          filter: { recepient: { eq: userData.id } },
-          limit: 100,
+    query: listNotifications,
+    variables: {
+        filter: {
+            recepient: { eq: userData.id },
+            status: { eq: "UNREAD" } // Add this filter for status
         },
-        authMode: 'AMAZON_COGNITO_USER_POOLS', // Specify the authentication mode
-      });
-
+        limit: 100,
+    },
+    authMode: 'AMAZON_COGNITO_USER_POOLS',
+});
       // Update the total number of notifications
       setTotalNotifications(response.data.listNotifications.items.length);
     }

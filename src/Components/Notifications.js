@@ -3,6 +3,7 @@ import { Container, Typography, Paper,  IconButton } from '@mui/material';
 import { API, graphqlOperation } from 'aws-amplify';
 import { Button } from '@mui/joy';
 import { listNotifications } from '../graphql/queries';
+import { updateNotification } from '../graphql/mutations';
 import NotificationsIcon from '@mui/icons-material/Notifications';
 import PersonAddRoundedIcon from '@mui/icons-material/PersonAddRounded';
 import CheckIcon from '@mui/icons-material/Check';
@@ -20,13 +21,22 @@ const NotificationsPage = ({ userData,setUserData }) => {
           const response = await API.graphql({
             query: listNotifications,
             variables: {
-              filter: { recepient: { eq: userData.id } },
+              filter: { recepient: { eq: userData.id }},
               limit: 100,
             },
             authMode: 'AMAZON_COGNITO_USER_POOLS',
           });
 
           setNotifications(response.data.listNotifications.items);
+
+          // Update the status of fetched UNREAD notifications to READ
+          if (response.data.listNotifications.items.length > 0) {
+            const notificationIds = response.data.listNotifications.items.map(
+              (notification) => notification.id
+            );
+
+            await markNotificationsAsRead(notificationIds);
+          }
         }
       } catch (error) {
         console.error('Error fetching notifications:', error);
@@ -34,8 +44,29 @@ const NotificationsPage = ({ userData,setUserData }) => {
       }
     };
 
+    const markNotificationsAsRead = async (notificationIds) => {
+    for (const notificationId of notificationIds) {
+    try {
+      await API.graphql({
+        query: mutations.updateNotification,
+        variables: {
+          input: {
+            id: notificationId,
+            status: 'READ',
+          },
+        },
+        authMode: 'AMAZON_COGNITO_USER_POOLS',
+      });
+      console.log(`Notification with ID ${notificationId} updated successfully.`);
+    } catch (error) {
+      console.error(`Error updating notification with ID ${notificationId}:`, error);
+      // Handle the error as needed
+    }
+  }
+    };
+
     fetchNotifications();
-  }, [userData]);
+  }, [userData, setUserData]);
 
   const handleAccept = async (senderId, notificationId) => {
     try {
