@@ -1,10 +1,12 @@
 import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { Container, Typography, Button, Grid, Paper } from '@mui/material';
+import { Container, Typography, Button, Grid, Paper,Skeleton } from '@mui/material';
 import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
 import { styled } from '@mui/system';
 import { API, graphqlOperation } from 'aws-amplify';
 import { listEvents } from '../graphql/queries';
+import { Storage } from 'aws-amplify';
+
 
 const StyledPaper = styled(Paper)({
   padding: '30px',
@@ -22,7 +24,27 @@ const Home = () => {
         const response = await API.graphql(graphqlOperation(listEvents, {
           filter: { private: { eq: false } },
         }));
-        setEvents(response.data.listEvents.items);
+        let moddedData = response.data.listEvents.items
+
+        moddedData = await Promise.all(
+          moddedData.map(async (event) => {
+            if (event.coverImage) {
+              try {
+                const imgUrl = await Storage.get("eventCovers/"+event.coverImage);
+                const userIsAdmin = JSON.parse(event.participants)[0].userId === "admin";
+                const isWaitlisted = JSON.parse(event.participants)[0].userId === "admin";
+  
+                return { ...event, imgUrl, userIsAdmin, isWaitlisted };
+              } catch (error) {
+                console.error('Error fetching image URL:', error);
+              }
+            }
+  
+            return event;
+          })
+        );
+
+        setEvents(moddedData);
       } catch (error) {
         console.error('Error fetching events:', error);
         // Handle error appropriately
@@ -45,17 +67,27 @@ const Home = () => {
 
       <Grid container spacing={3} justifyContent="center">
         {events.map(event => (
+          <>
           <Grid item key={event.id} xs={12} md={4}>
             <Paper elevation={3} sx={{ padding: '30px', marginBottom: '20px', minHeight: '300px', borderRadius: '11px', transition: 'transform 0.3s, box-shadow 0.3s', '&:hover': { transform: 'scale(1.05)', boxShadow: 8 } }}>
               {/* Render event details here */}
-              <Typography variant="h6" sx={{ marginTop: '20px', color: '#000' }}>
+              
+              <Typography variant="h6" sx={{ marginTop: '0px', color: '#000',fontFamily:"Poppins" }}>
                 {event.title}
               </Typography>
-              <Typography variant="body2" color="textSecondary" sx={{ color: '#000' }}>
+              {event.imgUrl ? (
+                  <img src={event.imgUrl} alt="Event Cover" style={{ objectFit:"cover", alignSelf:"flex-end" ,  width: '90%',height:"200px", margin: "10px", borderRadius: '8px' }} />
+                ) : (
+                  <ImageSkeleton width={"50%"} sx={{ margin: "10px", borderRadius: '8px' }} animation="wave" variant="rectangular" />
+                )}
+              <Typography variant="body2" color="textSecondary" sx={{ color: '#000',fontFamily:"Poppins",backgroundColor:"#f8f8f8",borderRadius:"10px",padding:1 }}>
                 {event.description}
               </Typography>
+
             </Paper>
           </Grid>
+ 
+          </>
         ))}
       </Grid>
 
@@ -67,3 +99,10 @@ const Home = () => {
 };
 
 export default Home;
+
+
+const ImageSkeleton = styled(Skeleton)({
+  width: '100%',
+  height: '100px',
+  marginBottom: '20px',
+});
