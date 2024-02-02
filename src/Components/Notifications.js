@@ -6,12 +6,16 @@ import PersonAddRoundedIcon from '@mui/icons-material/PersonAddRounded';
 import PrivacyTipIcon from '@mui/icons-material/PrivacyTip';
 import CheckIcon from '@mui/icons-material/Check';
 import ClearIcon from '@mui/icons-material/Clear';
+import { Storage } from 'aws-amplify';
+import { getEvent } from '../graphql/queries';
+
 import DeleteIcon from '@mui/icons-material/Delete';
 import * as mutations from '../graphql/mutations';
 import * as queries from '../graphql/queries';
 import { Button } from '@mui/joy';
 const NotificationsPage = ({ userData, setUserData }) => {
   const [notifications, setNotifications] = useState([]);
+  const [load, setLoad] = React.useState(false);
 
   useEffect(() => {
     const fetchNotifications = async () => {
@@ -71,7 +75,7 @@ const NotificationsPage = ({ userData, setUserData }) => {
     fetchNotifications();
   }, [userData, setUserData]);
 
-  const handleAccept = async (senderId, notificationId) => {
+  const handleAcceptFriendRequest = async (senderId, notificationId) => {
     try {
       // Fetch the user data of the sender
       const getUserResponse = await API.graphql(graphqlOperation(queries.getUser, { id: senderId }));
@@ -136,7 +140,7 @@ const NotificationsPage = ({ userData, setUserData }) => {
       });
   
       console.log('Delete notification response:', deleteNotificationResponse);
-      console.log(`Declined friend request with notificationId: ${notificationId}`);
+      // console.log(`Declined friend request with notificationId: ${notificationId}`);
   
       // Update state to remove the declined notification
       setNotifications((prevNotifications) =>
@@ -177,6 +181,96 @@ const NotificationsPage = ({ userData, setUserData }) => {
     }
   };
 
+
+  const handleAcceptEventRequest = async (eventId, notificationId) =>{
+    try {
+      const { data } = await API.graphql({
+        query: getEvent,
+        variables: {
+          id: eventId,
+        },
+        authMode: 'AMAZON_COGNITO_USER_POOLS', // Specify the authentication mode
+      });
+              if (!data.getEvent) { 
+        window.location.href="/Error404"
+        
+        
+      }
+      const participants = JSON.parse(data.getEvent.participants);
+      
+      if (participants[0].hasOwnProperty(userData.id)) {
+        window.location.href = "/dashboard";
+      }
+      
+
+      let moddedData = data.getEvent;
+      console.log("Join Event Data", moddedData);
+
+      if (moddedData.coverImage) {
+        try {
+          const imgUrl = await Storage.get("eventCovers/"+moddedData.coverImage);
+          moddedData = { ...moddedData, imgUrl };
+        } catch (error) {
+          console.error('Error fetching image URL:', error);
+        }
+      }
+      const updatedEventDetails = { moddedData };
+      //Start from here
+      
+      setLoad(true);
+
+       
+
+      const currentParticipantsCount = Object.keys(participants[0]).length;
+      const eventCapacity = updatedEventDetails.capacity;
+
+      if (currentParticipantsCount >= eventCapacity) {
+        setLoad(false);
+        console.log("Event capacity is full. Cannot join.");
+        return;
+      }
+
+      participants[0][userData.id] = { permissions: 'view' };
+      updatedEventDetails.participants = participants;
+
+      const updateEventResponse = await API.graphql({
+        query: mutations.updateEvent,
+        variables: {
+          input: {
+            id: eventId,
+            participants: JSON.stringify(updatedEventDetails.participants),
+          },
+        },
+        authMode: 'AMAZON_COGNITO_USER_POOLS',
+      });
+
+      console.log('Event updated:', updateEventResponse);
+      const deleteNotificationResponse = await API.graphql({
+        query: mutations.deleteNotification,
+        variables: {
+          input: {
+            id: notificationId,
+          },
+        },
+        authMode: 'AMAZON_COGNITO_USER_POOLS', // Specify the authentication mode
+      });
+
+      console.log('Delete notification response:', deleteNotificationResponse);
+      setTimeout(() => {
+        setLoad(false);
+        // window.location.href = '/dashboard';
+      }, 2000);
+      
+
+
+
+    } catch (error) {
+      console.error('Error fetching event details:', error);
+    }
+  }
+
+
+
   return (
     <Container sx={{ marginTop: '2rem' }}>
       <Paper elevation={3} sx={{ borderRadius: '15px', padding: '2rem', backgroundColor: '#eee' }}>
@@ -201,51 +295,73 @@ const NotificationsPage = ({ userData, setUserData }) => {
           </Grid>
         </Grid>
 
-        {notifications.map((notification) => (
-          <Paper
-            key={notification.id}
-            elevation={2}
-            sx={{ padding: '1rem', marginBottom: '1rem', borderRadius: '8px' }}
-          >
-            <Typography
-              sx={{
-                fontFamily: 'Poppins',
-                display: 'flex',
-                alignItems: 'center',
-                marginBottom: '1%',
-              }}
-            >
-              {notification.type === 'FRIEND_REQUEST' ? (
-                <PersonAddRoundedIcon sx={{ fontSize: '24px', marginRight: '1%' }} />
-              ) : (
-                <PrivacyTipIcon sx={{ fontSize: '24px', marginRight: '1%' }} />
-              )}
-              {notification.message}
-            </Typography>
+       {notifications.map((notification) => (
+  <Paper
+    key={notification.id}
+    elevation={2}
+    sx={{ padding: '1rem', marginBottom: '1rem', borderRadius: '8px' }}
+  >
+    <Typography
+      sx={{
+        fontFamily: 'Poppins',
+        display: 'flex',
+        alignItems: 'center',
+        marginBottom: '1%',
+      }}
+    >
+      {notification.type === 'FRIEND_REQUEST' ? (
+        <PersonAddRoundedIcon sx={{ fontSize: '24px', marginRight: '1%' }} />
+      ) : (
+        <PrivacyTipIcon sx={{ fontSize: '24px', marginRight: '1%' }} />
+      )}
+      {notification.message}
+    </Typography>
 
-            {notification.type === 'FRIEND_REQUEST' && (
-              <div sx={{ display: 'flex', justifyContent: 'flex-end', marginTop: '5%' }}>
-                <Button
-                 variant="soft"
-                  color="success"
-                  startIcon={<CheckIcon />}
-                  onClick={() => handleAccept(notification.sender,notification.id)}
-                >
-                  Accept
-                </Button>
-                <Button
-                  variant="soft"
-                  color="danger"
-                  startIcon={<ClearIcon />}
-                  onClick={() => handleDecline(notification.id)}
-                  sx={{ marginLeft: '1rem' }}
-                >
-                  Decline
-                </Button>
-              </div>
-            )}
-          </Paper>
-        ))}
+    {notification.type === 'FRIEND_REQUEST' && (
+      <div sx={{ display: 'flex', justifyContent: 'flex-end', marginTop: '5%' }}>
+        <Button
+          variant="soft"
+          color="success"
+          startIcon={<CheckIcon />}
+          onClick={() => handleAcceptFriendRequest(notification.sender, notification.id)}
+        >
+          Accept
+        </Button>
+        <Button
+          variant="soft"
+          color="danger"
+          startIcon={<ClearIcon />}
+          onClick={() => handleDecline(notification.id)}
+          sx={{ marginLeft: '1rem' }}
+        >
+          Decline
+        </Button>
+      </div>
+    )}
+
+    {notification.type === 'EVENT_REQUEST' && (
+      <div sx={{ display: 'flex', justifyContent: 'flex-end', marginTop: '5%' }}>
+        <Button
+          variant="soft"
+          color="success"
+          startIcon={<CheckIcon />}
+          onClick={() => handleAcceptEventRequest(notification?.other, notification.id)}
+        >
+          Accept
+        </Button>
+        <Button
+          variant="soft"
+          color="danger"
+          startIcon={<ClearIcon />}
+          onClick={() => handleDecline(notification.id)}
+          sx={{ marginLeft: '1rem' }}
+        >
+          Decline
+        </Button>
+      </div>
+    )}
+  </Paper>
+))}
 
         {notifications.length === 0 && (
           <Typography sx={{ color: 'gray' }}>No notifications available.</Typography>

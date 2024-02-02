@@ -9,6 +9,7 @@ import Uploader from "./Uploader"
 import Snackbar from '@mui/joy/Snackbar';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import dayjs from 'dayjs';
+import { notify } from '../Functions/notificationUtil';
 
 import FormControlLabel from '@mui/material/FormControlLabel';
 import { alpha, styled } from '@mui/material/styles';
@@ -167,8 +168,12 @@ const openSnackbar = (message) => {
        });
       const thisEventId = createEventResponse.data.createEvent.id;
       setEventId(thisEventId)
-   
-
+      const notificationMessage = `You were Invited to Join this Event: ${updatedEventDetails.title} by ${userData?.name}`;
+       
+ for (const friendId of friendIds) {
+    // Use the createNotification function
+    await notify( userData.id,friendId, 'EVENT_REQUEST', notificationMessage, 'UNREAD', thisEventId);
+  }
 setTimeout(() => {
   // After 3 seconds, set createLoadButton to false and redirect to the dashboard
   setLoadCreateButton(false);
