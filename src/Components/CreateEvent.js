@@ -1,9 +1,15 @@
-import React, { useState } from 'react';
-import { Container, TextField, Grid, LinearProgress,Stack,Switch,IconButton } from '@mui/material';
+import React, { useState,useEffect } from 'react';
+import { Container, TextField, Grid, LinearProgress,Stack,Switch,IconButton,Autocomplete,Table,Paper,Avatar,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TableRow,  } from '@mui/material';
 import Uploader from "./Uploader"
 import Snackbar from '@mui/joy/Snackbar';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import dayjs from 'dayjs';
+
 import FormControlLabel from '@mui/material/FormControlLabel';
 import { alpha, styled } from '@mui/material/styles';
 import { purple } from '@mui/material/colors';
@@ -13,6 +19,7 @@ import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import FileCopyIcon from '@mui/icons-material/FileCopy';
 import { API, graphqlOperation } from 'aws-amplify';
 import * as mutations from '../graphql/mutations';
+import { listUsers } from '../graphql/queries';
 import Button from '@mui/joy/Button';
 import Modal from '@mui/joy/Modal';
 import ModalClose from '@mui/joy/ModalClose';
@@ -46,6 +53,72 @@ const CreateEvent = ({userId,theme,userData}) => {
   });
   const [snackbarOpen, setSnackbarOpen] = useState(false);
 const [snackbarMessage, setSnackbarMessage] = useState('');
+const [selectedFriends, setSelectedFriends] = useState([]);
+const friendOptions = [
+  { label: 'Friend 1', value: 'friend1' },
+  { label: 'Friend 2', value: 'friend2' },
+  { label: 'Friend 3', value: 'friend2' },
+  // Add more friends as needed
+];
+
+const [friendIds, setFriendIds] = useState([]);
+const [friendResults, setFriendResults] = useState([]);
+
+useEffect(() => {
+  // Ensure userData and friends are available before processing
+  if (userData && userData.friends) {
+    const friendsList = JSON.parse(userData.friends);
+
+    // Filter friends with status "friend"
+    const filteredFriendIds = Object.keys(friendsList[0]).filter(
+      (friendId) => friendsList[0][friendId].status === 'friend'
+    );
+
+    setFriendIds(filteredFriendIds);
+  }
+}, [userData]);
+
+useEffect(() => {
+  // Fetch users based on friendIds
+  const fetchFriends = async () => {
+    try {
+      const { data } = await API.graphql(graphqlOperation(listUsers, {
+        filter: {
+          or: friendIds.map(id => ({ id: { eq: id } }))
+        },
+        limit: 10
+      }));
+
+      const friends = data.listUsers.items;
+      const friendsWithImgUrl = await Promise.all(friends.map(async (friend) => {
+        if (friend.profilePicture) {
+          try {
+            const imgUrl = await Storage.get(friend.profilePicture);
+            return { ...friend, imgUrl };
+          } catch (error) {
+            console.error('Error fetching data:', error);
+            return friend; // Return the friend without imgUrl in case of an error
+          }
+        } else {
+          return friend; // Return the friend without imgUrl if profilePicture is not present
+        }
+      }));
+
+      setFriendResults(friendsWithImgUrl);
+    } catch (error) {
+      console.error('Error fetching friends:', error);
+    }
+  };
+
+  if (friendIds.length > 0) {
+    fetchFriends();
+  }
+}, [friendIds]);
+
+
+
+
+
 
   
 
@@ -112,7 +185,7 @@ setTimeout(() => {
 
   
 
-  const totalSteps =2;
+  const totalSteps =3;
 
   const handleNext = () => {
     if (activeStep === 0) {
@@ -173,7 +246,16 @@ const handleBlur = (field) => {
     openSnackbar("Please enter a number between 1 and 1024");
   }
 };
+const handleFriendSelection = (event, newValue) => {
+  setSelectedFriends(newValue);
+};
 
+// Function to handle adding friends to the list (you need to implement this)
+const handleAddFriendsToList = () => {
+  // Implement logic to add selectedFriends to your list
+  console.log('Adding friends to the list:', selectedFriends);
+  // Add your logic here to update your data model or state
+};
 
 
   const renderStepContent = (step) => {
@@ -421,81 +503,134 @@ const handleBlur = (field) => {
         );
       case 2:
         return(
-            <>
+          <>
+          {/* header */}
             <Box
-              sx={{
-                width: "auto",
-                backgroundColor: '#f4f4f4',
-                borderRadius: '10px',
-                borderBottomLeftRadius: '0px',
-                WebkitBorderBottomRightRadius: '0px',
-                padding: '25px',
-                paddingBottom: '30px',
-                background: "linear-gradient(to bottom right, rgba(74, 158, 226,0.6),rgba(90, 63, 192,0.6))",
-                boxShadow: '0 4px 10px rgba(0, 0, 0, 0.05)',
-                marginBottom: '10px',
-                margin: 'auto',
-              }}
-            >
-              <Typography level="h3" style={{ color: "#f8f8f8", fontWeight: "550", marginLeft: '10px', fontFamily: 'Poppins, sans-serif' }}>
-                Send Invitations
-              </Typography>
-            </Box>
-            <Grid container spacing={2} sx={{ padding: "24px", paddingTop: "0px", paddingBottom: "0px", margin: 'auto', }}>
-              <Grid item xs={12}>
-                <Typography variant="body1" sx={{ fontFamily: 'Poppins', mb: 2 }}>
-                  Share the following link with your attendees :
-                </Typography>
-              </Grid>
-              <Grid item xs={12}>
-                <TextField
-                  label="Invite Link"
-                  fullWidth
-                  value={`link/${eventId}`}  // Placeholder link
-                  sx={{ fontFamily: 'Poppins', mb: 2, width: '50%' }}
-                  InputProps={{
-                    endAdornment: (
-                      <IconButton aria-label="copy" onClick={() => navigator.clipboard.writeText(`${window.location.origin}/join/${eventId}`)}>
-                        <FileCopyIcon />
-                      </IconButton>
-                    ),
-                  }}
-                />
-              </Grid>
+    sx={{
+      width: "auto",
+      backgroundColor: '#f4f4f4',
+      borderRadius: '10px',
+      borderBottomLeftRadius: '0px',
+      WebkitBorderBottomRightRadius: '0px',
+      padding: '21px',
+      paddingBottom: '30px',
+      background: "linear-gradient(to bottom right, rgba(74, 158, 226,0.6),rgba(90, 63, 192,0.6))",
+      boxShadow: '0 4px 10px rgba(0, 0, 0, 0.05)',
+      marginBottom: '4px',
+    }}
+  >
+    <Typography level="h3" style={{ color: "#f8f8f8", fontWeight: "550", marginLeft: '10px', fontFamily: 'Inter' }}>
+      Add Participants
+    </Typography>
+  </Box>
+  {/* body */}
+          <Box p={3} bgcolor="#f0f0f0" borderRadius={16}> {/* Added margins, background color, and border radius */}
+          <Grid container spacing={0}>
+            <Grid item xs={12}>
+            <Autocomplete
+            multiple
+            id="friend-search"
+            options={friendResults}
+            getOptionLabel={(option) => option.name}
+            onChange={handleFriendSelection}
+            sx={{fontFamily:"Poppins"}}
+            renderInput={(params) => (
+              <TextField
+                {...params}
+                label="Search and add friends"
+                variant="outlined"
+                sx={{ fontFamily: 'Poppins' }} // Set the font to Poppins
+              />
+            )}
+          />
             </Grid>
-          </>
+  
+            <Grid item xs={12} mb={1} mt={2}>
+              {/* <Typography variant="h5" mb={1} mt={2} fontWeight="bold" sx={{fontFamily:"Poppins",fontSize:"16px"}}>
+                Your Participants
+              </Typography> */}
+              <TableContainer component={Paper} elevation={3} borderRadius={16} sx={{maxHeight:"200px", height:"200px",    overflowY: 'auto',
+     '&::-webkit-scrollbar': {
+      width: '8px', // Set the width of the scrollbar
+    },
+    '&::-webkit-scrollbar-thumb': {
+      backgroundColor: '#aaa', // Color of the thumb
+      borderRadius: '8px', // Radius of the thumb
+      marginRight:"4px",
+    },
+    '&::-webkit-scrollbar-track': {
+      backgroundColor: 'none', // Color of the track
+    },}}> {/* Improved styling for the table */}
+                <Table>
+                  <TableHead>
+                    <TableRow>
+                    
+                    </TableRow>
+                  </TableHead>
+                  <TableBody>
+                    {selectedFriends.map((friend) => (
+                      <TableRow key={friend.name} >
+                        <TableCell sx={{padding:'10px'}}>
+                          <Avatar  src={friend.imgUrl}/> {/* Add the actual source dynamically */}
+                        </TableCell>
+                        <TableCell sx={{padding:'10px',}}>
+                          <Typography variant="body1" sx={{textAlign:"left"}}>{friend.username}</Typography>
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              </TableContainer>
+            </Grid>
+          </Grid>
+        </Box>
+        </>
         )
         case 3:
             return(
-                <>
-                <Box
-                  sx={{
-                    width: "auto",
-                    backgroundColor: '#f4f4f4',
-                    borderRadius: '10px',
-                    borderBottomLeftRadius: '0px',
-                    WebkitBorderBottomRightRadius: '0px',
-                    padding: '25px',
-                    paddingBottom: '30px',
-                    background: "linear-gradient(to bottom right, rgba(74, 158, 226,0.6),rgba(90, 63, 192,0.6))",
-                    boxShadow: '0 4px 10px rgba(0, 0, 0, 0.05)',
-                    marginBottom: '10px',
-                    margin: 'auto',
-                  }}
-                >
-                  <Typography variant="h5" style={{ color: "#f8f8f8", fontWeight: "550", marginLeft: '10px', fontFamily: 'Poppins, sans-serif' }}>
-                    Create Event
+              <>
+              <Box
+                sx={{
+                  width: "auto",
+                  backgroundColor: '#f4f4f4',
+                  borderRadius: '10px',
+                  borderBottomLeftRadius: '0px',
+                  WebkitBorderBottomRightRadius: '0px',
+                  padding: '25px',
+                  paddingBottom: '30px',
+                  background: "linear-gradient(to bottom right, rgba(74, 158, 226,0.6),rgba(90, 63, 192,0.6))",
+                  boxShadow: '0 4px 10px rgba(0, 0, 0, 0.05)',
+                  marginBottom: '10px',
+                  margin: 'auto',
+                }}
+              >
+                <Typography level="h3" style={{ color: "#f8f8f8", fontWeight: "550", marginLeft: '10px', fontFamily: 'Poppins, sans-serif' }}>
+                  Send Invitations
+                </Typography>
+              </Box>
+              <Grid container spacing={2} sx={{ padding: "24px", paddingTop: "0px", paddingBottom: "0px", margin: 'auto', }}>
+                <Grid item xs={12}>
+                  <Typography variant="body1" sx={{ fontFamily: 'Poppins', mb: 2 }}>
+                    Share the following link with your attendees :
                   </Typography>
-                </Box>
-                <Grid container spacing={2} sx={{ padding: "24px", paddingTop: "0px", paddingBottom: "0px", margin: 'auto', }}>
-                  <Grid item xs={12}>
-                    <Typography variant="body1" sx={{ fontFamily: 'Poppins', mb: 2, fontSize:"24px" }}>
-                     Thats it!.
-                    </Typography>
-                  </Grid>
-             
                 </Grid>
-              </>
+                <Grid item xs={12}>
+                  <TextField
+                    label="Invite Link"
+                    fullWidth
+                    value={`link/${eventId}`}  // Placeholder link
+                    sx={{ fontFamily: 'Poppins', mb: 2, width: '50%' }}
+                    InputProps={{
+                      endAdornment: (
+                        <IconButton aria-label="copy" onClick={() => navigator.clipboard.writeText(`${window.location.origin}/join/${eventId}`)}>
+                          <FileCopyIcon />
+                        </IconButton>
+                      ),
+                    }}
+                  />
+                </Grid>
+              </Grid>
+            </>
             )
       default:
         return null;
