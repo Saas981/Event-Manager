@@ -42,6 +42,7 @@ export default function EventUpdateForm(props) {
     rating: "",
     coverImage: "",
     private: "",
+    categories: "",
   };
   const [title, setTitle] = React.useState(initialValues.title);
   const [startTime, setStartTime] = React.useState(initialValues.startTime);
@@ -59,6 +60,7 @@ export default function EventUpdateForm(props) {
   const [rating, setRating] = React.useState(initialValues.rating);
   const [coverImage, setCoverImage] = React.useState(initialValues.coverImage);
   const [private1, setPrivate1] = React.useState(initialValues.private);
+  const [categories, setCategories] = React.useState(initialValues.categories);
   const [errors, setErrors] = React.useState({});
   const resetStateValues = () => {
     const cleanValues = eventRecord
@@ -76,6 +78,7 @@ export default function EventUpdateForm(props) {
     setRating(cleanValues.rating);
     setCoverImage(cleanValues.coverImage);
     setPrivate1(cleanValues.private);
+    setCategories(cleanValues.categories);
     setErrors({});
   };
   const [eventRecord, setEventRecord] = React.useState(eventModelProp);
@@ -102,6 +105,7 @@ export default function EventUpdateForm(props) {
     rating: [],
     coverImage: [],
     private: [],
+    categories: [],
   };
   const runValidationTasks = async (
     fieldName,
@@ -158,6 +162,7 @@ export default function EventUpdateForm(props) {
           rating,
           coverImage,
           private: private1,
+          categories,
         };
         const validationResponses = await Promise.all(
           Object.keys(validations).reduce((promises, fieldName) => {
@@ -225,6 +230,7 @@ export default function EventUpdateForm(props) {
               rating,
               coverImage,
               private: private1,
+              categories,
             };
             const result = onChange(modelFields);
             value = result?.title ?? value;
@@ -262,6 +268,7 @@ export default function EventUpdateForm(props) {
               rating,
               coverImage,
               private: private1,
+              categories,
             };
             const result = onChange(modelFields);
             value = result?.startTime ?? value;
@@ -297,6 +304,7 @@ export default function EventUpdateForm(props) {
               rating,
               coverImage,
               private: private1,
+              categories,
             };
             const result = onChange(modelFields);
             value = result?.location ?? value;
@@ -332,6 +340,7 @@ export default function EventUpdateForm(props) {
               rating,
               coverImage,
               private: private1,
+              categories,
             };
             const result = onChange(modelFields);
             value = result?.reoccuring ?? value;
@@ -369,6 +378,7 @@ export default function EventUpdateForm(props) {
               rating,
               coverImage,
               private: private1,
+              categories,
             };
             const result = onChange(modelFields);
             value = result?.endTime ?? value;
@@ -404,6 +414,7 @@ export default function EventUpdateForm(props) {
               rating,
               coverImage,
               private: private1,
+              categories,
             };
             const result = onChange(modelFields);
             value = result?.participants ?? value;
@@ -443,6 +454,7 @@ export default function EventUpdateForm(props) {
               rating,
               coverImage,
               private: private1,
+              categories,
             };
             const result = onChange(modelFields);
             value = result?.capacity ?? value;
@@ -478,6 +490,7 @@ export default function EventUpdateForm(props) {
               rating,
               coverImage,
               private: private1,
+              categories,
             };
             const result = onChange(modelFields);
             value = result?.description ?? value;
@@ -513,6 +526,7 @@ export default function EventUpdateForm(props) {
               rating,
               coverImage,
               private: private1,
+              categories,
             };
             const result = onChange(modelFields);
             value = result?.organizer ?? value;
@@ -552,6 +566,7 @@ export default function EventUpdateForm(props) {
               rating: value,
               coverImage,
               private: private1,
+              categories,
             };
             const result = onChange(modelFields);
             value = result?.rating ?? value;
@@ -587,6 +602,7 @@ export default function EventUpdateForm(props) {
               rating,
               coverImage: value,
               private: private1,
+              categories,
             };
             const result = onChange(modelFields);
             value = result?.coverImage ?? value;
@@ -622,6 +638,7 @@ export default function EventUpdateForm(props) {
               rating,
               coverImage,
               private: value,
+              categories,
             };
             const result = onChange(modelFields);
             value = result?.private ?? value;
@@ -635,6 +652,42 @@ export default function EventUpdateForm(props) {
         errorMessage={errors.private?.errorMessage}
         hasError={errors.private?.hasError}
         {...getOverrideProps(overrides, "private")}
+      ></TextField>
+      <TextField
+        label="Categories"
+        isRequired={false}
+        isReadOnly={false}
+        value={categories}
+        onChange={(e) => {
+          let { value } = e.target;
+          if (onChange) {
+            const modelFields = {
+              title,
+              startTime,
+              location,
+              reoccuring,
+              endTime,
+              participants,
+              capacity,
+              description,
+              organizer,
+              rating,
+              coverImage,
+              private: private1,
+              categories: value,
+            };
+            const result = onChange(modelFields);
+            value = result?.categories ?? value;
+          }
+          if (errors.categories?.hasError) {
+            runValidationTasks("categories", value);
+          }
+          setCategories(value);
+        }}
+        onBlur={() => runValidationTasks("categories", categories)}
+        errorMessage={errors.categories?.errorMessage}
+        hasError={errors.categories?.hasError}
+        {...getOverrideProps(overrides, "categories")}
       ></TextField>
       <Flex
         justifyContent="space-between"

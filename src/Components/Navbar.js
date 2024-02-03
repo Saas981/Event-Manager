@@ -54,6 +54,7 @@ const Navbar = ({ user,setTheme,theme,userData }) => {
   const [loading, setLoading] = useState(false); // Added loading state
   const [searchQuery, setSearchQuery] = useState('');
   const [totalNotifications,setTotalNotifications] = useState(0)
+  const [notification,setNotification] = useState(null)
   const navigate = useNavigate();
 
 
@@ -91,7 +92,9 @@ const Navbar = ({ user,setTheme,theme,userData }) => {
       }).subscribe({
         next: () => {
           // Increment the total number of notifications by 1 when a new notification is received
-          setTotalNotifications((prevTotal) => prevTotal + 1);
+         //REPLACE THIS  setTotalNotifications((prevTotal) => prevTotal + 1);
+
+          fetchAndSetTotalNotifications()
         },
         error: (error) => {
           console.error('Error in notification subscription:', error);
