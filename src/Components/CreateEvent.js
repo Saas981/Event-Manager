@@ -55,12 +55,7 @@ const CreateEvent = ({userId,theme,userData}) => {
   const [snackbarOpen, setSnackbarOpen] = useState(false);
 const [snackbarMessage, setSnackbarMessage] = useState('');
 const [selectedFriends, setSelectedFriends] = useState([]);
-const friendOptions = [
-  { label: 'Friend 1', value: 'friend1' },
-  { label: 'Friend 2', value: 'friend2' },
-  { label: 'Friend 3', value: 'friend2' },
-  // Add more friends as needed
-];
+
 
 const [friendIds, setFriendIds] = useState([]);
 const [friendResults, setFriendResults] = useState([]);

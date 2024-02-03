@@ -1,7 +1,12 @@
 import React, { useState,useEffect } from 'react';
-import { Container, TextField, Grid, LinearProgress,Stack,Switch,IconButton } from '@mui/material';
+import { Container, TextField, Grid, LinearProgress,Stack,Switch,IconButton,Autocomplete,Table,Paper,Avatar,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TableRow,  } from '@mui/material';
 import Uploader from "./Uploader"
-import Snackbar from '@mui/joy/Snackbar';
+import CancelIcon from '@mui/icons-material/Cancel';import Snackbar from '@mui/joy/Snackbar';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import dayjs from 'dayjs';
 import { useParams } from 'react-router-dom';
@@ -14,8 +19,8 @@ import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import FileCopyIcon from '@mui/icons-material/FileCopy';
 import { API, graphqlOperation } from 'aws-amplify';
 import * as mutations from '../graphql/mutations';
-import { getEvent } from '../graphql/queries';
-
+import { getEvent,listUsers } from '../graphql/queries';
+import DeleteIcon from '@mui/icons-material/Delete'
 import Button from '@mui/joy/Button';
 import Modal from '@mui/joy/Modal';
 import ModalClose from '@mui/joy/ModalClose';
@@ -29,6 +34,7 @@ import { Storage } from 'aws-amplify';
 
 const EditEvent = ({userId,theme,userData}) => {
       const { eventId } = useParams();
+      const [usersToBeDeleted, setUsersToBeDeleted] = useState([]);
 
   const [activeStep, setActiveStep] = useState(0);
   const [progress, setProgress] = useState(0);
@@ -50,8 +56,94 @@ const EditEvent = ({userId,theme,userData}) => {
   });
   const [snackbarOpen, setSnackbarOpen] = useState(false);
 const [snackbarMessage, setSnackbarMessage] = useState('');
+const [selectedUsers, setSelectedUsers] = useState([]);
 
-  
+const [friendIds, setFriendIds]= useState([])
+const [participantIds, setParticipantIds]= useState([])
+const [userIds, setUserIds] = useState([]);
+const [userResults, setUserResults] = useState([]);
+
+const handleUserSelection = (event, newValue) => {
+  // Use Set to ensure uniqueness and filter out duplicates
+  const uniqueSelectedUsers = new Set([...selectedUsers, ...newValue]);
+
+  // Convert Set back to an array and update state
+  setSelectedUsers([...uniqueSelectedUsers]);
+
+  console.log("SELECTED USERS ", [...uniqueSelectedUsers]);
+};
+
+
+
+
+useEffect(() => {
+  // Ensure userData and friends are available before processing
+  if (userData && userData.friends) {
+    const friendsList = JSON.parse(userData.friends);
+
+    // Filter friends with status "friend"
+    const filteredFriendIds = Object.keys(friendsList[0]).filter(
+      (friendId) => friendsList[0][friendId].status === 'friend'
+    );
+      setFriendIds(filteredFriendIds)
+    // Update state using the previous state
+    setUserIds((prevUserIds) => {
+      // Use Set to ensure uniqueness and filter out duplicates
+      const uniqueUserIds = new Set([...prevUserIds, ...filteredFriendIds]);
+
+      // Convert Set back to an array
+      return [...uniqueUserIds];
+    });
+  }
+}, [userData]);
+
+
+
+useEffect(() => {
+  // Fetch users based on userIds
+  const fetchUsers = async () => {
+    try {
+      const { data } = await API.graphql(graphqlOperation(listUsers, {
+        filter: {
+          or: userIds.map(id => ({ id: { eq: id } }))
+        },
+        limit: 10
+      }));
+
+      const users = data.listUsers.items;
+      const usersWithImgUrl = await Promise.all(users.map(async (user) => {
+        if (user.profilePicture) {
+          try {
+            const imgUrl = await Storage.get(user.profilePicture);
+            return { ...user, imgUrl };
+          } catch (error) {
+            console.error('Error fetching data:', error);
+            return user; // Return the user without imgUrl in case of an error
+          }
+        } else {
+          return user; // Return the user without imgUrl if profilePicture is not present
+        }
+      }));
+
+      setUserResults(usersWithImgUrl);
+      const filteredUsersWithImgUrl = usersWithImgUrl.filter((user) => !friendIds.includes(user.id));
+
+      // Set the filtered array as the new state
+      setSelectedUsers(filteredUsersWithImgUrl)
+    } catch (error) {
+      console.error('Error fetching users:', error);
+    }
+  };
+
+  if (userIds.length > 0) {
+    fetchUsers();
+  }
+}, [userIds]);
+
+
+
+
+
 //FEtch the event details
   useEffect(() => {
     const fetchEventDetails = async () => {
@@ -71,8 +163,8 @@ const [snackbarMessage, setSnackbarMessage] = useState('');
         }
         
         const participants = JSON.parse(data.getEvent.participants);
-        console.log("PARTICIAPNTS ",(participants[0][userData.id]["permissions"]!="admin"))
-        console.log("USERID ",userData.id)
+      //  console.log("PARTICIAPNTS ",(participants[0][userData.id]["permissions"]!="admin"))
+     //   console.log("USERID ",userData.id)
         
         if(userData){
             
@@ -84,12 +176,20 @@ const [snackbarMessage, setSnackbarMessage] = useState('');
 
         }
 
-
-
+          setUserIds(
+          (prevUserIds) => {
+            // Use Set to ensure uniqueness and filter out duplicates
+            const uniqueUserIds = new Set([...prevUserIds, ...Object.keys(participants[0])]);
+      
+            // Convert Set back to an array
+            return [...uniqueUserIds];
+          })
+         // setSelectedUsers(Object.keys(participants[0]))
+        console.log("SET USERS TO BE FETCHED ",Object.keys(participants[0]))
         
 
         let moddedData = data.getEvent;
-        console.log("------------USERNDATA ",userData)
+       // console.log("------------USERNDATA ",userData)
         if(userData?.username){
   moddedData.organizer = userData?.username;
         }
@@ -211,7 +311,7 @@ const [snackbarMessage, setSnackbarMessage] = useState('');
 
   
 
-  const totalSteps =2;
+  const totalSteps =3;
 
   const handleNext = () => {
     console.log("NEXT",activeStep)
@@ -273,6 +373,22 @@ const handleBlur = (field) => {
   }
 };
 
+const handleUserClick = (user) => {
+  // Check if the user is already marked for deletion
+  const isUserMarked = usersToBeDeleted.some((markedUser) => markedUser.id === user.id);
+
+  // Toggle the user's deletion status
+  if(user.id != userData.id){
+    if (isUserMarked) {
+      // If already marked, remove from the list
+      setUsersToBeDeleted((prevUsers) => prevUsers.filter((markedUser) => markedUser.id !== user.id));
+    } else {
+      // If not marked, add to the list
+      setUsersToBeDeleted((prevUsers) => [...prevUsers, user]);
+    }
+  }
+ 
+};
 
 
   const renderStepContent = (step) => {
@@ -528,6 +644,104 @@ opacity:"1.9",
         );
       case 2:
         return(
+          <>
+          {/* header */}
+            <Box
+    sx={{
+      width: "auto",
+      backgroundColor: '#f4f4f4',
+      borderRadius: '10px',
+      borderBottomLeftRadius: '0px',
+      WebkitBorderBottomRightRadius: '0px',
+      padding: '21px',
+      paddingBottom: '30px',
+      background: "linear-gradient(to bottom right, rgba(74, 158, 226,0.6),rgba(90, 63, 192,0.6))",
+      boxShadow: '0 4px 10px rgba(0, 0, 0, 0.05)',
+      marginBottom: '4px',
+    }}
+  >
+    <Typography level="h3" style={{ color: "#f8f8f8", fontWeight: "550", marginLeft: '10px', fontFamily: 'Inter' }}>
+      Add/Remove Participants
+    </Typography>
+  </Box>
+  {/* body */}
+          <Box p={3} bgcolor="#f0f0f0" borderRadius={16}> {/* Added margins, background color, and border radius */}
+          <Grid container spacing={0}>
+            <Grid item xs={12}>
+            <Autocomplete
+            multiple
+            id="friend-search"
+            options={userResults}
+            getOptionLabel={(option) => option.name}
+            onChange={handleUserSelection}
+            sx={{fontFamily:"Poppins"}}
+            renderInput={(params) => (
+              <TextField
+                {...params}
+                label="Search and add friends"
+                variant="outlined"
+                sx={{ fontFamily: 'Poppins' }} // Set the font to Poppins
+              />
+            )}
+          />
+            </Grid>
+  
+            <Grid item xs={12} mt={2}>
+              {/* <Typography variant="h5" mb={1} mt={2} fontWeight="bold" sx={{fontFamily:"Poppins",fontSize:"16px"}}>
+                Your Participants
+              </Typography> */}
+              <TableContainer component={Paper} elevation={3} borderRadius={16} sx={{maxHeight:"200px", height:"200px",    overflowY: 'auto',
+     '&::-webkit-scrollbar': {
+      width: '8px', // Set the width of the scrollbar
+    },
+    '&::-webkit-scrollbar-thumb': {
+      backgroundColor: '#aaa', // Color of the thumb
+      borderRadius: '8px', // Radius of the thumb
+      marginRight:"4px",
+    },
+    '&::-webkit-scrollbar-track': {
+      backgroundColor: 'none', // Color of the track
+    },}}> {/* Improved styling for the table */}
+      <Table>
+      <TableHead>
+        {/* Add your table headers here */}
+      </TableHead>
+      <TableBody>
+        {selectedUsers.map((user) => (
+          <TableRow
+            key={user.id}
+            onClick={() => handleUserClick(user)}
+            sx={{ backgroundColor: usersToBeDeleted.some((markedUser) => markedUser.id === user.id) ? '#FFCCCC' : 'inherit' }}
+          >
+            <TableCell sx={{ padding: '6px',paddingLeft:"10px" }}>
+              <Avatar src={user.imgUrl} />
+            </TableCell>
+            <TableCell sx={{ padding: '5px' }}>
+              <Typography variant="body1" sx={{ textAlign: 'left' }}>
+                {user.username}
+              </Typography>
+            </TableCell>
+            {usersToBeDeleted.some((markedUser) => markedUser.id === user.id) ? (
+              <TableCell align="right">
+                <CancelIcon color="error" fontSize="small" /> {/* Trash icon */}
+              </TableCell>
+            ):(
+              <TableCell align="right" sx={{width:"100%"}}>
+              {/* <DeleteIcon color="error" fontSize="small" /> Trash icon */}
+            </TableCell>
+            )}
+          </TableRow>
+        ))}
+      </TableBody>
+    </Table>
+              </TableContainer>
+            </Grid>
+          </Grid>
+        </Box>
+        </>
+        )
+      case 3:
+        return(
             <>
             <Box
               sx={{
@@ -572,7 +786,7 @@ opacity:"1.9",
             </Grid>
           </>
         )
-        case 3:
+        case 4:
             return(
                 <>
                 <Box
