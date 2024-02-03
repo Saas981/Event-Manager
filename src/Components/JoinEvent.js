@@ -14,6 +14,7 @@ import Button from '@mui/joy/Button';
 import { API, graphqlOperation } from 'aws-amplify';
 import { getEvent } from '../graphql/queries';
 import EventIcon from '@mui/icons-material/Event';
+
 import { Storage } from 'aws-amplify';
 import * as mutations from '../graphql/mutations';
 import AccessTimeSharpIcon from '@mui/icons-material/AccessTimeSharp';
@@ -27,6 +28,15 @@ const JoinEventPage = ({ user, theme }) => {
   useEffect(() => {
     const fetchEventDetails = async () => {
       try {
+        const response =  await API.post('EventAPI', '/items/encrypt', {
+          body: {
+            data: eventId,
+          },
+        });
+        // Log the response from the Lambda function
+        console.log('Lambda function response:', response);
+
+
         const { data } = await API.graphql({
           query: getEvent,
           variables: {

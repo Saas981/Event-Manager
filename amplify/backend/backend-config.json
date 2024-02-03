@@ -1,5 +1,19 @@
 {
   "api": {
+    "EventAPI": {
+      "dependsOn": [
+        {
+          "attributes": [
+            "Name",
+            "Arn"
+          ],
+          "category": "function",
+          "resourceName": "EventFunction"
+        }
+      ],
+      "providerPlugin": "awscloudformation",
+      "service": "API Gateway"
+    },
     "EventManager": {
       "dependsOn": [
         {
@@ -63,6 +77,31 @@
       },
       "providerPlugin": "awscloudformation",
       "service": "Cognito"
+    }
+  },
+  "function": {
+    "EventFunction": {
+      "build": true,
+      "providerPlugin": "awscloudformation",
+      "service": "Lambda"
+    }
+  },
+  "parameters": {
+    "AMPLIFY_function_EventFunction_deploymentBucketName": {
+      "usedBy": [
+        {
+          "category": "function",
+          "resourceName": "EventFunction"
+        }
+      ]
+    },
+    "AMPLIFY_function_EventFunction_s3Key": {
+      "usedBy": [
+        {
+          "category": "function",
+          "resourceName": "EventFunction"
+        }
+      ]
     }
   },
   "storage": {
