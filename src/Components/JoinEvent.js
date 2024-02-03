@@ -12,7 +12,7 @@ import {
 } from '@mui/material';
 import Button from '@mui/joy/Button';
 import { API, graphqlOperation } from 'aws-amplify';
-import { getEvent } from '../graphql/queries';
+import { getEvent, listEvents } from '../graphql/queries';
 import EventIcon from '@mui/icons-material/Event';
 
 import { Storage } from 'aws-amplify';
@@ -28,35 +28,46 @@ const JoinEventPage = ({ user, theme }) => {
   useEffect(() => {
     const fetchEventDetails = async () => {
       try {
-        const response =  await API.post('EventAPI', '/items/encrypt', {
-          body: {
-            data: eventId,
-          },
-        });
-        // Log the response from the Lambda function
-        console.log('Lambda function response:', response);
-
-
-        const { data } = await API.graphql({
-          query: getEvent,
-          variables: {
-            id: eventId,
-          },
-          authMode: 'AMAZON_COGNITO_USER_POOLS', // Specify the authentication mode
-        });
-                if (!data.getEvent) { 
+        // const response =  await API.post('EventAPI', '/items/encrypt', {
+        //   body: {
+        //     data: eventId,
+        //   },
+        // });
+        // // Log the response from the Lambda function
+        // console.log('Lambda function response:', response.encryptedData);
+        // const response2 =  await API.post('EventAPI', '/items/decrypt', {
+        //   body: {
+        //     data: eventId,
+        //   },
+        // });
+        // console.log('Lambda function response:', response2);
+        if (eventId.length>1 && eventId.length<8) { 
           window.location.href="/Error404"
           
           
         }
-        const participants = JSON.parse(data.getEvent.participants);
+
+        const { data } = await API.graphql({
+          query: listEvents,
+          variables: {
+            filter: { id: { beginsWith: eventId } },
+          },
+          authMode: 'AMAZON_COGNITO_USER_POOLS', // Specify the authentication mode
+        });
+        console.log('DATA A412S',data.listEvents.items[0])
+                if (!data.listEvents.items[0]) { 
+          window.location.href="/Error404"
+          
+          
+        }
+        const participants = JSON.parse(data.listEvents.items[0].participants);
         
         if (participants[0].hasOwnProperty(user)) {
           window.location.href = "/dashboard";
         }
         
 
-        let moddedData = data.getEvent;
+        let moddedData = data.listEvents.items[0];
         console.log("Join Event Data", moddedData);
 
         if (moddedData.coverImage) {

@@ -623,11 +623,11 @@ const handleAddFriendsToList = () => {
                   <TextField
                     label="Invite Link"
                     fullWidth
-                    value={`link/${eventId}`}  // Placeholder link
+                    value={`${window.location.origin}/join/${eventId.slice(0, 8)}`}  // Placeholder link
                     sx={{ fontFamily: 'Poppins', mb: 2, width: '50%' }}
                     InputProps={{
                       endAdornment: (
-                        <IconButton aria-label="copy" onClick={() => navigator.clipboard.writeText(`${window.location.origin}/join/${eventId}`)}>
+                        <IconButton aria-label="copy" onClick={() => navigator.clipboard.writeText(`${window.location.origin}/join/${eventId.slice(0, 8)}`)}>
                           <FileCopyIcon />
                         </IconButton>
                       ),
