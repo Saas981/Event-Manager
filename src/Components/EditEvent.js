@@ -30,6 +30,7 @@ import SaveAsIcon from '@mui/icons-material/SaveAs';
 import ModalDialog from '@mui/joy/ModalDialog';
 import Box from '@mui/joy/Box';
 import { Storage } from 'aws-amplify';
+import { notify } from '../Functions/notificationUtil';
 
 
 const EditEvent = ({userId,theme,userData}) => {
@@ -186,7 +187,7 @@ useEffect(() => {
           })
          // setSelectedUsers(Object.keys(participants[0]))
         console.log("SET USERS TO BE FETCHED ",Object.keys(participants[0]))
-        
+        setParticipantIds(Object.keys(participants[0]))
 
         let moddedData = data.getEvent;
        // console.log("------------USERNDATA ",userData)
@@ -220,7 +221,7 @@ useEffect(() => {
     };
 
     fetchEventDetails();
-  }, [eventId, userId,userData]);  
+  }, [eventId, userData]);  
 
 
 
@@ -267,11 +268,29 @@ useEffect(() => {
       location: eventDetails.location,
       capacity: eventDetails.capacity,
       private:eventDetails.private
+ 
     };
   
       // Call the updateEvent mutation
+         
+          //console.log("SELCETD ",selectedUsers)
+          const selectedUserIds = selectedUsers.map((user) => user.id);
+
+// Extract participant IDs from eventDetails
+const currentParticipantIds = JSON.parse(eventDetails.participants).map((participant) => Object.keys(participant));
+
+// Find IDs in selectedUsers that are not in eventDetails.participants
+const usersToBeAddedIds = selectedUserIds.filter((currentUserId) => !currentParticipantIds[0].includes(currentUserId));
+const notificationMessage = `You were Invited to Join this Event: ${updatedEventDetails.title} by ${userData?.name}`;
+
+// Loop through each user in usersToBeAdded
+for (const userId of usersToBeAddedIds) {
+  // Send notification to the current user
+  const notificationResponse = await notify(userData.id,userId, 'EVENT_REQUEST', notificationMessage, 'UNREAD', eventId);
+}
 
             console.log("DATA ",updatedEventDetails)
+            
 
       const updateEventResponse = await API.graphql({
         query: mutations.updateEvent,
