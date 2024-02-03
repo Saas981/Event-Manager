@@ -127,8 +127,8 @@ useEffect(() => {
       }));
 
       setUserResults(usersWithImgUrl);
-      const filteredUsersWithImgUrl = usersWithImgUrl.filter((user) => !friendIds.includes(user.id));
-
+      const filteredUsersWithImgUrl = usersWithImgUrl.filter((user) => participantIds.includes(user.id));
+      console.log("PARTIG SLITS ",participantIds)
       // Set the filtered array as the new state
       setSelectedUsers(filteredUsersWithImgUrl)
     } catch (error) {
@@ -187,6 +187,7 @@ useEffect(() => {
           })
          // setSelectedUsers(Object.keys(participants[0]))
         console.log("SET USERS TO BE FETCHED ",Object.keys(participants[0]))
+        
         setParticipantIds(Object.keys(participants[0]))
 
         let moddedData = data.getEvent;
@@ -255,6 +256,22 @@ useEffect(() => {
         }
       }
   
+
+      const participants = JSON.parse(eventDetails.participants)[0];
+
+      // Loop through each user in usersToBeDeleted and delete the corresponding key from participants
+      for (const userToBeDeleted of usersToBeDeleted) {
+        const userIdToDelete = userToBeDeleted.id;
+      
+        // Check if the user's key exists in participants before attempting to delete
+        if (participants.hasOwnProperty(userIdToDelete)) {
+          delete participants[userIdToDelete];
+          const notificationMessage = `You were kicked from the Event: ${eventDetails.title} by ${userData?.name}`;
+
+          const notificationResponse = await notify(userData.id,userIdToDelete, 'SYSTEM', notificationMessage, 'UNREAD', eventId);
+        }
+      }
+      console.log("MODDED AROTPASTSGA ",participants)
       // Prepare updated event details for the updateEvent mutation
    const updatedEventDetails = {
       id: eventId,
@@ -267,7 +284,8 @@ useEffect(() => {
       description: eventDetails.description,
       location: eventDetails.location,
       capacity: eventDetails.capacity,
-      private:eventDetails.private
+      private:eventDetails.private,
+      participants: JSON.stringify(participants)
  
     };
   
@@ -281,10 +299,11 @@ const currentParticipantIds = JSON.parse(eventDetails.participants).map((partici
 
 // Find IDs in selectedUsers that are not in eventDetails.participants
 const usersToBeAddedIds = selectedUserIds.filter((currentUserId) => !currentParticipantIds[0].includes(currentUserId));
-const notificationMessage = `You were Invited to Join this Event: ${updatedEventDetails.title} by ${userData?.name}`;
 
 // Loop through each user in usersToBeAdded
 for (const userId of usersToBeAddedIds) {
+  const notificationMessage = `You were Invited to Join this Event: ${updatedEventDetails.title} by ${userData?.name}`;
+
   // Send notification to the current user
   const notificationResponse = await notify(userData.id,userId, 'EVENT_REQUEST', notificationMessage, 'UNREAD', eventId);
 }
