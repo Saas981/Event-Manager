@@ -104,12 +104,12 @@ const Search = ({userData,setUserData}) => {
       authMode: 'AMAZON_COGNITO_USER_POOLS', // Ensure proper authentication
     });
 
-    //   friends[0][userId] = { status:"friend" };
+      friends[0][userId] = { status:"pending" };
      
-    // setUserData((prevUserData) => ({
-    //   ...prevUserData,
-    //   friends: JSON.stringify(friends),
-    // }));
+    setUserData((prevUserData) => ({
+      ...prevUserData,
+      friends: JSON.stringify(friends),
+    }));
   }
 
     const handleRemoveFriend = (userId) =>{
@@ -241,15 +241,29 @@ const Search = ({userData,setUserData}) => {
           Remove Friend
         </Button>
         ):(
-<Button
-          variant="plain"
-          color="primary"
-          size="small"
-          onClick={() => handleAddFriend(user.id)}
-          sx={{ marginLeft: '16px', marginRight: '10px' }}
-        >
-          Add Friend
-        </Button>
+          <>
+          {JSON.parse(userData?.friends)[0][user.id]?.status=="pending"?(
+            <Button
+            variant="soft"
+            color="warning"
+            size="small"
+            onClick={() => console.log("PENDING")}
+            sx={{ marginLeft: '16px', marginRight: '10px' }}
+          >
+            Pending . . .
+          </Button>
+            ):(
+              <Button
+              variant="plain"
+              color="primary"
+              size="small"
+              onClick={() => handleAddFriend(user.id)}
+              sx={{ marginLeft: '16px', marginRight: '10px' }}
+            >
+              Add Friend
+            </Button>
+            )}
+        </>
         )}
  </>
         ):(
