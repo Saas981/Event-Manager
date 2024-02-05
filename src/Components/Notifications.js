@@ -238,7 +238,7 @@ const NotificationsPage = ({ userData, setUserData }) => {
         variables: {
           input: {
             id: eventId,
-            participants: JSON.stringify(updatedEventDetails.participants),
+            participants: JSON.stringify([updatedEventDetails.participants]),
           },
         },
         authMode: 'AMAZON_COGNITO_USER_POOLS',

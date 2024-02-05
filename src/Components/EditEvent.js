@@ -285,7 +285,7 @@ useEffect(() => {
       location: eventDetails.location,
       capacity: eventDetails.capacity,
       private:eventDetails.private,
-      participants: JSON.stringify(participants)
+      participants: JSON.stringify([participants])
  
     };
   
