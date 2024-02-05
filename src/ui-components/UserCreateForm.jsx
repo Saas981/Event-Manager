@@ -25,18 +25,50 @@ export default function UserCreateForm(props) {
   const initialValues = {
     email: "",
     name: "",
+    phone: "",
+    username: "",
+    profilePicture: "",
+    friends: "",
+    accountStatus: "",
+    bio: "",
+    settings: "",
   };
   const [email, setEmail] = React.useState(initialValues.email);
   const [name, setName] = React.useState(initialValues.name);
+  const [phone, setPhone] = React.useState(initialValues.phone);
+  const [username, setUsername] = React.useState(initialValues.username);
+  const [profilePicture, setProfilePicture] = React.useState(
+    initialValues.profilePicture
+  );
+  const [friends, setFriends] = React.useState(initialValues.friends);
+  const [accountStatus, setAccountStatus] = React.useState(
+    initialValues.accountStatus
+  );
+  const [bio, setBio] = React.useState(initialValues.bio);
+  const [settings, setSettings] = React.useState(initialValues.settings);
   const [errors, setErrors] = React.useState({});
   const resetStateValues = () => {
     setEmail(initialValues.email);
     setName(initialValues.name);
+    setPhone(initialValues.phone);
+    setUsername(initialValues.username);
+    setProfilePicture(initialValues.profilePicture);
+    setFriends(initialValues.friends);
+    setAccountStatus(initialValues.accountStatus);
+    setBio(initialValues.bio);
+    setSettings(initialValues.settings);
     setErrors({});
   };
   const validations = {
     email: [{ type: "Email" }],
     name: [],
+    phone: [{ type: "Phone" }],
+    username: [],
+    profilePicture: [],
+    friends: [],
+    accountStatus: [],
+    bio: [],
+    settings: [],
   };
   const runValidationTasks = async (
     fieldName,
@@ -66,6 +98,13 @@ export default function UserCreateForm(props) {
         let modelFields = {
           email,
           name,
+          phone,
+          username,
+          profilePicture,
+          friends,
+          accountStatus,
+          bio,
+          settings,
         };
         const validationResponses = await Promise.all(
           Object.keys(validations).reduce((promises, fieldName) => {
@@ -122,6 +161,13 @@ export default function UserCreateForm(props) {
             const modelFields = {
               email: value,
               name,
+              phone,
+              username,
+              profilePicture,
+              friends,
+              accountStatus,
+              bio,
+              settings,
             };
             const result = onChange(modelFields);
             value = result?.email ?? value;
@@ -147,6 +193,13 @@ export default function UserCreateForm(props) {
             const modelFields = {
               email,
               name: value,
+              phone,
+              username,
+              profilePicture,
+              friends,
+              accountStatus,
+              bio,
+              settings,
             };
             const result = onChange(modelFields);
             value = result?.name ?? value;
@@ -160,6 +213,231 @@ export default function UserCreateForm(props) {
         errorMessage={errors.name?.errorMessage}
         hasError={errors.name?.hasError}
         {...getOverrideProps(overrides, "name")}
+      ></TextField>
+      <TextField
+        label="Phone"
+        isRequired={false}
+        isReadOnly={false}
+        type="tel"
+        value={phone}
+        onChange={(e) => {
+          let { value } = e.target;
+          if (onChange) {
+            const modelFields = {
+              email,
+              name,
+              phone: value,
+              username,
+              profilePicture,
+              friends,
+              accountStatus,
+              bio,
+              settings,
+            };
+            const result = onChange(modelFields);
+            value = result?.phone ?? value;
+          }
+          if (errors.phone?.hasError) {
+            runValidationTasks("phone", value);
+          }
+          setPhone(value);
+        }}
+        onBlur={() => runValidationTasks("phone", phone)}
+        errorMessage={errors.phone?.errorMessage}
+        hasError={errors.phone?.hasError}
+        {...getOverrideProps(overrides, "phone")}
+      ></TextField>
+      <TextField
+        label="Username"
+        isRequired={false}
+        isReadOnly={false}
+        value={username}
+        onChange={(e) => {
+          let { value } = e.target;
+          if (onChange) {
+            const modelFields = {
+              email,
+              name,
+              phone,
+              username: value,
+              profilePicture,
+              friends,
+              accountStatus,
+              bio,
+              settings,
+            };
+            const result = onChange(modelFields);
+            value = result?.username ?? value;
+          }
+          if (errors.username?.hasError) {
+            runValidationTasks("username", value);
+          }
+          setUsername(value);
+        }}
+        onBlur={() => runValidationTasks("username", username)}
+        errorMessage={errors.username?.errorMessage}
+        hasError={errors.username?.hasError}
+        {...getOverrideProps(overrides, "username")}
+      ></TextField>
+      <TextField
+        label="Profile picture"
+        isRequired={false}
+        isReadOnly={false}
+        value={profilePicture}
+        onChange={(e) => {
+          let { value } = e.target;
+          if (onChange) {
+            const modelFields = {
+              email,
+              name,
+              phone,
+              username,
+              profilePicture: value,
+              friends,
+              accountStatus,
+              bio,
+              settings,
+            };
+            const result = onChange(modelFields);
+            value = result?.profilePicture ?? value;
+          }
+          if (errors.profilePicture?.hasError) {
+            runValidationTasks("profilePicture", value);
+          }
+          setProfilePicture(value);
+        }}
+        onBlur={() => runValidationTasks("profilePicture", profilePicture)}
+        errorMessage={errors.profilePicture?.errorMessage}
+        hasError={errors.profilePicture?.hasError}
+        {...getOverrideProps(overrides, "profilePicture")}
+      ></TextField>
+      <TextField
+        label="Friends"
+        isRequired={false}
+        isReadOnly={false}
+        value={friends}
+        onChange={(e) => {
+          let { value } = e.target;
+          if (onChange) {
+            const modelFields = {
+              email,
+              name,
+              phone,
+              username,
+              profilePicture,
+              friends: value,
+              accountStatus,
+              bio,
+              settings,
+            };
+            const result = onChange(modelFields);
+            value = result?.friends ?? value;
+          }
+          if (errors.friends?.hasError) {
+            runValidationTasks("friends", value);
+          }
+          setFriends(value);
+        }}
+        onBlur={() => runValidationTasks("friends", friends)}
+        errorMessage={errors.friends?.errorMessage}
+        hasError={errors.friends?.hasError}
+        {...getOverrideProps(overrides, "friends")}
+      ></TextField>
+      <TextField
+        label="Account status"
+        isRequired={false}
+        isReadOnly={false}
+        value={accountStatus}
+        onChange={(e) => {
+          let { value } = e.target;
+          if (onChange) {
+            const modelFields = {
+              email,
+              name,
+              phone,
+              username,
+              profilePicture,
+              friends,
+              accountStatus: value,
+              bio,
+              settings,
+            };
+            const result = onChange(modelFields);
+            value = result?.accountStatus ?? value;
+          }
+          if (errors.accountStatus?.hasError) {
+            runValidationTasks("accountStatus", value);
+          }
+          setAccountStatus(value);
+        }}
+        onBlur={() => runValidationTasks("accountStatus", accountStatus)}
+        errorMessage={errors.accountStatus?.errorMessage}
+        hasError={errors.accountStatus?.hasError}
+        {...getOverrideProps(overrides, "accountStatus")}
+      ></TextField>
+      <TextField
+        label="Bio"
+        isRequired={false}
+        isReadOnly={false}
+        value={bio}
+        onChange={(e) => {
+          let { value } = e.target;
+          if (onChange) {
+            const modelFields = {
+              email,
+              name,
+              phone,
+              username,
+              profilePicture,
+              friends,
+              accountStatus,
+              bio: value,
+              settings,
+            };
+            const result = onChange(modelFields);
+            value = result?.bio ?? value;
+          }
+          if (errors.bio?.hasError) {
+            runValidationTasks("bio", value);
+          }
+          setBio(value);
+        }}
+        onBlur={() => runValidationTasks("bio", bio)}
+        errorMessage={errors.bio?.errorMessage}
+        hasError={errors.bio?.hasError}
+        {...getOverrideProps(overrides, "bio")}
+      ></TextField>
+      <TextField
+        label="Settings"
+        isRequired={false}
+        isReadOnly={false}
+        value={settings}
+        onChange={(e) => {
+          let { value } = e.target;
+          if (onChange) {
+            const modelFields = {
+              email,
+              name,
+              phone,
+              username,
+              profilePicture,
+              friends,
+              accountStatus,
+              bio,
+              settings: value,
+            };
+            const result = onChange(modelFields);
+            value = result?.settings ?? value;
+          }
+          if (errors.settings?.hasError) {
+            runValidationTasks("settings", value);
+          }
+          setSettings(value);
+        }}
+        onBlur={() => runValidationTasks("settings", settings)}
+        errorMessage={errors.settings?.errorMessage}
+        hasError={errors.settings?.hasError}
+        {...getOverrideProps(overrides, "settings")}
       ></TextField>
       <Flex
         justifyContent="space-between"

@@ -15,14 +15,14 @@ const UnauthorizedPage = () => {
       <Typography
         variant="h4"
         gutterBottom
-        style={{ fontFamily: 'Poppins, sans-serif' }}
+        style={{ fontFamily: 'Poppins, sans-serif',color:"#f8f8f8" }}
       >
         Not Authorized
       </Typography>
       <Typography
         variant="body1"
         align="center"
-        style={{ fontFamily: 'Poppins, sans-serif' }}
+        style={{ fontFamily: 'Poppins, sans-serif',color:"#e8e8e8"  }}
       >
         You do not have permission to access this page.
       </Typography>

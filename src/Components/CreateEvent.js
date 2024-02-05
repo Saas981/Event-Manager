@@ -1,16 +1,26 @@
-import React, { useState } from 'react';
-import { Container, TextField, Grid, LinearProgress,Stack,Switch,IconButton } from '@mui/material';
+import React, { useState,useEffect } from 'react';
+import { Container, TextField, Grid, LinearProgress,Stack,Switch,IconButton,Autocomplete,Table,Paper,Avatar,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TableRow,  } from '@mui/material';
 import Uploader from "./Uploader"
+import Snackbar from '@mui/joy/Snackbar';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import dayjs from 'dayjs';
+import { notify } from '../Functions/notificationUtil';
+
 import FormControlLabel from '@mui/material/FormControlLabel';
 import { alpha, styled } from '@mui/material/styles';
 import { purple } from '@mui/material/colors';
+import ErrorOutlineSharpIcon from '@mui/icons-material/ErrorOutlineSharp';
 import { DateTimePicker } from '@mui/x-date-pickers/DateTimePicker';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import FileCopyIcon from '@mui/icons-material/FileCopy';
 import { API, graphqlOperation } from 'aws-amplify';
 import * as mutations from '../graphql/mutations';
+import { listUsers } from '../graphql/queries';
 import Button from '@mui/joy/Button';
 import Modal from '@mui/joy/Modal';
 import ModalClose from '@mui/joy/ModalClose';
@@ -22,7 +32,7 @@ import Box from '@mui/joy/Box';
 import { Storage } from 'aws-amplify';
 
 
-const CreateEvent = ({userId}) => {
+const CreateEvent = ({userId,theme,userData}) => {
   const [activeStep, setActiveStep] = useState(0);
   const [progress, setProgress] = useState(0);
   const [open, setOpen] = React.useState(false);
@@ -31,19 +41,92 @@ const CreateEvent = ({userId}) => {
   const [eventId,setEventId]= React.useState();
   const [eventDetails, setEventDetails] = useState({
     title: '',
-    startTime: dayjs('2024-01-1T12:30'),
+    startTime: dayjs(),
     location: '',
     reoccuring: false,
-    endTime: dayjs('2024-01-2T12:30'),
-    capacity: 0,
+    endTime: dayjs().add(1,'day'),
+    capacity: 1,
     participants:`[ { "${userId}": { "permissions": "admin" } } ]`,
     description: '',
-    organizer: '',
+    organizer: userData?.username,
     coverImage:'',
+    private: true,
   });
+  const [snackbarOpen, setSnackbarOpen] = useState(false);
+const [snackbarMessage, setSnackbarMessage] = useState('');
+const [selectedFriends, setSelectedFriends] = useState([]);
+
+
+const [friendIds, setFriendIds] = useState([]);
+const [friendResults, setFriendResults] = useState([]);
+
+useEffect(() => {
+  // Ensure userData and friends are available before processing
+  if (userData && userData.friends) {
+    const friendsList = JSON.parse(userData.friends);
+
+    // Filter friends with status "friend"
+    const filteredFriendIds = Object.keys(friendsList[0]).filter(
+      (friendId) => friendsList[0][friendId].status === 'friend'
+    );
+
+    setFriendIds(filteredFriendIds);
+  }
+}, [userData]);
+
+useEffect(() => {
+  // Fetch users based on friendIds
+  const fetchFriends = async () => {
+    try {
+      const { data } = await API.graphql(graphqlOperation(listUsers, {
+        filter: {
+          or: friendIds.map(id => ({ id: { eq: id } }))
+        },
+        limit: 10
+      }));
+
+      const friends = data.listUsers.items;
+      const friendsWithImgUrl = await Promise.all(friends.map(async (friend) => {
+        if (friend.profilePicture) {
+          try {
+            const imgUrl = await Storage.get(friend.profilePicture);
+            return { ...friend, imgUrl };
+          } catch (error) {
+            console.error('Error fetching data:', error);
+            return friend; // Return the friend without imgUrl in case of an error
+          }
+        } else {
+          return friend; // Return the friend without imgUrl if profilePicture is not present
+        }
+      }));
+
+      setFriendResults(friendsWithImgUrl);
+    } catch (error) {
+      console.error('Error fetching friends:', error);
+    }
+  };
+
+  if (friendIds.length > 0) {
+    fetchFriends();
+  }
+}, [friendIds]);
+
+
+
+
+
+
   
 
+const openSnackbar = (message) => {
+  setSnackbarMessage(message);
+  setSnackbarOpen(true);
 
+  // Set a timeout to close the Snackbar after 5 seconds
+  setTimeout(() => {
+    setSnackbarOpen(false);
+  }, 5000);
+};
   const handleFinish = async () => {
     // Assuming you have the mutation defined, replace 'createEvent' with your actual mutation
     try {
@@ -53,7 +136,7 @@ const CreateEvent = ({userId}) => {
       }
       console.log("FILE", savedFile)
         try {
-          await Storage.put(eventDetails.title+eventDetails.organizer+savedFile.name , savedFile, {
+          await Storage.put("eventCovers/"+eventDetails.title+eventDetails.organizer+savedFile.name , savedFile, {
             contentType: "image/png", // contentType is optional
           });
         } catch (error) {
@@ -69,17 +152,23 @@ const CreateEvent = ({userId}) => {
       if(savedFile){
         updatedEventDetails = { ...eventDetails, coverImage: eventDetails.title+eventDetails.organizer+savedFile.name  };
       }
+      console.log("USER ID RIGHT NOW ", userId)
 
        const createEventResponse = await API.graphql({ 
          query: mutations.createEvent,
+          authMode: 'AMAZON_COGNITO_USER_POOLS',
          variables: {
            input: updatedEventDetails,
          }
        });
       const thisEventId = createEventResponse.data.createEvent.id;
       setEventId(thisEventId)
-   
-
+      const notificationMessage = `You were Invited to Join this Event: ${updatedEventDetails.title} by ${userData?.name}`;
+       
+ for (const friendId of friendIds) {
+    // Use the createNotification function
+    await notify( userData.id,friendId, 'EVENT_REQUEST', notificationMessage, 'UNREAD', thisEventId);
+  }
 setTimeout(() => {
   // After 3 seconds, set createLoadButton to false and redirect to the dashboard
   setLoadCreateButton(false);
@@ -96,12 +185,26 @@ setTimeout(() => {
 
   
 
-  const totalSteps =2;
+  const totalSteps =3;
 
   const handleNext = () => {
+    if (activeStep === 0) {
+      handleChange("participants",`[ { "${userId}": { "permissions": "admin" } } ]`)
+      handleChange("organizer",`${userData?.username}`)
+
+      // Check if title and organizer are provided before moving to the next step
+      if (!eventDetails.title) {
+        openSnackbar("Please fill in the required fields: Title and Organizer.");
+        return;
+      }
+    }
+  
     setActiveStep((prevActiveStep) => prevActiveStep + 1);
     setProgress((prevProgress) => (prevProgress + 100 / totalSteps > 100 ? 100 : prevProgress + 100 / totalSteps));
   };
+  
+  
+  
 
   const handleBack = () => {
     setActiveStep((prevActiveStep) => prevActiveStep - 1);
@@ -114,13 +217,46 @@ setTimeout(() => {
   };
 
   const handleChange = (field, value) => {
-    if(field.includes("time")){
-        //setEventDetails((prevDetails) => ({ ...prevDetails, [field]: dayjs(value) }));
-    }else{
+    if (field.includes("time")) {
+        // Handle time-related updates if needed
+    } else if (field === "capacity") {
+        // Validate and only accept positive integers for the "Capacity" field
+        const intValue = parseInt(value);
+        
+        if(intValue>=1 || isNaN(intValue)){
+ setEventDetails((prevDetails) => ({ ...prevDetails, [field]: intValue }));
+        }
+ 
+
+    } else {
         setEventDetails((prevDetails) => ({ ...prevDetails, [field]: value }));
     }
-    
-  };
+};
+
+//On blur set capacity to default value of 1
+const handleBlur = (field) => {
+  const value = eventDetails[field];
+
+  // Check if the value is less than 0 or not a number
+  if (isNaN(value) || value < 1 || value >= 1024) {
+    // Set the value to 0
+    handleChange(field, 1);
+
+    // Show Snackbar only when the input is invalid
+    openSnackbar("Please enter a number between 1 and 1024");
+  }
+};
+const handleFriendSelection = (event, newValue) => {
+  setSelectedFriends(newValue);
+};
+
+// Function to handle adding friends to the list (you need to implement this)
+const handleAddFriendsToList = () => {
+  // Implement logic to add selectedFriends to your list
+  console.log('Adding friends to the list:', selectedFriends);
+  // Add your logic here to update your data model or state
+};
+
 
   const renderStepContent = (step) => {
     switch (step) {
@@ -159,14 +295,16 @@ setTimeout(() => {
     />
   </Grid>
   <Grid item xs={12} sx={{marginTop:"10px"}}>
-    <TextField
-      label="Organizer Name"
-      fullWidth
-      variant="outlined"
-      value={eventDetails.organizer}
-      onChange={(e) => handleChange('organizer', e.target.value)}
-      sx={{ fontFamily: 'Inter', mb: 2 }}
-    />
+  <TextField
+  label=""
+  fullWidth
+  variant="outlined"
+  value={userData?.username} // Set the value to userData.username
+  onChange={(e) => handleChange('organizer', e.target.value)}
+  disabled // Set the disabled prop to make it disabled
+  sx={{ fontFamily: 'Inter', mb: 2 }}
+/>
+
   </Grid>
   <Grid item xs={12} sx={{marginTop:"10px"}}>
     <TextField
@@ -263,7 +401,39 @@ setTimeout(() => {
   <Grid item xs={12}>
     {/* Left side - Image upload */}
     <Grid container spacing={2}>
-      <Grid item xs={6} sx={{ color: '#bfa3ff' }}>
+      <Grid item xs={3} sx={{ color: '#bfa3ff' }}>
+      <FormControlLabel
+  labelPlacement="top"
+  color="#888888"
+  style={{
+    fontFamily: 'Poppins',
+    fontSize: '12px', // Added 'px' to specify the unit
+    marginBottom: '2px', // Changed 'mb' to 'marginBottom' for clarity
+    color: '#1f1f1f',
+  }}  control={
+    <PurpleSwitch
+      defaultChecked
+      size="large"
+      value={eventDetails.private}
+      onChange={(e) => handleChange('private', e.target.checked)}
+      color="default"
+    />
+  }
+  label={
+    <span
+      style={{
+        fontFamily: 'Poppins', // Set your desired font family
+        fontSize: '14px', // Set your desired font size
+      }}
+    >
+      Private
+    </span>
+  }
+/>
+
+               
+      </Grid>
+            <Grid item xs={4} sx={{ color: '#bfa3ff' }}>
         <FormControlLabel
          labelPlacement="top"
          color="#888888"
@@ -275,15 +445,25 @@ setTimeout(() => {
               
               size="large"
               value={eventDetails.reoccuring}
-              onChange={(e) => handleChange('reoccuring', e.target.value)}
+              onChange={(e) => handleChange('reoccuring',  e.target.checked)}
               color="default"
             />
           }
-          label="Reoccuring"
+          label={
+            <span
+              style={{
+                fontFamily: 'Poppins', // Set your desired font family
+                fontSize: '14px', // Set your desired font size
+              }}
+            >
+              Reoccuring
+            </span>
+          }
        
         />
+               
       </Grid>
-      <Grid item xs={6}>
+      <Grid item xs={5}>
         <TextField
           label="Capacity"
           type="number"
@@ -291,6 +471,7 @@ setTimeout(() => {
           variant="outlined"
           value={eventDetails.capacity}
           onChange={(e) => handleChange('capacity', e.target.value)}
+          onBlur={() => handleBlur('capacity')}
           sx={{ fontFamily: 'Poppins', mb: 2 }}
         />
       </Grid>
@@ -322,81 +503,134 @@ setTimeout(() => {
         );
       case 2:
         return(
-            <>
+          <>
+          {/* header */}
             <Box
-              sx={{
-                width: "auto",
-                backgroundColor: '#f4f4f4',
-                borderRadius: '10px',
-                borderBottomLeftRadius: '0px',
-                WebkitBorderBottomRightRadius: '0px',
-                padding: '25px',
-                paddingBottom: '30px',
-                background: "linear-gradient(to bottom right, rgba(74, 158, 226,0.6),rgba(90, 63, 192,0.6))",
-                boxShadow: '0 4px 10px rgba(0, 0, 0, 0.05)',
-                marginBottom: '10px',
-                margin: 'auto',
-              }}
-            >
-              <Typography level="h3" style={{ color: "#f8f8f8", fontWeight: "550", marginLeft: '10px', fontFamily: 'Poppins, sans-serif' }}>
-                Send Invitations
-              </Typography>
-            </Box>
-            <Grid container spacing={2} sx={{ padding: "24px", paddingTop: "0px", paddingBottom: "0px", margin: 'auto', }}>
-              <Grid item xs={12}>
-                <Typography variant="body1" sx={{ fontFamily: 'Poppins', mb: 2 }}>
-                  Share the following link with your attendees :
-                </Typography>
-              </Grid>
-              <Grid item xs={12}>
-                <TextField
-                  label="Invite Link"
-                  fullWidth
-                  value={`link/${eventId}`}  // Placeholder link
-                  sx={{ fontFamily: 'Poppins', mb: 2, width: '50%' }}
-                  InputProps={{
-                    endAdornment: (
-                      <IconButton aria-label="copy" onClick={() => navigator.clipboard.writeText(`${window.location.origin}/join/${eventId}`)}>
-                        <FileCopyIcon />
-                      </IconButton>
-                    ),
-                  }}
-                />
-              </Grid>
+    sx={{
+      width: "auto",
+      backgroundColor: '#f4f4f4',
+      borderRadius: '10px',
+      borderBottomLeftRadius: '0px',
+      WebkitBorderBottomRightRadius: '0px',
+      padding: '21px',
+      paddingBottom: '30px',
+      background: "linear-gradient(to bottom right, rgba(74, 158, 226,0.6),rgba(90, 63, 192,0.6))",
+      boxShadow: '0 4px 10px rgba(0, 0, 0, 0.05)',
+      marginBottom: '4px',
+    }}
+  >
+    <Typography level="h3" style={{ color: "#f8f8f8", fontWeight: "550", marginLeft: '10px', fontFamily: 'Inter' }}>
+      Add Participants
+    </Typography>
+  </Box>
+  {/* body */}
+          <Box p={3} bgcolor="#f0f0f0" borderRadius={16}> {/* Added margins, background color, and border radius */}
+          <Grid container spacing={0}>
+            <Grid item xs={12}>
+            <Autocomplete
+            multiple
+            id="friend-search"
+            options={friendResults}
+            getOptionLabel={(option) => option.name}
+            onChange={handleFriendSelection}
+            sx={{fontFamily:"Poppins"}}
+            renderInput={(params) => (
+              <TextField
+                {...params}
+                label="Search and add friends"
+                variant="outlined"
+                sx={{ fontFamily: 'Poppins' }} // Set the font to Poppins
+              />
+            )}
+          />
             </Grid>
-          </>
+  
+            <Grid item xs={12} mb={1} mt={2}>
+              {/* <Typography variant="h5" mb={1} mt={2} fontWeight="bold" sx={{fontFamily:"Poppins",fontSize:"16px"}}>
+                Your Participants
+              </Typography> */}
+              <TableContainer component={Paper} elevation={3} borderRadius={16} sx={{maxHeight:"200px", height:"200px",    overflowY: 'auto',
+     '&::-webkit-scrollbar': {
+      width: '8px', // Set the width of the scrollbar
+    },
+    '&::-webkit-scrollbar-thumb': {
+      backgroundColor: '#aaa', // Color of the thumb
+      borderRadius: '8px', // Radius of the thumb
+      marginRight:"4px",
+    },
+    '&::-webkit-scrollbar-track': {
+      backgroundColor: 'none', // Color of the track
+    },}}> {/* Improved styling for the table */}
+                <Table>
+                  <TableHead>
+                    <TableRow>
+                    
+                    </TableRow>
+                  </TableHead>
+                  <TableBody>
+                    {selectedFriends.map((friend) => (
+                      <TableRow key={friend.name} >
+                        <TableCell sx={{padding:'10px'}}>
+                          <Avatar  src={friend.imgUrl}/> {/* Add the actual source dynamically */}
+                        </TableCell>
+                        <TableCell sx={{padding:'10px',}}>
+                          <Typography variant="body1" sx={{textAlign:"left"}}>{friend.username}</Typography>
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              </TableContainer>
+            </Grid>
+          </Grid>
+        </Box>
+        </>
         )
         case 3:
             return(
-                <>
-                <Box
-                  sx={{
-                    width: "auto",
-                    backgroundColor: '#f4f4f4',
-                    borderRadius: '10px',
-                    borderBottomLeftRadius: '0px',
-                    WebkitBorderBottomRightRadius: '0px',
-                    padding: '25px',
-                    paddingBottom: '30px',
-                    background: "linear-gradient(to bottom right, rgba(74, 158, 226,0.6),rgba(90, 63, 192,0.6))",
-                    boxShadow: '0 4px 10px rgba(0, 0, 0, 0.05)',
-                    marginBottom: '10px',
-                    margin: 'auto',
-                  }}
-                >
-                  <Typography variant="h5" style={{ color: "#f8f8f8", fontWeight: "550", marginLeft: '10px', fontFamily: 'Poppins, sans-serif' }}>
-                    Create Event
+              <>
+              <Box
+                sx={{
+                  width: "auto",
+                  backgroundColor: '#f4f4f4',
+                  borderRadius: '10px',
+                  borderBottomLeftRadius: '0px',
+                  WebkitBorderBottomRightRadius: '0px',
+                  padding: '25px',
+                  paddingBottom: '30px',
+                  background: "linear-gradient(to bottom right, rgba(74, 158, 226,0.6),rgba(90, 63, 192,0.6))",
+                  boxShadow: '0 4px 10px rgba(0, 0, 0, 0.05)',
+                  marginBottom: '10px',
+                  margin: 'auto',
+                }}
+              >
+                <Typography level="h3" style={{ color: "#f8f8f8", fontWeight: "550", marginLeft: '10px', fontFamily: 'Poppins, sans-serif' }}>
+                  Send Invitations
+                </Typography>
+              </Box>
+              <Grid container spacing={2} sx={{ padding: "24px", paddingTop: "0px", paddingBottom: "0px", margin: 'auto', }}>
+                <Grid item xs={12}>
+                  <Typography variant="body1" sx={{ fontFamily: 'Poppins', mb: 2 }}>
+                    Share the following link with your attendees :
                   </Typography>
-                </Box>
-                <Grid container spacing={2} sx={{ padding: "24px", paddingTop: "0px", paddingBottom: "0px", margin: 'auto', }}>
-                  <Grid item xs={12}>
-                    <Typography variant="body1" sx={{ fontFamily: 'Poppins', mb: 2, fontSize:"24px" }}>
-                     Thats it!.
-                    </Typography>
-                  </Grid>
-             
                 </Grid>
-              </>
+                <Grid item xs={12}>
+                  <TextField
+                    label="Invite Link"
+                    fullWidth
+                    value={`${window.location.origin}/join/${eventId.slice(0, 8)}`}  // Placeholder link
+                    sx={{ fontFamily: 'Poppins', mb: 2, width: '50%' }}
+                    InputProps={{
+                      endAdornment: (
+                        <IconButton aria-label="copy" onClick={() => navigator.clipboard.writeText(`${window.location.origin}/join/${eventId.slice(0, 8)}`)}>
+                          <FileCopyIcon />
+                        </IconButton>
+                      ),
+                    }}
+                  />
+                </Grid>
+              </Grid>
+            </>
             )
       default:
         return null;
@@ -495,7 +729,7 @@ setTimeout(() => {
               </Button>
               ):(
 
-                <Button variant="soft" color="primary" onClick={handleNext}>
+                <Button variant="soft" color="primary"   onClick={handleNext}>
                 Next
               </Button>
 
@@ -508,6 +742,28 @@ setTimeout(() => {
         </Box>
         
       </Box>
+      
+  <Snackbar
+        variant="soft"
+        color="danger"
+        open={snackbarOpen}
+        anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
+        startDecorator={<ErrorOutlineSharpIcon />}
+        endDecorator={
+          <Button
+            onClick={() => setSnackbarOpen(false)}
+            size="sm"
+            variant="soft"
+            color="danger"
+          >
+            Dismiss
+          </Button>
+        }
+      >
+        {snackbarMessage}
+      </Snackbar>
+
+
     </Container>
   );
 };

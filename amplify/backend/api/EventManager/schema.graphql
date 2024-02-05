@@ -1,10 +1,27 @@
+type Notification @model @auth(rules: [{allow: private}]) {
+  id: ID!
+  sender: String
+  recepient: String
+  type: String
+  message: String
+  status: String
+  other: String
+}
+
 type User @model @auth(rules: [{allow: public}]) {
   id: ID!
   email: AWSEmail
   name: String
+  phone: AWSPhone
+  username: String
+  profilePicture: String
+  friends: String
+  accountStatus: String
+  bio: String
+  settings: String
 }
 
-type Event @model @auth(rules: [{allow: public}]) {
+type Event @model @auth(rules: [{allow: private}, {allow: public}]) {
   id: ID!
   title: String
   startTime: AWSDateTime
@@ -17,5 +34,26 @@ type Event @model @auth(rules: [{allow: public}]) {
   organizer: String
   rating: Float
   coverImage: String
+  private: String
+  categories: String
+}
+
+type Message @model @auth(rules: [{allow: private}]) {
+  id: ID!
+  textContent: String
+  imageContent: String
+  sender: String
+  chatRoomId: ID!
+  senderName: String
+}
+
+type ChatRoom @model @auth(rules: [{allow: private}]) {
+  id: ID!
+  name: String
+  type: String
+  admins: String
+  participants: String
+  eventId: String
+  settings: String
 }
  

@@ -40,6 +40,8 @@ export default function EventCreateForm(props) {
     organizer: "",
     rating: "",
     coverImage: "",
+    private: "",
+    categories: "",
   };
   const [title, setTitle] = React.useState(initialValues.title);
   const [startTime, setStartTime] = React.useState(initialValues.startTime);
@@ -56,6 +58,8 @@ export default function EventCreateForm(props) {
   const [organizer, setOrganizer] = React.useState(initialValues.organizer);
   const [rating, setRating] = React.useState(initialValues.rating);
   const [coverImage, setCoverImage] = React.useState(initialValues.coverImage);
+  const [private1, setPrivate1] = React.useState(initialValues.private);
+  const [categories, setCategories] = React.useState(initialValues.categories);
   const [errors, setErrors] = React.useState({});
   const resetStateValues = () => {
     setTitle(initialValues.title);
@@ -69,6 +73,8 @@ export default function EventCreateForm(props) {
     setOrganizer(initialValues.organizer);
     setRating(initialValues.rating);
     setCoverImage(initialValues.coverImage);
+    setPrivate1(initialValues.private);
+    setCategories(initialValues.categories);
     setErrors({});
   };
   const validations = {
@@ -83,6 +89,8 @@ export default function EventCreateForm(props) {
     organizer: [],
     rating: [],
     coverImage: [],
+    private: [],
+    categories: [],
   };
   const runValidationTasks = async (
     fieldName,
@@ -138,6 +146,8 @@ export default function EventCreateForm(props) {
           organizer,
           rating,
           coverImage,
+          private: private1,
+          categories,
         };
         const validationResponses = await Promise.all(
           Object.keys(validations).reduce((promises, fieldName) => {
@@ -203,6 +213,8 @@ export default function EventCreateForm(props) {
               organizer,
               rating,
               coverImage,
+              private: private1,
+              categories,
             };
             const result = onChange(modelFields);
             value = result?.title ?? value;
@@ -239,6 +251,8 @@ export default function EventCreateForm(props) {
               organizer,
               rating,
               coverImage,
+              private: private1,
+              categories,
             };
             const result = onChange(modelFields);
             value = result?.startTime ?? value;
@@ -273,6 +287,8 @@ export default function EventCreateForm(props) {
               organizer,
               rating,
               coverImage,
+              private: private1,
+              categories,
             };
             const result = onChange(modelFields);
             value = result?.location ?? value;
@@ -307,6 +323,8 @@ export default function EventCreateForm(props) {
               organizer,
               rating,
               coverImage,
+              private: private1,
+              categories,
             };
             const result = onChange(modelFields);
             value = result?.reoccuring ?? value;
@@ -343,6 +361,8 @@ export default function EventCreateForm(props) {
               organizer,
               rating,
               coverImage,
+              private: private1,
+              categories,
             };
             const result = onChange(modelFields);
             value = result?.endTime ?? value;
@@ -377,6 +397,8 @@ export default function EventCreateForm(props) {
               organizer,
               rating,
               coverImage,
+              private: private1,
+              categories,
             };
             const result = onChange(modelFields);
             value = result?.participants ?? value;
@@ -415,6 +437,8 @@ export default function EventCreateForm(props) {
               organizer,
               rating,
               coverImage,
+              private: private1,
+              categories,
             };
             const result = onChange(modelFields);
             value = result?.capacity ?? value;
@@ -449,6 +473,8 @@ export default function EventCreateForm(props) {
               organizer,
               rating,
               coverImage,
+              private: private1,
+              categories,
             };
             const result = onChange(modelFields);
             value = result?.description ?? value;
@@ -483,6 +509,8 @@ export default function EventCreateForm(props) {
               organizer: value,
               rating,
               coverImage,
+              private: private1,
+              categories,
             };
             const result = onChange(modelFields);
             value = result?.organizer ?? value;
@@ -521,6 +549,8 @@ export default function EventCreateForm(props) {
               organizer,
               rating: value,
               coverImage,
+              private: private1,
+              categories,
             };
             const result = onChange(modelFields);
             value = result?.rating ?? value;
@@ -555,6 +585,8 @@ export default function EventCreateForm(props) {
               organizer,
               rating,
               coverImage: value,
+              private: private1,
+              categories,
             };
             const result = onChange(modelFields);
             value = result?.coverImage ?? value;
@@ -568,6 +600,78 @@ export default function EventCreateForm(props) {
         errorMessage={errors.coverImage?.errorMessage}
         hasError={errors.coverImage?.hasError}
         {...getOverrideProps(overrides, "coverImage")}
+      ></TextField>
+      <TextField
+        label="Private"
+        isRequired={false}
+        isReadOnly={false}
+        value={private1}
+        onChange={(e) => {
+          let { value } = e.target;
+          if (onChange) {
+            const modelFields = {
+              title,
+              startTime,
+              location,
+              reoccuring,
+              endTime,
+              participants,
+              capacity,
+              description,
+              organizer,
+              rating,
+              coverImage,
+              private: value,
+              categories,
+            };
+            const result = onChange(modelFields);
+            value = result?.private ?? value;
+          }
+          if (errors.private?.hasError) {
+            runValidationTasks("private", value);
+          }
+          setPrivate1(value);
+        }}
+        onBlur={() => runValidationTasks("private", private1)}
+        errorMessage={errors.private?.errorMessage}
+        hasError={errors.private?.hasError}
+        {...getOverrideProps(overrides, "private")}
+      ></TextField>
+      <TextField
+        label="Categories"
+        isRequired={false}
+        isReadOnly={false}
+        value={categories}
+        onChange={(e) => {
+          let { value } = e.target;
+          if (onChange) {
+            const modelFields = {
+              title,
+              startTime,
+              location,
+              reoccuring,
+              endTime,
+              participants,
+              capacity,
+              description,
+              organizer,
+              rating,
+              coverImage,
+              private: private1,
+              categories: value,
+            };
+            const result = onChange(modelFields);
+            value = result?.categories ?? value;
+          }
+          if (errors.categories?.hasError) {
+            runValidationTasks("categories", value);
+          }
+          setCategories(value);
+        }}
+        onBlur={() => runValidationTasks("categories", categories)}
+        errorMessage={errors.categories?.errorMessage}
+        hasError={errors.categories?.hasError}
+        {...getOverrideProps(overrides, "categories")}
       ></TextField>
       <Flex
         justifyContent="space-between"

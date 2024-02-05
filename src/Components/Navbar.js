@@ -1,13 +1,39 @@
 
-import React, { useState } from 'react';
-import { AppBar, Toolbar, Button, IconButton, Typography, Container, useMediaQuery, useTheme, Menu, MenuItem,Stack, Slide,LinearProgress,Badge, CircularProgress, Avatar } from '@mui/material';
-import { Home, Info, ContactMail,Person, Login, Logout, PersonAdd, Menu as MenuIcon, Dashboard } from '@mui/icons-material';
+import React, { useState,useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
+
+import {
+  AppBar,
+  Toolbar,
+  Button,
+  IconButton,
+  Typography,
+  Container,
+  useMediaQuery,
+
+  Menu,
+  MenuItem,
+  Stack,
+  Slide,
+  LinearProgress,
+  Badge,
+  CircularProgress,
+  Avatar,
+  
+} from '@mui/material';
+import { Home, Info, ContactMail, Person, Login, Logout, PersonAdd,Settings, Menu as MenuIcon, Dashboard } from '@mui/icons-material';
 import useScrollTrigger from '@mui/material/useScrollTrigger';
-import { styled } from '@mui/material/styles';
 import { Link } from 'react-router-dom';
 import { Auth } from 'aws-amplify';
-
 import '../Styles/Navbar.css';
+import { styled, alpha } from '@mui/material/styles';
+import SearchIcon from '@mui/icons-material/Search';
+import EmailIcon from '@mui/icons-material/Email';
+import { API, graphqlOperation } from 'aws-amplify';
+import { listNotifications } from '../graphql/queries';
+import Box from '@mui/material/Box';
+import InputBase from '@mui/material/InputBase';
+import { onCreateNotification } from '../graphql/subscriptions';
 
 const StyledBadge = styled(Badge)(({ theme }) => ({
   '& .MuiBadge-badge': {
@@ -16,36 +42,104 @@ const StyledBadge = styled(Badge)(({ theme }) => ({
     width:"1px",
     height:"7px",
     boxShadow: `0 0 0 2px ${theme.palette.background.paper}`,
-    '&::after': {
-      position: 'absolute',
-      top: 0,
-      left: 0,
-      width: '100%',
-      height: '100%',
-      borderRadius: '50%',
-      animation: 'ripple 1.2s infinite ease-in-out',
-      border: '1px solid currentColor',
-      content: '""',
-    },
+  
   },
-  '@keyframes ripple': {
-    '0%': {
-      transform: 'scale(.8)',
-      opacity: 1,
-    },
-    '100%': {
-      transform: 'scale(2.4)',
-      opacity: 0,
-    },
-  },
+
 }));
 
 
-const Navbar = ({ user }) => {
-  const theme = useTheme();
-  const isMobile = useMediaQuery(theme.breakpoints.down('md'));
+const Navbar = ({ user,setTheme,theme,userData }) => {
+
   const [anchorEl, setAnchorEl] = React.useState(null);
   const [loading, setLoading] = useState(false); // Added loading state
+  const [searchQuery, setSearchQuery] = useState('');
+  const [totalNotifications,setTotalNotifications] = useState(0)
+  const [notification,setNotification] = useState(null)
+  const navigate = useNavigate();
+
+
+  
+  useEffect(() => {
+    const currentHref = window.location.href;
+
+    if (currentHref.endsWith('/notifications')) {
+      console.log('You are on the /notifications page.');
+      setTotalNotifications(0)
+      // Add any additional logic you want to perform when on the /notifications page
+    }
+  }, [window.location.href]); 
+
+
+
+
+    const handleSearch = () => {
+    // Navigate to the search page with the current searchQuery
+    navigate(`/search/${searchQuery}`);
+  };
+
+  const handleClearSearch = () => {
+    // Clear the search query and navigate to the search page
+    setSearchQuery('');
+    navigate(`/search`);
+  };
+
+  useEffect(() => {
+    if (userData?.id) {
+      const subscription = API.graphql({
+        query: onCreateNotification,
+        variables: { recepient: userData.id },
+        authMode: 'AMAZON_COGNITO_USER_POOLS', // Specify the authentication mode
+      }).subscribe({
+        next: () => {
+          // Increment the total number of notifications by 1 when a new notification is received
+         //REPLACE THIS  setTotalNotifications((prevTotal) => prevTotal + 1);
+
+          fetchAndSetTotalNotifications()
+        },
+        error: (error) => {
+          console.error('Error in notification subscription:', error);
+          // Handle error appropriately
+        },
+      });
+  
+      // Clean up the subscription when the component unmounts
+      return () => {
+        subscription.unsubscribe();
+      };
+    }
+  }, [userData]);
+  
+  
+
+
+const fetchAndSetTotalNotifications = async () => {
+  try {
+    if (userData?.id) {
+      // Fetch notifications for the current user
+      const response = await API.graphql({
+    query: listNotifications,
+    variables: {
+        filter: {
+            recepient: { eq: userData.id },
+            status: { eq: "UNREAD" } // Add this filter for status
+        },
+        limit: 100,
+    },
+    authMode: 'AMAZON_COGNITO_USER_POOLS',
+});
+      // Update the total number of notifications
+      setTotalNotifications(response.data.listNotifications.items.length);
+    }
+  } catch (error) {
+    console.error('Error fetching notifications:', error);
+    // Handle error appropriately
+  }
+};
+
+// Call the function in useEffect
+useEffect(() => {
+  fetchAndSetTotalNotifications();
+}, [userData]);
 
 
   console.log("CURRENT USER ",user)
@@ -82,18 +176,28 @@ const Navbar = ({ user }) => {
   const pages = ['About', 'Contact', 'Login', 'Signup'];
 
   return (
+
     <>
     <Slide appear={false} direction="down" in={!trigger}>
-      <AppBar className="navbar" position="fixed" style={{ opacity: 0.6, background: 'linear-gradient(to right, #ae9dfa, #f7abd7)', borderRadius: 0 }}>
-        <Container>
+<AppBar
+  className="navbar"
+  position="fixed"
+  style={{
+    opacity: 1,
+      background: `linear-gradient(to right, ${theme.palette.primary.main}, ${theme.palette.secondary.main})`,
+    padding:"0.5%",
+    borderRadius: 0,
+  }}
+>       <Container>
           <Toolbar >
             <IconButton className="nav-button" edge="start" color="inherit" component={Link} to="/">
               <Home />
             </IconButton>
-            <Typography variant="h6" style={{ flexGrow: 1, marginLeft: '10px', fontFamily: 'Poppins, sans-serif' }}>
+         
+            <Typography variant="h6" style={{ flexGrow: 1, marginLeft: 'x', fontFamily: 'Poppins, sans-serif' }}>
               Event Manager
             </Typography>
-            {isMobile ? (
+            {1!=1 ? (
               // Hamburger menu for smaller screens
               <>
                 <IconButton className="nav-button" edge="end" color="inherit" onClick={handleOpenMenu}>
@@ -126,22 +230,57 @@ const Navbar = ({ user }) => {
                 {user ? (
                   
                   <>
-            <Button color="inherit" className="nav-button" component={Link} to="/about" style={{ marginTop: "4px", marginRight: '3%', fontFamily: 'Poppins, sans-serif' }}>
+            <Button color="inherit" className="nav-button" component={Link} to="/about" style={{ marginTop: "4px", marginRight: '3%', fontFamily: 'Poppins, sans-serif',fontSize:"0.8rem" }}>
                   About
                   <Info style={{ marginLeft: '5px' }} />
                 </Button>
-                <Button color="inherit" className="nav-button" component={Link} to="/contact" style={{ marginTop: "4px", marginRight: '50%', fontFamily: 'Poppins, sans-serif' }}>
+                <Button color="inherit" className="nav-button" component={Link} to="/contact" style={{ marginTop: "4px", marginRight: '48%', fontFamily: 'Poppins, sans-serif',fontSize:"0.8rem"  }}>
                   Contact
                   <ContactMail style={{ marginLeft: '5px' }} />
+                    
                 </Button>
+                 
+                  {/* <Button color="inherit" className="nav-button" component={Link} to="/search" style={{ marginTop: "4px", marginRight: '40%', fontFamily: 'Poppins, sans-serif' }}>
+                  Search
+                  <SearchIcon style={{ marginLeft: '5px' }} />
+                </Button> */} <Search sx={{marginTop: "4px",position:"absolute", left: '45%'}}>
+            <SearchIconWrapper>
+              <SearchIcon />
+            </SearchIconWrapper>
+            <StyledInputBase
+               placeholder="Search…"
+        inputProps={{ 'aria-label': 'search' }}
+        value={searchQuery}
+        onChange={(e) => setSearchQuery(e.target.value)}
+        onKeyDown={(e) => {
+          if (e.key === 'Enter') {
+            handleSearch();
+          }
+        }}
+            />
+          </Search>
+              <IconButton className="nav-button" edge="start" color="inherit" component={Link} to="/notifications" sx={{marginRight:"1.5%"}}>
+              <Badge badgeContent={totalNotifications}  color='error'>
+                 <EmailIcon sx={{fontSize:"26px"}}/>
+                 </Badge>
+            </IconButton>
+
+        
                   <Button color="inherit" className="nav-button" style={{ marginRight: '1px' }}>
                     <StyledBadge
                       overlap="circular"
                       anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
                       variant="dot"
                     >
-                      <Avatar onClick={handleOpenMenu} />
+                         {userData?.profilePictureImage ?(
+                          <Avatar onClick={handleOpenMenu} src={URL.createObjectURL(userData?.profilePictureImage)} sx={{ width: 48, height: 48}}/>
+                               
+                               
+                                  ) :(  <Avatar onClick={handleOpenMenu} sx={{  width: 48, height: 48}} />)}
+                    
                     </StyledBadge>
+
+                   
                     <Menu
                       anchorEl={anchorEl}
                       style={{marginTop:'10px'}}
@@ -149,12 +288,18 @@ const Navbar = ({ user }) => {
                       onClose={handleCloseMenu}
                     >
                                 <MenuItem component={Link} to="/profile" onClick={handleCloseMenu}>
+                               
             <Person style={{ marginRight: '8px', fontSize: '22px' }} />
+
             <span style={{ fontSize: '15px' }}>Profile</span>
           </MenuItem>
                         <MenuItem component={Link} to="/dashboard" onClick={handleCloseMenu}>
             <Dashboard style={{ marginRight: '8px', fontSize: '22px' }} />
             <span style={{ fontSize: '15px' }}>Dashboard</span>
+          </MenuItem>
+          <MenuItem component={Link} to="/settings" onClick={handleCloseMenu}>
+            <Settings style={{ marginRight: '8px', fontSize: '22px' }} />
+            <span style={{ fontSize: '15px' }}>Settings</span>
           </MenuItem>
                      <MenuItem onClick={handleSignOut}>
             <Logout style={{ marginRight: '8px',fontSize:'22px' }} />
@@ -185,6 +330,7 @@ const Navbar = ({ user }) => {
                 )}
               </>
             )}
+           
           </Toolbar>
         </Container>
        
@@ -207,7 +353,52 @@ const Navbar = ({ user }) => {
     </Slide>
    
       </>
+
   );
 };
 
 export default Navbar;
+
+
+
+const Search = styled('div')(({ theme }) => ({
+  position: 'relative',
+  borderRadius: theme.shape.borderRadius,
+  backgroundColor: alpha(theme.palette.common.white, 0.15),
+  '&:hover': {
+    backgroundColor: alpha(theme.palette.common.white, 0.25),
+  },
+  marginLeft: 0,
+  width: '100%',
+  [theme.breakpoints.up('sm')]: {
+    marginLeft: theme.spacing(1),
+    width: 'auto',
+  },
+}));
+
+const SearchIconWrapper = styled('div')(({ theme }) => ({
+  padding: theme.spacing(0, 2),
+  height: '100%',
+  position: 'absolute',
+  pointerEvents: 'none',
+  display: 'flex',
+  alignItems: 'center',
+  justifyContent: 'center',
+}));
+
+const StyledInputBase = styled(InputBase)(({ theme }) => ({
+  color: 'inherit',
+  width: '100%',
+  '& .MuiInputBase-input': {
+    padding: theme.spacing(1, 10, 1, 0),
+    // vertical padding + font size from searchIcon
+    paddingLeft: `calc(1em + ${theme.spacing(4)})`,
+    transition: theme.transitions.create('width'),
+    [theme.breakpoints.up('sm')]: {
+      width: '12ch',
+      '&:focus': {
+        width: '20ch',
+      },
+    },
+  },
+}));
