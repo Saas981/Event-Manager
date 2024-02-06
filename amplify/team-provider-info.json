@@ -26,7 +26,7 @@
       "function": {
         "EventFunction": {
           "deploymentBucketName": "amplify-eventmanager-staging-172907-deployment",
-          "s3Key": "amplify-builds/EventFunction-74796d7a786b38483931-build.zip"
+          "s3Key": "amplify-builds/EventFunction-57667754706277753537-build.zip"
         }
       }
     }
