@@ -19,7 +19,7 @@ import { Storage } from 'aws-amplify';
 import * as mutations from '../graphql/mutations';
 import AccessTimeSharpIcon from '@mui/icons-material/AccessTimeSharp';
 
-const JoinEventPage = ({ user, theme }) => {
+const JoinEventPage = ({ user, theme,userData }) => {
   const { eventId } = useParams();
   const [load, setLoad] = React.useState(false);
   const [eventDetails, setEventDetails] = useState(null);
@@ -62,7 +62,7 @@ const JoinEventPage = ({ user, theme }) => {
         }
         const participants = JSON.parse(data.listEvents.items[0].participants);
         
-        if (participants[0].hasOwnProperty(user)) {
+        if (participants[0].hasOwnProperty(userData?.id)) {
           window.location.href = "/dashboard";
         }
         
@@ -88,7 +88,7 @@ const JoinEventPage = ({ user, theme }) => {
     };
 
     fetchEventDetails();
-  }, [eventId, user]);  
+  }, [eventId, userData?.id]);  
 
   useEffect(() => {
     if (eventDetails && eventDetails.capacity) {
@@ -119,14 +119,14 @@ const JoinEventPage = ({ user, theme }) => {
         return;
       }
 
-      participants[0][user] = { permissions: 'view' };
+      participants[0][userData?.id] = { permissions: 'view' };
       updatedEventDetails.participants = participants;
-
+      console.log("EVENT ID",)
       const updateEventResponse = await API.graphql({
         query: mutations.updateEvent,
         variables: {
           input: {
-            id: eventId,
+            id: eventDetails.id,
             participants: JSON.stringify(updatedEventDetails.participants),
           },
         },
@@ -162,7 +162,7 @@ const JoinEventPage = ({ user, theme }) => {
 
       //Extract paritcipants
       let participants = JSON.parse(updatedEventDetails.participants);
-      participants[0][user] = { permissions: 'waitlist' };
+      participants[0][userData?.id] = { permissions: 'waitlist' };
       updatedEventDetails.participants = participants;
 
       const updateEventResponse = await API.graphql({
